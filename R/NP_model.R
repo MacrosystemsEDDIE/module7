@@ -4,7 +4,7 @@ NP_model <- function(time, states, parms, inputs){
   PHYTO <- states[1]
   DIN <- states[2]
 
-  maxUptake <- parms[1]
+  maxUptake <- parms[1] #think if we are going to update a parm it should be this
   kspar <- parms[2] #uEinst m-2 s-1
   ksdin <- parms[3] #mmol m-3
   maxGrazing <- parms[4]
