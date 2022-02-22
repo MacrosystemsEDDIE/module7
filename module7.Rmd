@@ -4,20 +4,39 @@ author: "Mary Lofton, Tadhg Moore, Cayelan Carey, Quinn Thomas"
 date: "2/16/2022"
 output: html_document
 ---
-## Set-up
+## Set-up (not shown)
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, echo=FALSE, message = FALSE, warning=FALSE}
 # Load libraries ----
 library(ggplot2)
-library(plotly)
 library(tidyverse)
 library(lubridate)
 ```
+## Updates so far:  
+- I borrowed heavily from EnKF functions developed for a GLEON workshop in 2019 (run by Jake Zwart) to develop this script. There's one discrepancy in the Kalman filter function that I'm not 100% confident I resolved correctly - Quinn or Tadhg, can you check this? The dimensions of the H matrix (the observation ID matrix) don't really make sense to me either in the function where it's originally constructed or as it's applied in the Kalman filter function. It ends up being a 3x2 when it's applied in the Kalman filter and I would have thought it would be either 3x1, since I've set things up to tune two states and one parameter...? Anyways I just don't understand the H matrix dimensions and could use some guidance there.    
+  
+- Following on that, I definitely think we'll need to acknowledge Jake. Tadhg and I chatted a bit about whether borrowing the code merited co-authorship for Jake and decided that since it was provided as part of an open workshop it probably wasn't required, but if Quinn/Cayelan thinks differently I'm definitely open to revisiting that.  
+  
+- Right now we are assimilating data for chl-a and DIN and tuning the maxUptake parameter based on those two states. The maxUptake parameter tuning is pretty boring (see final plot), I think because we only have monthly DIN observations and the covariance between the two is not super-strong (you can see the value of the maxUptake parameter reacts a bit to our second DIN observation in the plot, but it's not much). Honestly tuning a parameter may be more involved than we are aiming for with the module anyways.    
+   
+- I think the NP model is workable for our purposes if we want one of the learning objectives to be about how the response of the forecast to data assimilation depends on our relative confidence in observations vs. model structure. In playing around with the CV values of the various data streams, we can tune things pretty well such that sometimes data assimilation allows the model to capture blooms and other times it doesn't. Definitely check it out for yourself!  
+  
+- One of the immediate next steps would be to run this based on a NOAA forecast product rather than observed driver data, but I just wanted to check in with you all and get some quick feedback first.  
+  
+- I think there is a TON that could be done just with this very basic framework..here are some of the lines of inquiry that come to mind that dovetail nicely with our module topic and what we've brainstormed so far:  
+  
+1) How does our confidence in observations vs. our model affect the response of a forecast to assimilated data?  
+2) How does the frequency of assimilated observations affect forecast output?  
+3) How well does the forecast capture extreme events (algal bloom) with and without data assimilation?  
+  
+There's tons more that could be explored with the covariance structure but again that might be a little much...   
+  
 ## Define functions
-### Function to read in NEON data
+### NEON data functions
+#### Function to read in NEON data
 ```{r}
 # Read in NEON data ---- 
 #' @param siteID character; four-letter identifier for the NEON site
@@ -39,39 +58,9 @@ read_neon_data <- function(siteID, var) {
   }
 }
 ```
-### Function to create NP model inputs
+### NP model functions  
+#### Function to create NP model inputs
 ```{r}
-# Create np inputs (Tadhg's version) ----
-# create_np_inputs <- function(time, PAR = NULL, swr = NULL, temp = NULL) {
-# 
-#   # year <- lubridate::year(time[1])
-#   ndays <- round(as.numeric(difftime(time, time[1], units = "days")))
-# 
-#   # PAR calculations ----
-#   if(is.null(PAR) & !is.null(swr)) {
-#     PAR <- LakeMetabolizer::sw.to.par.base(swr)
-#   }
-# 
-#   if(is.null(PAR) & is.null(swr)) {
-#     PAR <- 0.5 * (540 + 440 * sin(2 * pi * ndays/365-1.4))
-#   }
-# 
-#   if(length(temp) == 2) {
-#     TEMP <- (temp[1] + temp[2] * sin(2*pi*ndays/365-1.4))
-#   } else {
-#     TEMP <- temp
-#   }
-# 
-# 
-#   out = data.frame(Day = ndays, PAR = PAR, TEMP = TEMP)
-# 
-# 
-#   #Read to a .csv file
-#   # write.csv(out, file.path("data", out_file), row.names = FALSE)
-#   return(out)
-# 
-# }
-
 # Create np inputs (MEL's version) ----
 create_np_inputs <- function(drivers_df,driver_colnames) {
   #we are just doing linear interpolation for now
@@ -114,7 +103,7 @@ create_np_inputs <- function(drivers_df,driver_colnames) {
 
 # END
 ```
-### Function to define NP model
+#### Function to define NP model
 ```{r}
 
 # Define NP model
@@ -312,7 +301,7 @@ kalman_filter = function(Y, R, obs, H, n_en, cur_step){
   #non-conformable arguments
   #ok I think the issue is that Jake added the matrix function to the H matrix
   #transposition...not sure why this was done; probably ask TNM + RQT to take 
-  #a look
+  #a look, b/c not sure why we've specified a 3x2 matrix for H.....
   
   ###### update Y vector ######
   for(q in 1:n_en){
@@ -506,8 +495,6 @@ EnKF = function(n_en = 100,
                         n_en = n_en) 
   
   # start modeling
-  ## STOPPED EDITING HERE!
-  ## next step is to incorporate NP model into this function instead of doc model
   for(t in 2:n_step){
     for(n in 1:n_en){
       
@@ -540,22 +527,22 @@ EnKF = function(n_en = 100,
 
 ## Read in NEON data (using BARC as test case for now)
 ```{r}
-#* Load in NEON sites dataframe ----
-neon_sites_df <- read.csv("data/neon_sites.csv")
+# Load in NEON sites dataframe ----
+neon_sites_df <- read.csv("./data/neon_sites.csv")
 neon_sites_df$long <- round(neon_sites_df$long, 3)
 neon_sites_df$lat <- round(neon_sites_df$lat, 3)
 
-#* Reference for downloading variables ----
-neon_vars <- read.csv("data/neon_variables.csv")
+# Reference for downloading variables ----
+neon_vars <- read.csv("./data/neon_variables.csv")
 
 # Objective 1 - Site Selection ----
 siteID <- "BARC"
 
-#* Website to find more information:
+# Website to find more information:
 print(paste0("https://www.neonscience.org/field-sites/", siteID))
 
 # Objective 2 - Explore data ----
-#* Load in data ----
+# Load in data ----
 
 #Drivers
 wtemp <- read_neon_data(siteID, "Surface water temperature") %>%
@@ -579,7 +566,7 @@ p_wtemp <- ggplot(data = wtemp) +
   ylab("Temperature (\u00B0C)") +
   xlab("Time") +
   theme_classic()
-ggplotly(p_wtemp)
+p_wtemp
 #missing data from 05AUG18 to 19NOV18
 
 p_par <- ggplot(data = par) +
@@ -587,14 +574,14 @@ p_par <- ggplot(data = par) +
   ylab("PAR (umol/m2/s") +
   xlab("Time") +
   theme_classic()
-ggplotly(p_par)
+p_par
 
 p_chla <- ggplot(data = chla) +
   geom_point(aes(Date, value)) +
   ylab("Chl-a mg/L") +
   xlab("Time") +
   theme_classic()
-ggplotly(p_chla)
+p_chla
 #looks like August 2020 or thereabouts might be a good dynamic time to pick
 #and naturally the big bloom in 2018-2019 is when there is no wtemp data - ha!
 
@@ -603,7 +590,7 @@ p_din <- ggplot(data = din) +
   ylab("DIN mmolN m-3") +
   xlab("Time") +
   theme_classic()
-ggplotly(p_din)
+p_din
 #oohhhh but we don't have DIN then
 
 #Check date ranges for various data
@@ -671,13 +658,13 @@ est_out = EnKF(n_en = n_en,
            maxUptake_init = 1.0, 
            obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
            param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.2,0.2), # CV of driver data for wtemp and PAR, respectively 
+           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively 
            init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
            state_names = c("chla","din"))
 
 
 ```
-##Plot forecast
+## Plot forecast
 ```{r}
 # plotting 
 plot_chla = function(est_out){
@@ -720,4 +707,16 @@ plot_din = function(est_out){
          code = 3, length = 0.1, angle = 90, col = 'red')
 }
 plot_din(est_out) 
+
+plot_maxUptake = function(est_out){
+  mean_maxUptake_est = apply(est_out$Y[3,,], 1, FUN = mean)
+  plot(mean_maxUptake_est ~ est_out$dates, type ='l', 
+       ylim = range(est_out$Y[3,,]),
+       col = 'grey', ylab = 'maxUptake (day^-1)', xlab ='')
+  for(i in 2:n_en){
+    lines(est_out$Y[2,,i] ~ est_out$dates, col = 'grey')
+  }
+  lines(mean_maxUptake_est ~ est_out$dates, col = 'black', lwd = 2)
+}
+plot_maxUptake(est_out) 
 ```
