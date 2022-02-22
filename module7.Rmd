@@ -611,17 +611,14 @@ wtemp1 <- wtemp %>%
   filter(Date >= "2018-06-04" & Date <= "2018-08-05") %>%
   rename(wtemp = V1) %>%
   select(Date,wtemp)
-
 par1 <- par %>%
   filter(Date >= "2018-06-04" & Date <= "2018-08-05") %>%
   rename(par = value) %>%
   select(Date,par)
-
 chla1 <- chla %>%
   filter(Date >= "2018-06-04" & Date <= "2018-08-05") %>%
   rename(chla = value) %>%
   select(Date,chla)
-
 din1 <- din %>%
   filter(collectDate >= "2018-06-04" & collectDate <= "2018-08-05") %>%
   rename(din = value,
@@ -631,7 +628,6 @@ din1 <- din %>%
   summarize(din = mean(din, na.rm = TRUE))
 #there are multiple obs on one day - why??
 #for now, just taking average of all obs on same day
-
 lake_data_00 <- left_join(par1,wtemp1,by = "Date")
 lake_data_0 <- left_join(lake_data_00,chla1,by = "Date")
 lake_data <- left_join(lake_data_0,din1,by = "Date") %>%
@@ -719,4 +715,216 @@ plot_maxUptake = function(est_out){
   lines(mean_maxUptake_est ~ est_out$dates, col = 'black', lwd = 2)
 }
 plot_maxUptake(est_out) 
+```
+  
+## Generate 35-day "forecast" using 2019 data  
+Switching over to 2019 b/c there are big gaps in wtemp data in fall 2018 that our current rough-cut linear interpolation method is probably not going to be that great at filling.   
+Keeping 2018 above b/c there's no bloom event in 2019.   
+  
+### Data wrangling
+```{r}
+wtemp1 <- wtemp %>%
+  filter(Date >= "2019-06-01" & Date <= "2019-09-10") %>%
+  rename(wtemp = V1) %>%
+  select(Date,wtemp)
+
+par1 <- par %>%
+  filter(Date >= "2019-06-01" & Date <= "2019-09-10") %>%
+  rename(par = value) %>%
+  select(Date,par)
+
+chla1 <- chla %>%
+  filter(Date >= "2019-06-01" & Date <= "2019-09-10") %>%
+  rename(chla = value) %>%
+  select(Date,chla)
+
+din1 <- din %>%
+  filter(collectDate >= "2019-06-01" & collectDate <= "2019-09-10") %>%
+  rename(din = value,
+         Date = collectDate) %>%
+  select(Date,din) %>%
+  group_by(Date) %>%
+  summarize(din = mean(din, na.rm = TRUE))
+#there are multiple obs on one day - why??
+#for now, just taking average of all obs on same day
+
+lake_data_00 <- left_join(par1,wtemp1,by = "Date")
+lake_data_0 <- left_join(lake_data_00,chla1,by = "Date")
+lake_data <- left_join(lake_data_0,din1,by = "Date") %>%
+  rename(datetime = Date)
+lake_data$chla[62:101] <- NA
+lake_data$din[62:101] <- NA
+```
+### Run forecast  
+I've got three versions here:  
+1) same CVs as the run for 2018 above  
+2) small CV for observations and initial conditions  
+```{r}
+n_en = 100 # how many ensembles 
+
+#1) same as for 2018
+est_out_2019 = EnKF(n_en = n_en, 
+           start = '2019-06-01', # start date 
+           stop = '2019-09-10', # stop date
+           time_step = 'days',
+           obs_file = lake_data,
+           driver_file = lake_data,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 1.0, 
+           obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
+           param_cv = 0.2,#for maxUptake
+           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively 
+           init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"))
+
+#2) small CV for IC
+est_out_2019_smallICCV = EnKF(n_en = n_en,
+           start = '2019-06-01', # start date
+           stop = '2019-09-10', # stop date
+           time_step = 'days',
+           obs_file = lake_data,
+           driver_file = lake_data,
+           n_states_est = 2,
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 1.0,
+           obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
+           param_cv = 0.2,#for maxUptake
+           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"))
+
+#3) big CV for IC
+est_out_2019_bigICCV = EnKF(n_en = n_en,
+           start = '2019-06-01', # start date
+           stop = '2019-09-10', # stop date
+           time_step = 'days',
+           obs_file = lake_data,
+           driver_file = lake_data,
+           n_states_est = 2,
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 1.0,
+           obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
+           param_cv = 0.2,#for maxUptake
+           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
+           init_cond_cv = c(0.4,0.4),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"))
+
+#4) small CV for obs
+est_out_2019_smallObsCV = EnKF(n_en = n_en,
+           start = '2019-06-01', # start date
+           stop = '2019-09-10', # stop date
+           time_step = 'days',
+           obs_file = lake_data,
+           driver_file = lake_data,
+           n_states_est = 2,
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 1.0,
+           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           param_cv = 0.2,#for maxUptake
+           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
+           init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"))
+
+#5) big CV for obs
+est_out_2019_bigObsCV = EnKF(n_en = n_en,
+           start = '2019-06-01', # start date
+           stop = '2019-09-10', # stop date
+           time_step = 'days',
+           obs_file = lake_data,
+           driver_file = lake_data,
+           n_states_est = 2,
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 1.0,
+           obs_cv = c(0.4,0.4),#cv for chl-a and DIN, respectively
+           param_cv = 0.2,#for maxUptake
+           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
+           init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"))
+
+#6) big CV for obs and IC
+est_out_2019_bigCV = EnKF(n_en = n_en,
+           start = '2019-06-01', # start date
+           stop = '2019-09-10', # stop date
+           time_step = 'days',
+           obs_file = lake_data,
+           driver_file = lake_data,
+           n_states_est = 2,
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 1.0,
+           obs_cv = c(0.4,0.4),#cv for chl-a and DIN, respectively
+           param_cv = 0.2,#for maxUptake
+           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
+           init_cond_cv = c(0.4,0.4),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"))
+
+#7) small CV for obs and IC
+est_out_2019_smallCV = EnKF(n_en = n_en,
+           start = '2019-06-01', # start date
+           stop = '2019-09-10', # stop date
+           time_step = 'days',
+           obs_file = lake_data,
+           driver_file = lake_data,
+           n_states_est = 2,
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 1.0,
+           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           param_cv = 0.2,#for maxUptake
+           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"))
+
+#8) big CV for drivers
+est_out_2019_bigDriverCV = EnKF(n_en = n_en,
+           start = '2019-06-01', # start date
+           stop = '2019-09-10', # stop date
+           time_step = 'days',
+           obs_file = lake_data,
+           driver_file = lake_data,
+           n_states_est = 2,
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 1.0,
+           obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
+           param_cv = 0.2,#for maxUptake
+           driver_cv = c(0.2,0.2), # CV of driver data for wtemp and PAR, respectively
+           init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"))
+
+
+```
+### Plot forecast
+```{r}
+# plotting 
+plot_chla(est_out_2019) 
+plot_chla(est_out_2019_smallICCV)
+plot_chla(est_out_2019_bigICCV) 
+plot_chla(est_out_2019_smallObsCV) 
+plot_chla(est_out_2019_bigObsCV) 
+plot_chla(est_out_2019_bigCV)
+plot_chla(est_out_2019_smallCV) 
+plot_chla(est_out_2019_bigDriverCV)
+
+plot_din(est_out_2019) 
+plot_din(est_out_2019_smallICCV)
+plot_din(est_out_2019_bigICCV) 
+plot_din(est_out_2019_smallObsCV) 
+plot_din(est_out_2019_bigObsCV) 
+plot_din(est_out_2019_bigCV)
+plot_din(est_out_2019_smallCV) 
+plot_din(est_out_2019_bigDriverCV)
+
+
+
+
+
+
+
 ```
