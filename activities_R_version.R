@@ -45,3 +45,28 @@ p <- ggplot(data = airt) +
   xlab("Time") +
   theme_classic()
 ggplotly(p)
+
+# Parameters for NPZ model
+parms <- c(
+  maxUptake = 1.0, #day-1
+  kspar=120, #uEinst m-2 s-1
+  ksdin=0.5, #mmol m-3
+  maxGrazing=1.0, # day-1
+  ksphyto=1, #mmol N m-3
+  pFaeces=0.3, #unitless
+  mortalityRate=0.4, #(mmmolN m-3)-1 day-1
+  excretionRate=0.1, #day-1
+  mineralizationRate=0.1, #day-1
+  Chl_Nratio = 1, #mg chl (mmolN)-1
+  Q10 = 2,  #unitless
+  addTEMP = 0, # added to temperature
+  scaleNLOAD = 1, # multiplier for N loading
+  refTEMP = 20
+)  
+
+# Initial conditions for NPZ
+yini <- c(
+  PHYTO = 2, #mmolN m-3
+  # ZOO = 0.4, #mmolN m-3
+  # DETRITUS = 1, #mmolN m-3
+  DIN = 9) #mmolN m-3

@@ -1,25 +1,26 @@
-NP_model <- function(time, states, parms, inputs){
+NP_model <- function(PHYTO, DIN, TEMP, PAR, maxUptake){
 
+  #STATES
+  curr_PHYTO = PHYTO
+  curr_DIN = DIN
+  
+  #PARAMETERS
+  maxUptake = maxUptake #day-1; this is the only parameter we are tuning
+  kspar=120 #uEinst m-2 s-1
+  ksdin=0.5 #mmol m-3
+  maxGrazing=1.0 # day-1
+  ksphyto=1 #mmol N m-3
+  pFaeces=0.3 #unitless
+  mortalityRate=0.4 #(mmmolN m-3)-1 day-1
+  excretionRate=0.1 #day-1
+  mineralizationRate=0.1 #day-1
+  Chl_Nratio = 1 #mg chl (mmolN)-1
+  Q10 = 2  #unitless
+  refTEMP = 20
 
-  PHYTO <- states[1]
-  DIN <- states[2]
-
-  maxUptake <- parms[1]
-  kspar <- parms[2] #uEinst m-2 s-1
-  ksdin <- parms[3] #mmol m-3
-  maxGrazing <- parms[4]
-  ksphyto <- parms[5]
-  pFaeces <- parms[6]
-  mortalityRate <- parms[7]
-  excretionRate <- parms[8]
-  mineralizationRate <- parms[9]
-  Chl_Nratio  <- parms[10]
-  Q10 <- parms[11]
-  refTEMP <- parms[12]
-
-  #USE THE PAR INPUT AND TIME-STEP INDEX TO GET THE CURRENT PAR VALUE
-  PAR <- inputs[time, 2]
-  TEMP <- inputs[time, 3] + parms[12]
+  #DRIVERS
+  PAR <- PAR
+  TEMP <- TEMP 
 
   #FLUX EQUATIONS HERE
   Temp_effect = Q10^((TEMP-refTEMP)/10)
@@ -32,10 +33,10 @@ NP_model <- function(time, states, parms, inputs){
   #Convert from plankton biomass to Chlorophyll to compare to data
   Chlorophyll <- PHYTO^Chl_Nratio
 
-  dPHYTO <- N_Uptake - Mortality
-  dDIN <- Mortality - N_Uptake #+ NLOAD + Excretion
+  PHYTO = curr_PHYTO + N_Uptake - Mortality
+  DIN = curr_DIN + Mortality - N_Uptake #+ NLOAD + Excretion
 
-  return(list(c(dPHYTO,
-                dDIN),                          # the rate of change
-              c(Chlorophyll = Chlorophyll, PAR=PAR, TEMP = TEMP, N_Uptake = N_Uptake, Mortality = Mortality, Temp_effect = Temp_effect)))   # the ordinary output variables
+  return(list(PHYTO = PHYTO,
+              DIN = DIN,
+              maxUptake = maxUptake))   # the ordinary output variables
 }
