@@ -1,7 +1,7 @@
 ---
-title: "Macrosystems EDDIE Module 7: Using Data to Improve Ecological Forecasts"
+title: "Macrosystems EDDIE Module 7: Using Data to Improve Ecological Forecasts (Activity B)"
 author: "Mary Lofton, Tadhg Moore, Cayelan Carey, Quinn Thomas"
-date: "2/16/2022"
+date: "3/8/2022"
 output: html_document
 ---
 ## Set-up (not shown)
@@ -14,25 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(tidyverse)
 library(lubridate)
+library(mvtnorm)
 ```
-## Updates so far:  
-- I borrowed heavily from EnKF functions developed for a GLEON workshop in 2019 (run by Jake Zwart) to develop this script. There's one discrepancy in the Kalman filter function that I'm not 100% confident I resolved correctly - Quinn or Tadhg, can you check this? The dimensions of the H matrix (the observation ID matrix) don't really make sense to me either in the function where it's originally constructed or as it's applied in the Kalman filter function. It ends up being a 3x2 when it's applied in the Kalman filter and I would have thought it would be either 3x1, since I've set things up to tune two states and one parameter...? Anyways I just don't understand the H matrix dimensions and could use some guidance there.    
-  
-- Following on that, I definitely think we'll need to acknowledge Jake. Tadhg and I chatted a bit about whether borrowing the code merited co-authorship for Jake and decided that since it was provided as part of an open workshop it probably wasn't required, but if Quinn/Cayelan thinks differently I'm definitely open to revisiting that.  
-  
-- Right now we are assimilating data for chl-a and DIN and tuning the maxUptake parameter based on those two states. The maxUptake parameter tuning is pretty boring (see final plot), I think because we only have monthly DIN observations and the covariance between the two is not super-strong (you can see the value of the maxUptake parameter reacts a bit to our second DIN observation in the plot, but it's not much). Honestly tuning a parameter may be more involved than we are aiming for with the module anyways.    
-   
-- I think the NP model is workable for our purposes if we want one of the learning objectives to be about how the response of the forecast to data assimilation depends on our relative confidence in observations vs. model structure. In playing around with the CV values of the various data streams, we can tune things pretty well such that sometimes data assimilation allows the model to capture blooms and other times it doesn't. Definitely check it out for yourself!  
-  
-- One of the immediate next steps would be to run this based on a NOAA forecast product rather than observed driver data, but I just wanted to check in with you all and get some quick feedback first.  
-  
-- I think there is a TON that could be done just with this very basic framework..here are some of the lines of inquiry that come to mind that dovetail nicely with our module topic and what we've brainstormed so far:  
-  
-1) How does our confidence in observations vs. our model affect the response of a forecast to assimilated data?  
-2) How does the frequency of assimilated observations affect forecast output?  
-3) How well does the forecast capture extreme events (algal bloom) with and without data assimilation?  
-  
-There's tons more that could be explored with the covariance structure but again that might be a little much...   
   
 ## Define functions
 ### NEON data functions
@@ -104,6 +87,7 @@ create_np_inputs <- function(drivers_df,driver_colnames) {
 # END
 ```
 #### Function to define NP model
+IMPORTANT!! This is not quite the same model as would have been used in Module 5 because I've adapted it to play nicely with Jake's EnKF functions. So that might require some re-coordinating of code for Activity A, Objective 6 compared to what currently exists.
 ```{r}
 
 # Define NP model
@@ -296,13 +280,6 @@ kalman_filter = function(Y, R, obs, H, n_en, cur_step){
   K = ((1 / (n_en - 1)) * delta_Y %*% t(delta_Y) %*% t(H[, , cur_step])) %*%
     qr.solve(((1 / (n_en - 1)) * H[, , cur_step] %*% delta_Y %*% t(delta_Y) %*% t(H[, , cur_step]) + R[, , cur_step]))
   
-  #ugh getting error
-  #delta_Y %*% t(delta_Y) %*% matrix(t(H[, , cur_step]))
-  #non-conformable arguments
-  #ok I think the issue is that Jake added the matrix function to the H matrix
-  #transposition...not sure why this was done; probably ask TNM + RQT to take 
-  #a look, b/c not sure why we've specified a 3x2 matrix for H.....
-  
   ###### update Y vector ######
   for(q in 1:n_en){
     Y[, cur_step, q] = Y[, cur_step, q] + K %*% (cur_obs - H[, , cur_step] %*% Y[, cur_step, q]) # adjusting each ensemble using kalman gain and observations
@@ -325,17 +302,11 @@ initialize_Y = function(Y, obs, init_params, n_states_est, n_params_est, n_param
   #MEL omitting this for now - can build back in later if needed
   
   if(n_params_est > 0){
-    ## update this later ***********************
-    #MEL: not sure what update Jake was referring to here?
     first_params = init_params
   }else{
     first_params = NULL
   }
   
-  #MEL: this is interesting; here we deal with the possibility of drawing negative
-  #values from a normal distribution by just taking the absolute value of the
-  #draw; I haven't seen this before; is this accepted practice in this type
-  #of application?
   Y[ , 1, ] = array(abs(rnorm(n = n_en * (n_states_est + n_params_est),
                               mean = c(first_obs, first_params),
                               sd = c(state_sd, param_sd))),
@@ -395,8 +366,8 @@ get_drivers = function(drivers_df, model_dates, n_drivers, driver_colnames, driv
 #' @param state_names character string vector of state names as specified in obs_file
 
 EnKF = function(n_en = 100, 
-                start = '2018-06-05', # start date 
-                stop = '2018-08-05', 
+                start = '2019-06-11', # start date 
+                stop = '2019-08-10', 
                 time_step = 'days', 
                 obs_file = lake_data,
                 driver_file = lake_data,
@@ -434,8 +405,8 @@ EnKF = function(n_en = 100,
   maxUptake_init = maxUptake_init # Initial estimate of DOC decay rate day^-1 
   
   yini <- c( #initial estimate of PHYTO and DIN states, respectively
-  PHYTO = 0.002, #mmolN m-3 which is the same as mg chl b/c ratio set to 1
-  DIN = 9) #mmolN m-3
+  PHYTO = obs_df[1,2], #mmolN m-3 which is the same as mg chl b/c ratio set to 1
+  DIN = obs_df[1,3]) #mmolN m-3
   
   state_cv = obs_cv #coefficient of variation of chla and din observations, respectively 
   state_sd = state_cv * yini
@@ -505,9 +476,27 @@ EnKF = function(n_en = 100,
                                       PAR = drivers[t-1, 2, n],
                                       maxUptake = Y[3, t-1, n])
       
-      Y[1 , t, n] = model_output$PHYTO_pred # store in Y vector
-      Y[2 , t, n] = model_output$DIN_pred
-      Y[3 , t, n] = model_output$maxUptake
+      ######quick hack to add in process error (ha!)########
+      
+      #specify Y_star (mean of multivariate normal)
+      Y_star = matrix(c(model_output$PHYTO_pred, model_output$DIN_pred, model_output$maxUptake))
+      
+      #specify sigma (covariance matrix of states and updating parameters)
+      residual_matrix <- matrix(NA, nrow = 4, ncol = 3)
+      residual_matrix[1,] <- c(0.5, 15, 0.01)
+      residual_matrix[2,] <- c(1, 10, 0.02)
+      residual_matrix[3,] <- c(2.5, 5, 0.03)
+      residual_matrix[4,] <- c(-0.3, -5, -0.03)
+
+      sigma <- cov(residual_matrix)
+      
+      #make a draw from Y_star
+      Y_draw = abs(rmvnorm(1, mean = Y_star, sigma = sigma))
+      Y[1 , t, n] = Y_draw[1] # store in Y vector
+      Y[2 , t, n] = Y_draw[2]
+      Y[3 , t, n] = Y_draw[3]
+      
+      #####end of hack######################################
     }
     # check if there are any observations to assimilate 
     if(any(!is.na(obs[ , , t]))){
@@ -552,8 +541,7 @@ par <- read_neon_data(siteID, "Underwater PAR") %>%
 
 #States
 chla <- read_neon_data(siteID, "Chlorophyll-a") %>%
-  filter(year(Date) %in% c(2018,2019)) %>%
-  mutate(value = value/1000) #to convert to mg for input into NP model
+  filter(year(Date) %in% c(2018,2019))  #to convert to mg for input into NP model
 din <- read_neon_data(siteID, "Nitrogen") %>%
   filter(year(collectDate) %in% c(2018,2019)) %>%
   mutate(value = value*14*1000) #to convert to mmolN m-3 for input into NP model
@@ -567,7 +555,6 @@ p_wtemp <- ggplot(data = wtemp) +
   xlab("Time") +
   theme_classic()
 p_wtemp
-#missing data from 05AUG18 to 19NOV18
 
 p_par <- ggplot(data = par) +
   geom_point(aes(Date, value)) +
@@ -582,8 +569,6 @@ p_chla <- ggplot(data = chla) +
   xlab("Time") +
   theme_classic()
 p_chla
-#looks like August 2020 or thereabouts might be a good dynamic time to pick
-#and naturally the big bloom in 2018-2019 is when there is no wtemp data - ha!
 
 p_din <- ggplot(data = din) +
   geom_point(aes(collectDate, value)) +
@@ -591,36 +576,28 @@ p_din <- ggplot(data = din) +
   xlab("Time") +
   theme_classic()
 p_din
-#oohhhh but we don't have DIN then
 
-#Check date ranges for various data
-range(wtemp$Date, na.rm = TRUE)
-range(par$Date, na.rm = TRUE)
-range(chla$Date, na.rm = TRUE)
-range(din$collectDate, na.rm = TRUE)
-#ok so we are really looking at 2018-2019 probably
 
-#ha what do we think the chances are that we'll find a time that overlaps in terms
-#of data availability across all the NEON lakes??
-
-#let's start with 05JUN18 to 05AUG18 just to see
 ```
 ## Data wrangling to get NEON data in format for Jake's functions
 ```{r}
 wtemp1 <- wtemp %>%
-  filter(Date >= "2018-06-04" & Date <= "2018-08-05") %>%
+  filter(Date >= "2019-06-10" & Date <= "2019-08-10") %>%
   rename(wtemp = V1) %>%
   select(Date,wtemp)
+
 par1 <- par %>%
-  filter(Date >= "2018-06-04" & Date <= "2018-08-05") %>%
+  filter(Date >= "2019-06-10" & Date <= "2019-08-10") %>%
   rename(par = value) %>%
   select(Date,par)
+
 chla1 <- chla %>%
-  filter(Date >= "2018-06-04" & Date <= "2018-08-05") %>%
+  filter(Date >= "2019-06-10" & Date <= "2019-08-10") %>%
   rename(chla = value) %>%
   select(Date,chla)
+
 din1 <- din %>%
-  filter(collectDate >= "2018-06-04" & collectDate <= "2018-08-05") %>%
+  filter(collectDate >= "2019-06-10" & collectDate <= "2019-08-10") %>%
   rename(din = value,
          Date = collectDate) %>%
   select(Date,din) %>%
@@ -628,6 +605,7 @@ din1 <- din %>%
   summarize(din = mean(din, na.rm = TRUE))
 #there are multiple obs on one day - why??
 #for now, just taking average of all obs on same day
+
 lake_data_00 <- left_join(par1,wtemp1,by = "Date")
 lake_data_0 <- left_join(lake_data_00,chla1,by = "Date")
 lake_data <- left_join(lake_data_0,din1,by = "Date") %>%
@@ -635,27 +613,34 @@ lake_data <- left_join(lake_data_0,din1,by = "Date") %>%
 
 ```
 
+##Create 3 datasets:  
+1. IC is most recent observation and there are no other observations
+```{r}
+lake_data_no_assim <- lake_data[c(1:35),]
+lake_data_no_assim[c(2:35),c(4:5)] <- NA
+
+lake_data_weekly_assim <- lake_data[c(1:35),]
+lake_data_weekly_assim[c(2:7,9:14,16:21,23:28,30:35),c(4:5)] <- NA
+```
+
 ## Run forecast
 ```{r}
 n_en = 100 # how many ensembles 
 
-
-##MAKE SURE TO REVISIT ALL THE CVS CAUSE YOU WERE THINKING IN TERMS OF SD WHEN
-#YOU ESTIMATED THESE ORIGINALLY
 est_out = EnKF(n_en = n_en, 
-           start = '2018-06-05', # start date 
-           stop = '2018-08-05', # stop date
+           start = '2019-06-11', # start date 
+           stop = '2019-07-15', # stop date
            time_step = 'days',
-           obs_file = lake_data,
-           driver_file = lake_data,
+           obs_file = lake_data_weekly_assim,
+           driver_file = lake_data_weekly_assim,
            n_states_est = 2, 
            n_params_est = 1,
            n_params_obs = 0,
            maxUptake_init = 1.0, 
-           obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
-           param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively 
-           init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
+           obs_cv = c(0.2,0.1),#cv for chl-a and DIN, respectively
+           param_cv = 0.05,#for maxUptake
+           driver_cv = c(0.05,0.05), # CV of driver data for wtemp and PAR, respectively 
+           init_cond_cv = c(0.05,0.05),#cv for chl-a and DIN, respectively
            state_names = c("chla","din"))
 
 
@@ -663,34 +648,35 @@ est_out = EnKF(n_en = n_en,
 ## Plot forecast
 ```{r}
 # plotting 
-plot_chla = function(est_out){
+plot_chla_no_assim = function(est_out){
   mean_chla_est = apply(est_out$Y[1,,] , 1, FUN = mean)
   plot(mean_chla_est ~ est_out$dates, type ='l', 
-       ylim = range(c(est_out$Y[1,,] , 
-                      est_out$obs[1,,] ),
-                    na.rm = T),
+       ylim = range(est_out$Y[1,,], na.rm = TRUE ),
        col = 'grey', ylab = 'chla (mg L-1)', xlab = '')
   for(i in 2:n_en){
     lines(est_out$Y[1,,i]  ~ est_out$dates, 
           col = 'grey')
   }
   lines(mean_chla_est ~ est_out$dates, col = 'black', lwd =2 )
+  points(lake_data$chla[1:35]  ~ 
+           est_out$dates[1:35], pch = 16, col = 'blue')
   points(est_out$obs[1,,]  ~ 
            est_out$dates, pch = 16, col = 'red')
+  arrows(est_out$dates[1:35], lake_data$chla[1:35]  - est_out$state_sd[1], 
+         est_out$dates[1:35], lake_data$chla[1:35]  + est_out$state_sd[1], 
+         code = 3, length = 0.1, angle = 90, col = 'blue')
   arrows(est_out$dates, est_out$obs[1,,]  - est_out$state_sd[1], 
          est_out$dates, est_out$obs[1,,]  + est_out$state_sd[1], 
          code = 3, length = 0.1, angle = 90, col = 'red')
 }
-plot_chla(est_out) 
+plot_chla_no_assim(est_out) 
 
 # plotting 
-plot_din = function(est_out){
+plot_din_no_assim = function(est_out){
   mean_din_est = apply(est_out$Y[2,,] , 1, FUN = mean)
   plot(mean_din_est ~ est_out$dates, type ='l', 
-       ylim = range(c(est_out$Y[2,,] , 
-                      est_out$obs[2,,] ),
-                    na.rm = T),
-       col = 'grey', ylab = 'chla (mg L-1)', xlab = '')
+       ylim = range(est_out$Y[2,,],na.rm = TRUE ),
+       col = 'grey', ylab = 'DIN (mg L-1)', xlab = '')
   for(i in 2:n_en){
     lines(est_out$Y[2,,i]  ~ est_out$dates, 
           col = 'grey')
@@ -698,11 +684,16 @@ plot_din = function(est_out){
   lines(mean_din_est ~ est_out$dates, col = 'black', lwd =2 )
   points(est_out$obs[2,,]  ~ 
            est_out$dates, pch = 16, col = 'red')
+  points(lake_data$din[2:35]  ~ 
+           est_out$dates[2:35], pch = 16, col = 'blue')
   arrows(est_out$dates, est_out$obs[2,,]  - est_out$state_sd[2], 
          est_out$dates, est_out$obs[2,,]  + est_out$state_sd[2], 
          code = 3, length = 0.1, angle = 90, col = 'red')
+  arrows(est_out$dates[2:35], lake_data$din[2:35]  - est_out$state_sd[1], 
+         est_out$dates[2:35], lake_data$din[2:35]  + est_out$state_sd[1], 
+         code = 3, length = 0.1, angle = 90, col = 'blue')
 }
-plot_din(est_out) 
+plot_din_no_assim(est_out) 
 
 plot_maxUptake = function(est_out){
   mean_maxUptake_est = apply(est_out$Y[3,,], 1, FUN = mean)
@@ -717,214 +708,4 @@ plot_maxUptake = function(est_out){
 plot_maxUptake(est_out) 
 ```
   
-## Generate 35-day "forecast" using 2019 data  
-Switching over to 2019 b/c there are big gaps in wtemp data in fall 2018 that our current rough-cut linear interpolation method is probably not going to be that great at filling.   
-Keeping 2018 above b/c there's no bloom event in 2019.   
-  
-### Data wrangling
-```{r}
-wtemp1 <- wtemp %>%
-  filter(Date >= "2019-06-01" & Date <= "2019-09-10") %>%
-  rename(wtemp = V1) %>%
-  select(Date,wtemp)
 
-par1 <- par %>%
-  filter(Date >= "2019-06-01" & Date <= "2019-09-10") %>%
-  rename(par = value) %>%
-  select(Date,par)
-
-chla1 <- chla %>%
-  filter(Date >= "2019-06-01" & Date <= "2019-09-10") %>%
-  rename(chla = value) %>%
-  select(Date,chla)
-
-din1 <- din %>%
-  filter(collectDate >= "2019-06-01" & collectDate <= "2019-09-10") %>%
-  rename(din = value,
-         Date = collectDate) %>%
-  select(Date,din) %>%
-  group_by(Date) %>%
-  summarize(din = mean(din, na.rm = TRUE))
-#there are multiple obs on one day - why??
-#for now, just taking average of all obs on same day
-
-lake_data_00 <- left_join(par1,wtemp1,by = "Date")
-lake_data_0 <- left_join(lake_data_00,chla1,by = "Date")
-lake_data <- left_join(lake_data_0,din1,by = "Date") %>%
-  rename(datetime = Date)
-lake_data$chla[62:101] <- NA
-lake_data$din[62:101] <- NA
-```
-### Run forecast  
-I've got three versions here:  
-1) same CVs as the run for 2018 above  
-2) small CV for observations and initial conditions  
-```{r}
-n_en = 100 # how many ensembles 
-
-#1) same as for 2018
-est_out_2019 = EnKF(n_en = n_en, 
-           start = '2019-06-01', # start date 
-           stop = '2019-09-10', # stop date
-           time_step = 'days',
-           obs_file = lake_data,
-           driver_file = lake_data,
-           n_states_est = 2, 
-           n_params_est = 1,
-           n_params_obs = 0,
-           maxUptake_init = 1.0, 
-           obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
-           param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively 
-           init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
-           state_names = c("chla","din"))
-
-#2) small CV for IC
-est_out_2019_smallICCV = EnKF(n_en = n_en,
-           start = '2019-06-01', # start date
-           stop = '2019-09-10', # stop date
-           time_step = 'days',
-           obs_file = lake_data,
-           driver_file = lake_data,
-           n_states_est = 2,
-           n_params_est = 1,
-           n_params_obs = 0,
-           maxUptake_init = 1.0,
-           obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
-           param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
-           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
-           state_names = c("chla","din"))
-
-#3) big CV for IC
-est_out_2019_bigICCV = EnKF(n_en = n_en,
-           start = '2019-06-01', # start date
-           stop = '2019-09-10', # stop date
-           time_step = 'days',
-           obs_file = lake_data,
-           driver_file = lake_data,
-           n_states_est = 2,
-           n_params_est = 1,
-           n_params_obs = 0,
-           maxUptake_init = 1.0,
-           obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
-           param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
-           init_cond_cv = c(0.4,0.4),#cv for chl-a and DIN, respectively
-           state_names = c("chla","din"))
-
-#4) small CV for obs
-est_out_2019_smallObsCV = EnKF(n_en = n_en,
-           start = '2019-06-01', # start date
-           stop = '2019-09-10', # stop date
-           time_step = 'days',
-           obs_file = lake_data,
-           driver_file = lake_data,
-           n_states_est = 2,
-           n_params_est = 1,
-           n_params_obs = 0,
-           maxUptake_init = 1.0,
-           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
-           param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
-           init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
-           state_names = c("chla","din"))
-
-#5) big CV for obs
-est_out_2019_bigObsCV = EnKF(n_en = n_en,
-           start = '2019-06-01', # start date
-           stop = '2019-09-10', # stop date
-           time_step = 'days',
-           obs_file = lake_data,
-           driver_file = lake_data,
-           n_states_est = 2,
-           n_params_est = 1,
-           n_params_obs = 0,
-           maxUptake_init = 1.0,
-           obs_cv = c(0.4,0.4),#cv for chl-a and DIN, respectively
-           param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
-           init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
-           state_names = c("chla","din"))
-
-#6) big CV for obs and IC
-est_out_2019_bigCV = EnKF(n_en = n_en,
-           start = '2019-06-01', # start date
-           stop = '2019-09-10', # stop date
-           time_step = 'days',
-           obs_file = lake_data,
-           driver_file = lake_data,
-           n_states_est = 2,
-           n_params_est = 1,
-           n_params_obs = 0,
-           maxUptake_init = 1.0,
-           obs_cv = c(0.4,0.4),#cv for chl-a and DIN, respectively
-           param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
-           init_cond_cv = c(0.4,0.4),#cv for chl-a and DIN, respectively
-           state_names = c("chla","din"))
-
-#7) small CV for obs and IC
-est_out_2019_smallCV = EnKF(n_en = n_en,
-           start = '2019-06-01', # start date
-           stop = '2019-09-10', # stop date
-           time_step = 'days',
-           obs_file = lake_data,
-           driver_file = lake_data,
-           n_states_est = 2,
-           n_params_est = 1,
-           n_params_obs = 0,
-           maxUptake_init = 1.0,
-           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
-           param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.1,0.1), # CV of driver data for wtemp and PAR, respectively
-           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
-           state_names = c("chla","din"))
-
-#8) big CV for drivers
-est_out_2019_bigDriverCV = EnKF(n_en = n_en,
-           start = '2019-06-01', # start date
-           stop = '2019-09-10', # stop date
-           time_step = 'days',
-           obs_file = lake_data,
-           driver_file = lake_data,
-           n_states_est = 2,
-           n_params_est = 1,
-           n_params_obs = 0,
-           maxUptake_init = 1.0,
-           obs_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
-           param_cv = 0.2,#for maxUptake
-           driver_cv = c(0.2,0.2), # CV of driver data for wtemp and PAR, respectively
-           init_cond_cv = c(0.2,0.2),#cv for chl-a and DIN, respectively
-           state_names = c("chla","din"))
-
-
-```
-### Plot forecast
-```{r}
-# plotting 
-plot_chla(est_out_2019) 
-plot_chla(est_out_2019_smallICCV)
-plot_chla(est_out_2019_bigICCV) 
-plot_chla(est_out_2019_smallObsCV) 
-plot_chla(est_out_2019_bigObsCV) 
-plot_chla(est_out_2019_bigCV)
-plot_chla(est_out_2019_smallCV) 
-plot_chla(est_out_2019_bigDriverCV)
-
-plot_din(est_out_2019) 
-plot_din(est_out_2019_smallICCV)
-plot_din(est_out_2019_bigICCV) 
-plot_din(est_out_2019_smallObsCV) 
-plot_din(est_out_2019_bigObsCV) 
-plot_din(est_out_2019_bigCV)
-plot_din(est_out_2019_smallCV) 
-plot_din(est_out_2019_bigDriverCV)
-
-
-
-
-
-
-
-```
