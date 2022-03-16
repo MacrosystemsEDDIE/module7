@@ -1,7 +1,7 @@
 ---
 title: "Macrosystems EDDIE Module 7: Using Data to Improve Ecological Forecasts (Activity B)"
 author: "Mary Lofton, Tadhg Moore, Cayelan Carey, Quinn Thomas"
-date: "3/8/2022"
+date: "3/16/2022"
 output: html_document
 ---
 ## Set-up (not shown)
@@ -100,6 +100,106 @@ get_NEON_lm <- function(siteID,x,y,start_date){
     
     return(list(df = df, fit = fit, m = m, b = b, r2 = r2, sigma = sigma))
   }
+```
+#### Function to format NEON data for input to EnKF
+```{r}
+format_enkf_inputs <- function(siteID, neon_vars){
+  
+#Drivers
+wtemp <- read_neon_data(siteID, "Surface water temperature") %>%
+  filter(value == min(value, na.rm = TRUE) ) %>%
+  rename(wtemp = V1) %>%
+  select(Date,wtemp)
+
+par <- read_neon_data(siteID, "Underwater PAR") %>%
+  rename(par = value) %>%
+  select(Date,par)
+
+#States
+chla <- read_neon_data(siteID, "Chlorophyll-a") %>%
+  rename(chla = value) %>%
+  select(Date,chla)
+
+din <- read_neon_data(siteID, "Nitrate sensor") %>%
+  rename(din = value) %>%
+  select(Date,din)
+
+lake_data_00 <- left_join(par,wtemp,by = "Date")
+lake_data_0 <- left_join(lake_data_00,chla,by = "Date")
+lake_data <- left_join(lake_data_0,din,by = "Date") %>%
+  rename(datetime = Date)
+return(lake_data)
+}
+
+```
+
+#### Function to create input dataset for various frequencies of data assimilation
+```{r}
+#' students will choose a frequency of data assimilation ranging from monthly to #' daily
+#' @param freq_chla frequency of chla data assimilation in days between 1-30
+#' @param freq_din frequency of din data assimilation in days between 1-30
+#' @param lake_data NEON lake dataset that has been formatted using the format_enkf_inputs function
+#' @param start_date start date of forecast (either 2020-09-25 or 2020-10-02)
+create_data_assim_inputs <- function(freq_chla, freq_din, lake_data, start_date){
+  
+  dates <- get_model_dates(as.Date(start_date)-1, as.Date(start_date)+34, time_step = 'days')
+  
+  a <- 1:35
+  b1 <- a[seq(1, length(a), freq_chla)]
+  b2 <- a[seq(1, length(a), freq_din)]
+  
+  out <- lake_data %>%
+    select(datetime, chla, din) %>%
+    mutate(datetime = as.Date(datetime)) %>%
+    filter(datetime %in% dates) %>%
+    mutate(rownum = row_number(datetime)) %>%
+    mutate(chla = ifelse(rownum %in% b1,chla,NA),
+           din = ifelse(rownum %in% b2,din,NA)) %>%
+    select(-rownum)
+  
+  return(out)
+  
+}
+```
+
+#### Function to get initial conditions for forecast using formatted NEON lake data
+```{r}
+#' specify initial conditions as either the observation from the first day of the forecast or the most recent observation
+#' @param lake_data NEON lake dataset that has been formatted using the format_enkf_inputs function
+#' @param start_date start date of forecast (either 2020-09-25 or 2020-10-02)
+get_yini <- function(lake_data, start_date){
+  
+  yini <- c(NA,NA)
+  
+  lake_data$datetime = as.Date(lake_data$datetime)
+
+  closest<-function(xv, sv){
+  xv[which.min(xv-sv)]}
+
+  if(is.na(lake_data[lake_data[, "datetime"] == as.Date(start_date),"chla"])){
+    startrow <- which(lake_data[, "datetime"] == as.Date(start_date))
+    NotNA <- lake_data %>% 
+      mutate(rownum = c(1:length(lake_data$chla))) %>% 
+      filter(!is.na(chla) & datetime < start_date)
+    yinirow <- which.min(abs(startrow-NotNA$rownum))
+    yini[1] <- NotNA[yinirow,"chla"]
+  } else {
+      yini[1] <- lake_data[lake_data[, "datetime"] == as.Date(start_date),"chla"]
+    }
+    
+    if(is.na(lake_data[lake_data[, "datetime"] == as.Date(start_date),"din"])){
+       startrow <- which(lake_data[, "datetime"] == as.Date(start_date))
+    NotNA <- lake_data %>% 
+      mutate(rownum = c(1:length(lake_data$din))) %>% 
+      filter(!is.na(din) & datetime < start_date)
+    yinirow <- which.min(abs(startrow-NotNA$rownum))
+    yini[2] <- NotNA[yinirow,"din"]
+    } else {
+      yini[2] <- lake_data[lake_data[, "datetime"] == as.Date(start_date),"din"]
+    }
+  
+  return(yini)
+}
 ```
 
 ### NOAA forecast functions  
@@ -263,12 +363,13 @@ NP_model <- function(PHYTO, DIN, TEMP, PAR, maxUptake){
   maxGrazing=1.0 # day-1
   ksphyto=1 #mmol N m-3
   pFaeces=0.3 #unitless
-  mortalityRate=0.4 #(mmmolN m-3)-1 day-1
+  mortalityRate=0.01 #(mmmolN m-3)-1 day-1
   excretionRate=0.1 #day-1
   mineralizationRate=0.1 #day-1
-  Chl_Nratio = 1 #mg chl (mmolN)-1
+  Chl_Nratio = 0.1 #mg chl (mmolN)-1
   Q10 = 2  #unitless
   refTEMP = 20
+  N_Load = 0.2
 
   #DRIVERS
   PAR <- PAR
@@ -281,11 +382,9 @@ NP_model <- function(PHYTO, DIN, TEMP, PAR, maxUptake){
   Mortality <- mortalityRate*curr_PHYTO^2
   Mineralization <- mineralizationRate * Temp_effect
 
-  #Convert from plankton biomass to Chlorophyll to compare to data
-  Chlorophyll <- curr_PHYTO^Chl_Nratio
-
+  #predicted values
   PHYTO_pred = curr_PHYTO + N_Uptake - Mortality
-  DIN_pred = curr_DIN + Mortality - N_Uptake #+ NLOAD + Excretion
+  DIN_pred = curr_DIN + Mortality - N_Uptake + N_Load
 
   return(list(PHYTO_pred = PHYTO_pred,
               DIN_pred = DIN_pred,
@@ -623,10 +722,10 @@ EnKF = function(n_en = 30,
       
       #specify sigma (covariance matrix of states and updating parameters)
       residual_matrix <- matrix(NA, nrow = 4, ncol = 3)
-      residual_matrix[1,] <- c(0,0,0) #c(0.005, 0.003, 0.01)
-      residual_matrix[2,] <- c(0,0,0) #c(0.001, 0.002, 0.02)
-      residual_matrix[3,] <- c(0,0,0) #c(0.0025, 0.001, 0.03)
-      residual_matrix[4,] <- c(0,0,0) #c(-0.0030, -0.001, -0.03)
+      residual_matrix[1,] <- c(0.5, 0.3, 0.01)
+      residual_matrix[2,] <- c(1, 0.2, 0.02)
+      residual_matrix[3,] <- c(0.25, 0.1, 0.03)
+      residual_matrix[4,] <- c(-0.30, -0.1, -0.03)
 
       sigma_proc <- cov(residual_matrix)
       
@@ -656,38 +755,6 @@ EnKF = function(n_en = 30,
 
 ```
 ### Plotting functions  
-#### Function to plot output of NEON variable linear regression
-```{r}
-  # Air temp vs Water temp plot ----
-  output$at_wt <- renderPlotly({
-    validate(
-      need(input$table01_rows_selected != "",
-           message = "Please select a site in Objective 1.")
-    )
-    
-    obj <- wtemp_airtemp()$sel
-    
-    p <- ggplot() +
-      geom_point(data = wtemp_airtemp()$data, aes_string(names(wtemp_airtemp()$data)[2], names(wtemp_airtemp()$data)[3]), color = "black") +
-      ylab("Surface water temperature (\u00B0C)") +
-      xlab("Air temperature (\u00B0C)") +
-      theme_minimal(base_size = 12) 
-    
-    if(nrow(obj) != 0) {
-      p <- p + 
-        geom_point(data = obj, aes_string(names(obj)[2], names(obj)[3]), color = cols[2])
-    }
-    if(!is.null(lmfit2$m)) {
-      p <- p + 
-        geom_abline(slope = lmfit2$m, intercept = lmfit2$b, color = cols[2], linetype = "dashed")
-    }
-    
-    return(ggplotly(p, dynamicTicks = TRUE, source = "B"))
-    
-  })
-}
-```
-
 #### Functions to plot chl-a forecast
 ```{r}
 # plotting 
@@ -712,16 +779,8 @@ plot_chla_no_assim = function(est_out){
          est_out$dates, est_out$obs[1,,]  + est_out$state_sd[1], 
          code = 3, length = 0.1, angle = 90, col = 'red')
 }
-est_out = out
-plot_chla_no_assim(est_out)
-```
 
-```{r}
-ggplot(data = fc_conv, aes(x = date, y = wtemp, group = L1, color = L1))+
-  geom_line()+
-  theme_classic()
 ```
-
 
 #### Function to plot DIN forecast
 ```{r}
@@ -736,18 +795,19 @@ plot_din_no_assim = function(est_out){
           col = 'grey')
   }
   lines(mean_din_est ~ est_out$dates, col = 'black', lwd =2 )
-  points(est_out$obs[2,,]  ~ 
-           est_out$dates, pch = 16, col = 'red')
   points(lake_data$din[2:35]  ~ 
            est_out$dates[2:35], pch = 16, col = 'blue')
+  arrows(est_out$dates[2:35], lake_data$din[2:35]  - est_out$state_sd[2], 
+         est_out$dates[2:35], lake_data$din[2:35]  + est_out$state_sd[2], 
+         code = 3, length = 0.1, angle = 90, col = 'blue')
+  points(est_out$obs[2,,]  ~ 
+           est_out$dates, pch = 16, col = 'red')
   arrows(est_out$dates, est_out$obs[2,,]  - est_out$state_sd[2], 
          est_out$dates, est_out$obs[2,,]  + est_out$state_sd[2], 
          code = 3, length = 0.1, angle = 90, col = 'red')
-  arrows(est_out$dates[2:35], lake_data$din[2:35]  - est_out$state_sd[1], 
-         est_out$dates[2:35], lake_data$din[2:35]  + est_out$state_sd[1], 
-         code = 3, length = 0.1, angle = 90, col = 'blue')
 }
 ```
+
 #### Function to plot maxUptake parameter
 ```{r}
 plot_maxUptake = function(est_out){
@@ -756,14 +816,15 @@ plot_maxUptake = function(est_out){
        ylim = range(est_out$Y[3,,]),
        col = 'grey', ylab = 'maxUptake (day^-1)', xlab ='')
   for(i in 2:n_en){
-    lines(est_out$Y[2,,i] ~ est_out$dates, col = 'grey')
+    lines(est_out$Y[3,,i] ~ est_out$dates, col = 'grey')
   }
   lines(mean_maxUptake_est ~ est_out$dates, col = 'black', lwd = 2)
 }
 ```
 
 
-## Read in NEON data (using BARC as test case for now)
+## Objective 7  
+### Set-up
 ```{r}
 # Load in NEON sites dataframe ----
 neon_sites_df <- read.csv("./data/neon_sites.csv")
@@ -780,102 +841,21 @@ print(neon_sites_df$siteID)
 #everything else is workable I think
 siteID <- "BARC"
 
-# Website to find more information:
-print(paste0("https://www.neonscience.org/field-sites/", siteID))
-
-# Objective 2 - Explore data ----
-# Load in data ----
-
-#Drivers
-wtemp <- read_neon_data(siteID, "Surface water temperature") %>%
-  filter(value == min(value, na.rm = TRUE) )
-par <- read_neon_data(siteID, "Underwater PAR") 
-
-#States
-chla <- read_neon_data(siteID, "Chlorophyll-a") 
-
-din <- read_neon_data(siteID, "Nitrate sensor") 
-
-#Plot data
-p_wtemp <- ggplot(data = wtemp) +
-  geom_point(aes(Date, V1)) +
-  ylab("Temperature (\u00B0C)") +
-  xlab("Time") +
-  theme_classic()
-p_wtemp
-
-p_par <- ggplot(data = par) +
-  geom_point(aes(Date, value)) +
-  ylab("PAR (umol/m2/s") +
-  xlab("Time") +
-  theme_classic()
-p_par
-
-p_chla <- ggplot(data = chla) +
-  geom_point(aes(Date, value)) +
-  ylab("Chl-a mg/L") +
-  xlab("Time") +
-  theme_classic()
-p_chla
-
-p_din <- ggplot(data = din) +
-  geom_point(aes(Date, value)) +
-  ylab("Nitrate mmolN m-3") +
-  xlab("Time") +
-  theme_classic()
-p_din
-
-
-```
-## Data wrangling to get NEON data in format for Jake's functions
-```{r}
-wtemp1 <- wtemp %>%
-  filter(Date >= "2020-09-24" & Date <= "2020-10-29") %>%
-  rename(wtemp = V1) %>%
-  select(Date,wtemp)
-
-par1 <- par %>%
-  filter(Date >= "2020-09-24" & Date <= "2020-10-29") %>%
-  rename(par = value) %>%
-  select(Date,par)
-
-chla1 <- chla %>%
-  filter(Date >= "2020-09-24" & Date <= "2020-10-29") %>%
-  rename(chla = value) %>%
-  select(Date,chla)
-
-din1 <- din %>%
-  filter(Date >= "2020-09-24" & Date <= "2020-10-29") %>%
-  rename(din = value) %>%
-  select(Date,din) %>%
-  group_by(Date) %>%
-  summarize(din = mean(din, na.rm = TRUE))
-#there are multiple obs on one day - why??
-#for now, just taking average of all obs on same day
-
-lake_data_00 <- left_join(par1,wtemp1,by = "Date")
-lake_data_0 <- left_join(lake_data_00,chla1,by = "Date")
-lake_data <- left_join(lake_data_0,din1,by = "Date") %>%
-  rename(datetime = Date)
-
-```
-
-##Create 3 datasets:  
-1. IC is most recent observation and there are no other observations  
-2. Chl-a observations are assimilated weekly  
-3. Chl-a observations are assimilated weekly and water temp observations are assimilated weekly
-```{r}
-lake_data_no_assim <- lake_data[c(1:35),]
-lake_data_no_assim[c(2:35),c(4:5)] <- NA
-
-lake_data_weekly_assim <- lake_data[c(1:35),]
-lake_data_weekly_assim[c(2:7,9:14,16:21,23:28,30:35),c(4:5)] <- NA
-```
-
-## Run forecast
-```{r}
 #set start date of forecast
 start_date = "2020-09-25" 
+
+#load NEON data and format for input into EnKF
+lake_data <- format_enkf_inputs(siteID = siteID, neon_vars = neon_vars)
+
+#format observation data file depending on selected frequency of data assimilation
+obs_file <- create_data_assim_inputs(freq_chla = 36,
+                                     freq_din = 36,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
+
+#get initial conditions for forecast
+yini <- get_yini(lake_data = lake_data,
+                 start_date = start_date)
 
 #load NOAA GEFS forecast
 fc <- load_noaa_forecast(siteID = siteID, start_date = start_date)
@@ -898,13 +878,13 @@ est_out = EnKF(n_en = n_en,
            start = '2020-09-25', # start date 
            stop = '2020-10-29', # stop date
            time_step = 'days',
-           obs_file = lake_data_no_assim,
+           obs_file = lake_data_weekly_assim,
            driver_file = fc_conv,
            n_states_est = 2, 
            n_params_est = 1,
            n_params_obs = 0,
-           maxUptake_init = 0.1, 
-           obs_cv = c(0.2,0.1),#cv for chl-a and DIN, respectively
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.1,0.5),#cv for chl-a and DIN, respectively
            param_cv = 0.1,#for maxUptake
            init_cond_cv = c(0.05,0.05),#cv for chl-a and DIN, respectively
            state_names = c("chla","din"),
