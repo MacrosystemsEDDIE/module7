@@ -1,0 +1,27 @@
+q_no,Question,location
+q1,What is meant by the term 'data assimilation' in the context of ecological forecasting?,Introduction:
+q2,How do you think the process of integrating the most recently observed data into models can improve forecasts? ,Introduction:
+q3,Fill out information about your selected NEON site:,Site Selection: Objective 1
+q3a,Name of selected site:,
+q3b,Four letter site identifier:,
+q3c,Latitude:,
+q3d,Longitude:,
+q3e,Lake area (km2):,
+q3f,Elevation (m):,
+q4,Scroll over the interactive plot to determine how frequently different types of data are collected. Fill out the table below with the collection frequency of the listed environmental variables. To edit the table you must double click the cell and then type in your answer.,Site Selection: Objective 2
+q5,Why might some types of data be collected more frequently than others? Try to think of two reasons.,Site Selection: Objective 2
+q6,Describe the effect of each of the following variables on chlorophyll-a. Chlorophyll-a is used as a proxy measurement for phytoplankton concentration and primary productivity in aquatic environments.,Site Selection: Objective 
+q6a,Air temperature,
+q6b,Surface water temperature,
+q6c,Nitrogen,
+q6d,Underwater PAR,
+q7,Were there any other relationships you found at your site? If so, please describe below.,
+q8,Classify the following as either a state variable or a driver variable by dragging it into the corresponding bin.
+q9,We are using chlorophyll-a as a proxy of aquatic primary productivity. Select how you envision increases in each driver variable to affect chlorophyll-a concentrations:,
+q9a,Increases in water temperature,
+q9b,Increases in underwater light,
+q10,List two ecosystem variables in lakes and inland water bodies that depend on water temperature., 
+q11,How would developing forecasts of water temperature help us to generate forecasts for the variables you listed in Q.10?
+q12,Check out the forecast model you have estimated. Notice the 95% confidence interval, which is generated using differences between water temperature observations and the estimated water temperature values from the model. How do you think the uncertainty associated with this water temperature model might affect a forecast of chlorophyll-a that relies on water temperature forecasts as input?,
+q13,Which model has a lower RMSE?,
+q14,Based on your answer to Q.13, when using these linear regression models, would you expect forecasts of water temperature or underwater light to have greater uncertainty?,

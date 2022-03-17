@@ -1,0 +1,20 @@
+tab_id,name
+mtab1,Overview
+mtab2,Presentation
+mtab3,Introduction
+mtab4,Site Selection
+stab1,Objective 1 - Select and view a NEON site
+stab2,Objective 2 - Explore data
+stab3,Objective 3 - Explore variable relationships
+mtab5,Activity A
+stab4,Objective 4 - Understand model
+stab5,Objective 5 - Prepare inputs
+stab6,Objective 6 - Forecast!
+mtab6,Activity B
+stab7,Objective 7 - Assimilate data
+stab8,Objective 8 - Explore observation uncertainty
+stab9,Objective 9 - Explore data frequency
+stab10,Summary
+mtab7,Activity C
+stab11,Objective 10 - Management scenario
+stab12,Summary
