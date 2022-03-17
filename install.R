@@ -32,6 +32,8 @@ install.packages("deSolve")
 install.packages("reshape2")
 install.packages("rmarkdown")
 install.packages("remotes")
+install.packages("kableExtra")
+install.packages("ggthemes")
 remotes::install_github('yonicd/slickR') # removed from CRAN - now only on GitHub
 
 
