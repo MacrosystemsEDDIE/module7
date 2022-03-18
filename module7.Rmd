@@ -1,6 +1,6 @@
 ---
 title: "Macrosystems EDDIE Module 7: Using Data to Improve Ecological Forecasts (Activity B)"
-author: "Mary Lofton, Tadhg Moore, Cayelan Carey, Quinn Thomas"
+author: "Mary Lofton, Tadhg Moore, Quinn Thomas, Cayelan Carey"
 date: "3/16/2022"
 output: html_document
 ---
@@ -66,8 +66,7 @@ get_NEON_lm <- function(siteID,x,y,start_date){
     xvar[, 1] <- as.POSIXct(xvar[, 1], tz = "UTC")
     xvar$Date <- as.Date(xvar[, 1])
     xvar <- plyr::ddply(xvar, c("Date"), function(x) mean(x[, 2], na.rm = TRUE)) # Daily average - also puts everything on same timestamp
-    xvar <- subset(xvar, xvar$Date <= start_date)
-    xvar <- tail(xvar, n = 30)
+    xvar <- subset(xvar, xvar$Date < start_date)
     
     #grab y variable
     ref2 <- y
@@ -82,11 +81,14 @@ get_NEON_lm <- function(siteID,x,y,start_date){
       yvar <- yvar[yvar[, 2] == min(yvar[, 2], na.rm = TRUE), c(1, 3)] # subset to Surface water temperature
     }
     yvar <- plyr::ddply(yvar, c("Date"), function(y) mean(y[, 2], na.rm = TRUE)) # Daily average - also puts everything on same timestamp
-    yvar <- subset(yvar, yvar$Date <= start_date)
-    yvar <- tail(yvar, n = 30)
+    yvar <- subset(yvar, yvar$Date < start_date)
+    #ok need to merge first and then find rows with no NAs
     
     #merge x and y
-    df <- merge(xvar, yvar, by = "Date")
+    df <- merge(xvar, yvar, by = "Date") %>%
+    arrange(desc(Date)) %>% 
+    filter(!is.na(V1.x) & !is.na(V1.y)) %>%
+    slice(1:30)
     colnames(df)[-1] <- c("X", "Y")
     
     #fit model
@@ -96,13 +98,19 @@ get_NEON_lm <- function(siteID,x,y,start_date){
     b <- round(coeffs[1], 2)
     r2 <- round(summary(fit)$r.squared, 2)
     
-    sigma <- sigma(fit)
+    sig <- sigma(fit)
     
-    return(list(df = df, fit = fit, m = m, b = b, r2 = r2, sigma = sigma))
+    return(list(df = df, fit = fit, m = m, b = b, r2 = r2, sigma = sig))
   }
 ```
+
 #### Function to format NEON data for input to EnKF
 ```{r}
+#' pulls in variables needed for selected site and NP model and aggregates them
+#'
+#' @param siteID name of NEON lake site
+#' @param neon_vars table of NEON variables available at lake sites; needed because of call to nested read_neon_data function
+
 format_enkf_inputs <- function(siteID, neon_vars){
   
 #Drivers
@@ -142,7 +150,7 @@ return(lake_data)
 #' @param start_date start date of forecast (either 2020-09-25 or 2020-10-02)
 create_data_assim_inputs <- function(freq_chla, freq_din, lake_data, start_date){
   
-  dates <- get_model_dates(as.Date(start_date)-1, as.Date(start_date)+34, time_step = 'days')
+  dates <- get_model_dates(as.Date(start_date), as.Date(start_date)+35, time_step = 'days')
   
   a <- 1:35
   b1 <- a[seq(1, length(a), freq_chla)]
@@ -615,7 +623,7 @@ get_drivers = function(fc_conv, n_drivers, driver_colnames, model_dates, n_en){
 #' @param param_cv coefficient of variation of parameters 
 #' @param init_cond_cv initial condition CV 
 #' @param state_names character string vector of state names as specified in obs_file
-#' @param yini vector of initial conditions for states
+#' @param yini vector of initial conditions for states (chla, din)
 
 EnKF = function(n_en = 30, 
                 start = '2020-09-25', # start date 
@@ -754,12 +762,50 @@ EnKF = function(n_en = 30,
 
 
 ```
+#### Function to calculate RMSE
+```{r}
+#' calculate RMSE of ensemble mean vs. observations 
+#' 
+#' @param est_out forecast output from EnKF wrapper 
+#' @param lake_data NEON data for selected site formatted using format_enkf_inputs function
+
+rmse <- function(est_out, lake_data){
+  
+  #get ensemble mean
+  mean_chla_est = apply(est_out$Y[1,,] , 1, FUN = mean)
+  mean_din_est = apply(est_out$Y[2,,] , 1, FUN = mean)
+
+  
+  #limit obs to forecast dates
+  lake_data1 <- lake_data %>%
+    mutate(datetime = as.Date(datetime)) %>%
+    filter(datetime %in% est_out$dates)
+  
+  #calculate RMSE
+  rmse_chla <- sqrt(mean((lake_data1$chla - mean_chla_est)^2, na.rm = TRUE))
+  rmse_nitrate <- sqrt(mean((lake_data1$din - mean_din_est)^2, na.rm = TRUE))
+  
+  return(list(rmse_chla = rmse_chla, rmse_nitrate = rmse_nitrate))
+
+
+}
+
+```
+
+
 ### Plotting functions  
 #### Functions to plot chl-a forecast
 ```{r}
-# plotting 
-plot_chla_no_assim = function(est_out){
+#' plot chlorophyll forecast and observations 
+#' 
+#' @param est_out forecast output from EnKF wrapper 
+#' @param lake_data NEON data for selected site formatted using format_enkf_inputs function
+
+plot_chla = function(est_out, lake_data){
   mean_chla_est = apply(est_out$Y[1,,] , 1, FUN = mean)
+  lake_data <- lake_data %>%
+    mutate(datetime = as.Date(datetime)) %>%
+    filter(datetime %in% est_out$dates)
   plot(mean_chla_est ~ est_out$dates, type ='l', 
        ylim = range(est_out$Y[1,,], na.rm = TRUE ),
        col = 'grey', ylab = 'chla (mg L-1)', xlab = '')
@@ -784,12 +830,18 @@ plot_chla_no_assim = function(est_out){
 
 #### Function to plot DIN forecast
 ```{r}
-# plotting 
-plot_din_no_assim = function(est_out){
+#' plot nitrate forecast and observations 
+#' 
+#' @param est_out forecast output from EnKF wrapper 
+#' @param lake_data NEON data for selected site formatted using format_enkf_inputs function
+plot_nitrate = function(est_out, lake_data){
   mean_din_est = apply(est_out$Y[2,,] , 1, FUN = mean)
+  lake_data <- lake_data %>%
+    mutate(datetime = as.Date(datetime)) %>%
+    filter(datetime %in% est_out$dates)
   plot(mean_din_est ~ est_out$dates, type ='l', 
        ylim = range(est_out$Y[2,,],na.rm = TRUE ),
-       col = 'grey', ylab = 'DIN (mg L-1)', xlab = '')
+       col = 'grey', ylab = 'Nitrate (um L-1)', xlab = '')
   for(i in 2:n_en){
     lines(est_out$Y[2,,i]  ~ est_out$dates, 
           col = 'grey')
@@ -810,6 +862,10 @@ plot_din_no_assim = function(est_out){
 
 #### Function to plot maxUptake parameter
 ```{r}
+#' plot maxUptake parameter forecast 
+#' 
+#' @param est_out forecast output from EnKF wrapper 
+
 plot_maxUptake = function(est_out){
   mean_maxUptake_est = apply(est_out$Y[3,,], 1, FUN = mean)
   plot(mean_maxUptake_est ~ est_out$dates, type ='l', 
@@ -821,9 +877,81 @@ plot_maxUptake = function(est_out){
   lines(mean_maxUptake_est ~ est_out$dates, col = 'black', lwd = 2)
 }
 ```
+#### Function to plot predictions vs. observations for chl-a
+```{r}
+#' plot chl-a mean forecast and observations 
+#' 
+#' @param est_out forecast output from EnKF wrapper 
+#' @param lake_data NEON data for selected site formatted using format_enkf_inputs function
+pred_v_obs_chla = function(est_out, lake_data){
+  mean_chla_est = apply(est_out$Y[1,,] , 1, FUN = mean)
+  
+  # this could be used to show a 95% confidence error bar on predicted
+  # but I think the error bars make the plot a bit hard to read
+  # top_din_est = apply(est_out$Y[2,,] , 1, FUN = quantile, probs=c(0.975))
+  # bottom_din_est = apply(est_out$Y[2,,] , 1, FUN = quantile, probs=c(0.025))
+
+  lake_data <- lake_data %>%
+    mutate(datetime = as.Date(datetime)) %>%
+    filter(datetime %in% est_out$dates)
+  plot(mean_chla_est ~ lake_data$chla, type ='p', 
+       ylim = c(min(c(range(mean_chla_est,na.rm = TRUE),range(lake_data$chla,na.rm = TRUE))),c(max(c(range(mean_chla_est,na.rm = TRUE),range(lake_data$chla,na.rm = TRUE))))),
+       xlim = c(min(c(range(mean_chla_est,na.rm = TRUE),range(lake_data$chla,na.rm = TRUE))),c(max(c(range(mean_chla_est,na.rm = TRUE),range(lake_data$chla,na.rm = TRUE))))),
+       col = 'black', ylab = 'predicted Chl-a (ug L-1)', xlab = 'observed Chl-a (ug L-1)')
+  abline(a=0, b=1)
+  
+  #this code could be used to show error bars representing uncertainty but 
+  #I think it makes the plot kinda hard to read
+  # arrows(lake_data$din[1:35]  - est_out$state_sd[2], mean_din_est,
+  #        lake_data$din[1:35]  + est_out$state_sd[2], mean_din_est, 
+  #        code = 3, length = 0.1, angle = 90, col = 'black')
+  # arrows(lake_data$din, mean_din_est  - est_out$state_sd[2], 
+  #        lake_data$din, mean_din_est  + est_out$state_sd[2], 
+  #        code = 3, length = 0.1, angle = 90, col = 'black')
+}
+```
+#### Function to plot predictions vs. observations for nitrate
+```{r}
+#' plot nitrate forecast and observations 
+#' 
+#' @param est_out forecast output from EnKF wrapper 
+#' @param lake_data NEON data for selected site formatted using format_enkf_inputs function
+pred_v_obs_nitrate = function(est_out, lake_data){
+  mean_din_est = apply(est_out$Y[2,,] , 1, FUN = mean)
+  
+  # this could be used to show a 95% confidence error bar on predicted
+  # but I think the error bars make the plot a bit hard to read
+  # top_din_est = apply(est_out$Y[2,,] , 1, FUN = quantile, probs=c(0.975))
+  # bottom_din_est = apply(est_out$Y[2,,] , 1, FUN = quantile, probs=c(0.025))
+
+  lake_data <- lake_data %>%
+    mutate(datetime = as.Date(datetime)) %>%
+    filter(datetime %in% est_out$dates)
+  plot(mean_din_est ~ lake_data$din, type ='p', 
+       ylim = c(min(c(range(mean_din_est,na.rm = TRUE),range(lake_data$din,na.rm = TRUE))),c(max(c(range(mean_din_est,na.rm = TRUE),range(lake_data$din,na.rm = TRUE))))),
+       xlim = c(min(c(range(mean_din_est,na.rm = TRUE),range(lake_data$din,na.rm = TRUE))),c(max(c(range(mean_din_est,na.rm = TRUE),range(lake_data$din,na.rm = TRUE))))),
+       col = 'black', ylab = 'predicted Nitrate (um L-1)', xlab = 'observed Nitrate (um L-1)')
+  abline(a=0, b=1)
+  
+  #this code could be used to show error bars representing uncertainty but 
+  #I think it makes the plot kinda hard to read
+  # arrows(lake_data$din[1:35]  - est_out$state_sd[2], mean_din_est,
+  #        lake_data$din[1:35]  + est_out$state_sd[2], mean_din_est, 
+  #        code = 3, length = 0.1, angle = 90, col = 'black')
+  # arrows(lake_data$din, mean_din_est  - est_out$state_sd[2], 
+  #        lake_data$din, mean_din_est  + est_out$state_sd[2], 
+  #        code = 3, length = 0.1, angle = 90, col = 'black')
+}
+```
 
 
-## Objective 7  
+## Objective 7: Assimilate data  
+This objective introducees students to data assimilation by asking students to generate forecasts:  
+A. using initial conditions based on the most recent chl-a and nitrate observations but no subsequent data assimilation  
+B. that assimilate chl-a data at a "medium" frequency (every 10 days)  
+C. that assimilate nitrate data at a "medium" frequency (every 10 days)  
+D. that assimilate both chl-a and nitrate data every 10 days  
+The desired learning outcome is for students to understand that data assimilation corrects model predictions and improves forecast performance as assessed by RMSE calculated for the mean ensemble prediction and observations.    
 ### Set-up
 ```{r}
 # Load in NEON sites dataframe ----
@@ -837,8 +965,7 @@ neon_vars <- read.csv("./data/neon_variables.csv")
 # Objective 1 - Site Selection ----
 print(neon_sites_df$siteID)
 #we have BARC, CRAM, LIRO, PRLA, PRPO, SUGG, TOOK
-#OK TOOK is not an option for this module b/c don't have enough nitrate data;
-#everything else is workable I think
+#need to think about which sites we want to use for Mod 7 based on how they behave in app testing
 siteID <- "BARC"
 
 #set start date of forecast
@@ -846,12 +973,6 @@ start_date = "2020-09-25"
 
 #load NEON data and format for input into EnKF
 lake_data <- format_enkf_inputs(siteID = siteID, neon_vars = neon_vars)
-
-#format observation data file depending on selected frequency of data assimilation
-obs_file <- create_data_assim_inputs(freq_chla = 36,
-                                     freq_din = 36,
-                                     lake_data = lake_data,
-                                     start_date = start_date)
 
 #get initial conditions for forecast
 yini <- get_yini(lake_data = lake_data,
@@ -869,34 +990,323 @@ lm_upar <- get_NEON_lm(siteID = siteID, x = "Shortwave radiation",
                      y = "Underwater PAR", start_date = start_date)
 
 #convert NOAA GEFS forecast to water temp and upar forecast
-fc_conv <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, fc = fc, start_date = start_date)
+driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, fc = fc, start_date = start_date)
+```
+### Run forecast with no data assimilation  
+In this case, inserting 36 as the frequency of chl-a and nitrate assimilation ensures that only the first observation in the 35 day observation period will be assimilated. If there are no chl-a or nitrate data available on the start date of the forecast, the get_yini function will pull in the most recent observation prior to the forecast start date as the initial condition for that variable.
+```{r}
+#format observation data file depending on selected frequency of data assimilation
 
+obs_file <- create_data_assim_inputs(freq_chla = 36,
+                                     freq_din = 36,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
 
 n_en = 30 # how many ensemble members 
 
+#run the forecast!
 est_out = EnKF(n_en = n_en, 
            start = '2020-09-25', # start date 
            stop = '2020-10-29', # stop date
            time_step = 'days',
-           obs_file = lake_data_weekly_assim,
-           driver_file = fc_conv,
+           obs_file = obs_file,
+           driver_file = driver_file,
            n_states_est = 2, 
            n_params_est = 1,
            n_params_obs = 0,
            maxUptake_init = 0.12, 
-           obs_cv = c(0.1,0.5),#cv for chl-a and DIN, respectively
+           obs_cv = c(0.01,0.05),#cv for chl-a and DIN, respectively
            param_cv = 0.1,#for maxUptake
-           init_cond_cv = c(0.05,0.05),#cv for chl-a and DIN, respectively
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
            state_names = c("chla","din"),
-           yini = c(7.21, 1.39))
+           yini = yini)
 
-
-```
-## Plot forecast
-```{r}
-plot_chla_no_assim(est_out) 
-plot_din_no_assim(est_out) 
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data) 
+plot_nitrate(est_out = est_out, lake_data = lake_data) 
 plot_maxUptake(est_out) 
-```
-  
+pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
+pred_v_obs_nitrate(est_out = est_out, lake_data = lake_data)
+rmse(est_out = est_out, lake_data = lake_data)
 
+
+```
+### Run forecast with chl-a data assimilated every 10 days  
+Notice that the freq_chla argument in the create_data_assim_inputs file has been adjusted to 10. If chl-a data is not available on the 10th, 20th, or 30th days, the value for that day will be NA and the forecast function will proceed without assimilating chl-a data for that day.
+```{r}
+#format observation data file depending on selected frequency of data assimilation
+
+obs_file <- create_data_assim_inputs(freq_chla = 10,
+                                     freq_din = 36,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
+
+n_en = 30 # how many ensemble members 
+
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-09-25', # start date 
+           stop = '2020-10-29', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data) 
+plot_nitrate(est_out = est_out, lake_data = lake_data) 
+plot_maxUptake(est_out) 
+pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
+pred_v_obs_nitrate(est_out = est_out, lake_data = lake_data)
+rmse(est_out = est_out, lake_data = lake_data)
+
+```
+### Run forecast with nitrate data assimilated every 10 days  
+Notice that the freq_din argument in the create_data_assim_inputs file has been adjusted to 10. If nitrate data is not available on the 10th, 20th, or 30th days, the value for that day will be NA and the forecast function will proceed without assimilating nitrate data for that day.
+```{r}
+#format observation data file depending on selected frequency of data assimilation
+
+obs_file <- create_data_assim_inputs(freq_chla = 36,
+                                     freq_din = 10,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
+
+n_en = 30 # how many ensemble members 
+
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-09-25', # start date 
+           stop = '2020-10-29', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data) 
+plot_nitrate(est_out = est_out, lake_data = lake_data) 
+plot_maxUptake(est_out) 
+pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
+pred_v_obs_nitrate(est_out = est_out, lake_data = lake_data)
+rmse(est_out = est_out, lake_data = lake_data)
+
+```
+### Run forecast with both chl-a and nitrate data assimilated every 10 days  
+```{r}
+#format observation data file depending on selected frequency of data assimilation
+obs_file <- create_data_assim_inputs(freq_chla = 10,
+                                     freq_din = 10,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
+
+n_en = 30 # how many ensemble members 
+
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-09-25', # start date 
+           stop = '2020-10-29', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data) 
+plot_nitrate(est_out = est_out, lake_data = lake_data) 
+plot_maxUptake(est_out) 
+pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
+pred_v_obs_nitrate(est_out = est_out, lake_data = lake_data)
+rmse(est_out = est_out, lake_data = lake_data)
+
+```
+
+## Objective 8: Explore observation uncertainty  
+This objective will ask students to adjust the observation uncertainty associated with chl-a and nitrate data. The learning outcome of the objective is for students to understand that the amount of uncertainty associated with observations determines how much the model corrects itself to align with those observations. In the Shiny app, students will use sliders to adjust the values of the obs_cv argument to the EnKF function. Below are two examples: one when observation uncertainty for both variables is low, and one when it is high.  
+
+### Low observation uncertainty
+```{r}
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-09-25', # start date 
+           stop = '2020-10-29', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.02,0.02),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data) 
+plot_nitrate(est_out = est_out, lake_data = lake_data) 
+plot_maxUptake(est_out) 
+#not plotting pred vs. obs or calculating RMSE here as the focus is on the behavior of the ensemble, not the forecast accuracy
+
+```
+### High observation uncertainty
+```{r}
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-09-25', # start date 
+           stop = '2020-10-29', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.5,0.5),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data) 
+plot_nitrate(est_out = est_out, lake_data = lake_data) 
+plot_maxUptake(est_out) 
+#not plotting pred vs. obs or calculating RMSE here as the focus is on the behavior of the ensemble, not the forecast accuracy
+
+
+```
+## Objective 9: Explore data frequency
+This objective will ask students to adjust the observation frequency (and therefore the assimilation frequency) of chl-a and nitrate data. The learning outcome of the objective is for students to understand that more frequency data assimilation may permit for more accurate forecasts, as models closely track real-world conditions. In addition, there may be opportunity for students to understand that one state variable may be corrected by assimilation of observations of a second state variable based on the covariance of the two; however, we need to decide if this is within or beyond our scope. In the Shiny app, students will use sliders to adjust the values of the chla_freq and din_freq arguments to the create_data_assim_inputs function. Below are three examples: one chla is assimilated at a high frequency and nitrate is assimilated at a low frequency, as well as the inverse and the scenario where both are assimilated at high frequency (daily).  
+
+### High chl-a assimilation frequency
+```{r}
+#format observation data file depending on selected frequency of data assimilation
+obs_file <- create_data_assim_inputs(freq_chla = 1,
+                                     freq_din = 30,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
+
+n_en = 30 # how many ensemble members 
+
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-09-25', # start date 
+           stop = '2020-10-29', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data) 
+plot_nitrate(est_out = est_out, lake_data = lake_data) 
+plot_maxUptake(est_out) 
+pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
+pred_v_obs_nitrate(est_out = est_out, lake_data = lake_data)
+rmse(est_out = est_out, lake_data = lake_data)
+```
+
+### High nitrate assimilation frequency
+```{r}
+#format observation data file depending on selected frequency of data assimilation
+obs_file <- create_data_assim_inputs(freq_chla = 30,
+                                     freq_din = 1,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
+
+n_en = 30 # how many ensemble members 
+
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-09-25', # start date 
+           stop = '2020-10-29', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data) 
+plot_nitrate(est_out = est_out, lake_data = lake_data) 
+plot_maxUptake(est_out) 
+pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
+pred_v_obs_nitrate(est_out = est_out, lake_data = lake_data)
+rmse(est_out = est_out, lake_data = lake_data)
+```
+
+### High chl-a and nitrate assimilation frequency
+```{r}
+#format observation data file depending on selected frequency of data assimilation
+obs_file <- create_data_assim_inputs(freq_chla = 1,
+                                     freq_din = 1,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
+
+n_en = 30 # how many ensemble members 
+
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-09-25', # start date 
+           stop = '2020-10-29', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data) 
+plot_nitrate(est_out = est_out, lake_data = lake_data) 
+plot_maxUptake(est_out) 
+pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
+pred_v_obs_nitrate(est_out = est_out, lake_data = lake_data)
+rmse(est_out = est_out, lake_data = lake_data)
+```
