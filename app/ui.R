@@ -572,8 +572,9 @@ border-color: #FFF;
                                                                    p("TABLE FOR ANSWERS"),
                                                                    # DTOutput('q7_tab'),
                                                                    br(),
-                                                                   h4(quest["q8", 1]),
-                                                                   textAreaInput2(inputId = "q8", label = "", width = "90%"),
+                                                                   h4(quest[qid[12], ]),
+                                                                   textAreaInput2(inputId = qid[12], label = "",
+                                                                                  width = "90%"),
                                                                    br()
                                                                    )
                                                             )
@@ -609,9 +610,115 @@ border-color: #FFF;
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3("Objective 3 - Build a water temperature model"),
+                                                                h3(tab_names["stab4", 2]),
                                                                 p(id = "txt_j", module_text["obj_03", ])
                                                                 )
+                                                      )
+                                               ),
+                                             fluidRow(
+                                               column(12, align = "center",
+                                                      img(src = "02-build-model.png", height = "30%",
+                                                          width = "30%")
+                                               )
+                                             ), br(), br(), hr(),
+                                             #* Intro text ====
+                                             fluidRow(
+                                               # conditionalPanel(condition = "input.site_html > 1",
+                                               #** NEON Intro ----
+                                               column(4,
+                                                      h3("What is a Model?"),
+                                                      h4("Read through this section and scroll through the slides"),
+                                                      p(id = "txt_j", module_text["model1", ]),
+                                                      p(id = "txt_j", module_text["model2", ]),
+                                                      p(id = "txt_j", module_text["model3", ]),
+                                                      p(id = "txt_j", module_text["mod_desc", ]),
+                                                      p(id = "txt_j", module_text["phyto_chla", ]),
+                                                      p("Click through the images to see how we can go from a conceptual food web model to a mathematical representation of the interaction of Nitrogen (N) and Phytoplankton (P).", id = "txt_j")
+                                               ),
+                                               column(8,
+                                                      br(), br(), br(),
+                                                      h5("Click on the arrows to navigate through the slides", align = "center"),
+                                                      wellPanel(
+                                                        slickROutput("slck_model", width = "600px", height = "450px")
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(10, align = "left",
+                                                      box(id = "box6", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   h4(quest[qid[12], 1]),
+                                                                   radioButtons(qid[13], quest[qid[13], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   radioButtons(qid[14], quest[qid[14], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   radioButtons(qid[15], quest[qid[15], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   radioButtons(qid[16], quest[qid[16], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   br()
+                                                            )
+                                                          )
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             
+                                             #** Sort state and process variables ====
+                                             h2(tags$b("Exercise")),
+                                             p(id = "txt_j", "When working with ecological models, the terms 'state variable' and 'parameter' are used. Using the model diagram above, can you identify which are state variables or parameters?"),
+                                             p(id = "txt_j", module_text["state_var", 1]),
+                                             p(id = "txt_j", module_text["parameter", 1]),
+                                             
+                                             fluidRow(
+                                               column(12, align = "left",
+                                                      box(id = "box7", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(8, offset = 1,
+                                                                   h4(quest[qid[16], 1]),
+                                                                   bucket_list(
+                                                                     header = "",
+                                                                     group_name = "bucket_list_group",
+                                                                     orientation = "horizontal",
+                                                                     add_rank_list(
+                                                                       text = tags$b("Drag from here"),
+                                                                       labels = sample(c(state_vars, process_vars)),
+                                                                       input_id = "rank_list_1"
+                                                                     ),
+                                                                     add_rank_list(
+                                                                       text = tags$b("State variable"),
+                                                                       labels = NULL,
+                                                                       input_id = "rank_list_2"
+                                                                     ),
+                                                                     add_rank_list(
+                                                                       text = tags$b("Parameter"),
+                                                                       labels = NULL,
+                                                                       input_id = "rank_list_3"
+                                                                     )
+                                                                   ),
+                                                                   br(),
+                                                                   h4(quest[qid[17], 1]),
+                                                                   radioButtons(qid[18], quest[qid[18], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   radioButtons(qid[19], quest[qid[19], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   br()
+                                                            ),
+                                                            column(2,
+                                                                   wellPanel(
+                                                                     useShinyjs(),  # Set up shinyjs
+                                                                     actionButton("ans_btn", "Check answers"),
+                                                                     textOutput("state_ans"),
+                                                                     textOutput("proc_ans")
+                                                                   )
+                                                            )
+                                                          )
+                                                      )
+                                               )
+                                             ),
+                                             fluidRow(
+                                               column(5, offset = 1,
+                                                      h3("Next step"),
+                                                      p("Now we will use this information about the model to build a model to forecast primary productivity in our chosen site.")
                                                       )
                                                )
                                              ),
@@ -620,11 +727,165 @@ border-color: #FFF;
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3("Objective 5 - Improve Model for Forecasting"),
+                                                                h3(tab_names["stab5", 2]),
                                                                 p(id = "txt_j", module_text["obj_05", ])
                                                                 )
                                                       )
+                                               ),
+                                             fluidRow(
+                                               column(6,
+                                                      h4("Linear Regression"),
+                                                      p(id = "txt_j", module_text["linear_regression", ]),
+                                                      p("The equation form for a linear regression is: "),
+                                                      p(withMathJax("$$y = mx + b $$"), style = "font-size: 20px;"),
+                                               ),
+                                               column(6, align = "center",
+                                                      img(src = "linear_regression_example.png",
+                                                          height = "50%",
+                                                          width = "50%"),
+                                                      p(tags$em("An example plot showing surface water temperature vs. air temperature with a regression line added (orange dashed) with the corresponding equation."))
+                                                      )
+                                               ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Air vs Surface water temperature"),
+                                                      wellPanel(
+                                                        plotlyOutput("at_wt")
+                                                      ),
+                                                      p("You can add a linear regression to the whole data or a subset by selecting data points using the 'Box Select' or 'Lasso Select' tool. This may be required if you have many points around 0 or you want to exclude obvious outliers."),
+                                                      actionButton("add_lm2", "Add linear regression"),
+                                                      p("Clear selected points and regression line"),
+                                                      actionButton("clear_sel2", "Clear plot"),
+                                                      br(),
+                                                      wellPanel(
+                                                        p(tags$b("Linear regression equation:")),
+                                                        uiOutput('lm2_eqn')
+                                                      )
+                                               ),
+                                               column(6,
+                                                      h3("Shortwave radiation vs underwater PAR"),
+                                                      wellPanel(
+                                                        plotlyOutput("sw_upar")
+                                                      ),
+                                                      p("You can add a linear regression to the whole data or a subset by selecting data points using the 'Box Select' or 'Lasso Select' tool. This may be required if you have many points around 0 or you want to exclude obvious outliers."),
+                                                      actionButton("add_lm3", "Add linear regression"),
+                                                      p("Clear selected points and regression line"),
+                                                      actionButton("clear_sel3", "Clear plot"),
+                                                      br(),
+                                                      wellPanel(
+                                                        p(tags$b("Linear regression equation:")),
+                                                        uiOutput('lm3_eqn')
+                                                      )
+                                               ),
+                                             ),
+                                             fluidRow(
+                                               column(12,
+                                                      h3("Convert NOAA weather forecast"),
+                                                      p("The model we are using uses data on a daily timestep so we will aggregate the hourly weather forecast to daily averages first and then use the linear model to convert the 30 members in the ensemble from air temperature (predictor variable) to surface water temperature (response variable) and shortwave radiation (predictor variable) to underwater PAR (response variable)."),
+                                                      actionButton("conv_fc", "Convert forecast!", icon = icon("exchange-alt")),
+                                                      br(),
+                                                      wellPanel(
+                                                        plotlyOutput("conv_plot", height = "600px"),
+                                                      ),
+                                                      hr()
                                                )
+                                             ),
+                                             fluidRow(
+                                               column(5, offset = 1,
+                                                      h3("Next step"),
+                                                      p("Now we have converted the weather forecast data into inputs that are used by our model (surface water temperature and underwater PAR), we will use them to generate a forecast of primary productivity with the model we built in Objective 5.")
+                                                      )
+                                               )
+                                             ),
+                                    #* Objective 6 - Forecast! ====
+                                    tabPanel(title = tab_names["stab6", 2], value = "stab6",
+                                             fluidRow(
+                                               column(12,
+                                                      wellPanel(style = paste0("background: ", obj_bg),
+                                                                h3(tab_names["stab6", 2]),
+                                                                p(id = "txt_j", module_text["obj_06", ])
+                                                                )
+                                                      )
+                                               ),
+                                             fluidRow(
+                                               column(4,
+                                                      h3("Initial Condition Uncertainty"),
+                                                      p(module_text["init_uncert", ]),
+                                                      p("Even though we have measurements of water temperature from our lake, we know that water temperature varies throughout the day so this measurement might not capture exactly the temperature in our lake at this time.")
+                                               ),
+                                               column(8,
+                                                      h5("Click the arrows to navigate through the slides", align = "center"),
+                                                      wellPanel(
+                                                        slickROutput("ic_uc_slides", width = "640px", height = "360px")
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(4,
+                                                      h4("Forecasting with Initial Conditions Uncertainty"),
+                                                      p("To account for initial condition uncertainty we can generate a distribution around this value and then run our model with slightly different initial conditions to account for this uncertainty."),
+                                                      p("Use the slider below to adjust the standard deviation and then generate a normal distribution around the observation"),
+                                                      sliderInput("ic_uc", "Standard deviation", min = 0.05, max = 0.5, value = 0.1, step = 0.05),
+                                                      actionButton("gen_ic", "Generate distribution")
+                                               ),
+                                               column(4,
+                                                      h4("Recent Observations"),
+                                                      wellPanel(
+                                                        plotlyOutput("ic_obs_plot")
+                                                      )
+                                               ),
+                                               column(4,
+                                                      h4("Distribution of Initial Conditions"),
+                                                      wellPanel(
+                                                        plotOutput("ic_uc_plot")
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(4,
+                                                      h3("Forecast!"),
+                                                      p("Now we will generate forecasts with different initial conditions for each of our models."),
+                                                      br(),
+                                                      actionButton("run_fc1", "Run forecast"),
+                                                      br(),
+                                                      p("We will use 100 different initial condtions in the forecast ensemble. These will be sampled from the distribution generated above."),
+                                                      
+                                                      sliderInput("n_mem1", "No. of members", min = 5, max = 100, value = 30, step = 5),
+                                                      br(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   # textAreaInput2(inputId = qid[26], label = quest[qid[26], ], width = "90%"),
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               column(8,
+                                                      wellPanel(
+                                                        plotlyOutput("chla_fc1"),
+                                                        radioButtons("plot_type1", "Plot type", c("Line", "Distribution"),
+                                                                     inline = TRUE)
+                                                      ),
+                                                      wellPanel(
+                                                        plotlyOutput("nitrate_fc1")
+                                                      ),
+                                                      wellPanel(
+                                                        plotlyOutput("maxUptake_fc1")
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(5, offset = 1,
+                                                      h3("Next step"),
+                                                      p("TBD...")
+                                               )
+                                             )
                                              )
                                     )
                         ),
@@ -642,51 +903,40 @@ border-color: #FFF;
                         ),
                         tabsetPanel(id = "tabseries3",
                                     #* Activity B - Overview ====
-                                    # tabPanel(title = tab_names["stab6", 2], value = "stab6",
-                                    #          fluidRow(
-                                    #            column(12,
-                                    #                   wellPanel(style = paste0("background: ", obj_bg),
-                                    #                             h3("Overview"),
-                                    #                             p(id = "txt_j", module_text["act_B_overview", ])
-                                    #                             )
-                                    #                   )
-                                    #            )
-                                    #          ),
-                                    #* Objective 6 - Forecast! ====
-                                    tabPanel(title = tab_names["stab6", 2], value = "stab6",
-                                             fluidRow(
-                                               column(12,
-                                                      wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab6", 2]),
-                                                                p(id = "txt_j", module_text["obj_06", ])
-                                                                )
-                                                      )
-                                               )
-                                    ),
-                                    #* Objective 7 - Assimilate data ====
                                     tabPanel(title = tab_names["stab7", 2], value = "stab7",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab7", 2]),
+                                                                h3("Overview"),
+                                                                p(id = "txt_j", module_text["act_B_overview", ])
+                                                                )
+                                                      )
+                                               )
+                                             ),
+                                    #* Objective 7 - Assimilate data ====
+                                    tabPanel(title = tab_names["stab8", 2], value = "stab7",
+                                             fluidRow(
+                                               column(12,
+                                                      wellPanel(style = paste0("background: ", obj_bg),
+                                                                h3(tab_names["stab8", 2]),
                                                                 p(id = "txt_j", module_text["obj_07", ])
                                                                 )
                                                       )
                                                )
                                              ),
                                     #* Objective 8 - Explore observation uncertainty ====
-                                    tabPanel(title = tab_names["stab8", 2], value = "obj9",
+                                    tabPanel(title = tab_names["stab9", 2], value = "stab9",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab8", 2]),
+                                                                h3(tab_names["stab9", 2]),
                                                                 p(id = "txt_j", module_text["obj_08", ])
                                                                 )
                                                       )
                                                )
                                              ),
                                     #* Objective 9 - Driver Uncertainty ====
-                                    tabPanel(title = tab_names["stab9", 2], value = "stab9",
+                                    tabPanel(title = tab_names["stab10", 2], value = "stab10",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -697,11 +947,11 @@ border-color: #FFF;
                                                )
                                              ) ,
                                     # * Activity B - Summary ====
-                                    tabPanel(title = tab_names["stab10", 2], value = "stab10",
+                                    tabPanel(title = tab_names["stab11", 2], value = "stab11",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab10", 2]),
+                                                                h3(tab_names["stab11", 2]),
                                                                 p(id = "txt_j", module_text["act_B_summ", ]),
                                                                 p("Remember, the Shiny app will disconnect if you leave it idle for 10 minutes, so make sure to download your '.eddie' file at the bottom of the page to checkpoint your progress.")
                                                                 )
@@ -724,7 +974,7 @@ border-color: #FFF;
                           ),
                         tabsetPanel(id = "tabseries4",
                                     #* Objective 10 - Management Scenario ====
-                                    tabPanel(title = tab_names["stab11", 2], value = "stab11",
+                                    tabPanel(title = tab_names["stab12", 2], value = "stab12",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -735,7 +985,7 @@ border-color: #FFF;
                                                )
                                              ),
                                     #* Activity C - Summary ====
-                                    tabPanel(title = tab_names["stab12", 2], value = "stab12",
+                                    tabPanel(title = tab_names["stab13", 2], value = "stab13",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),

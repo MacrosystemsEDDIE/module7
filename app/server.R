@@ -30,8 +30,11 @@ shinyServer(function(input, output, session) {
 
 
   # Select NEON DT rows ----
-  neon_chla <- reactiveValues(df = NULL)
-  airt1_fc <- reactiveValues(df = NULL)
+  start_date <- "2020-09-25"
+  noaa_fc <- reactiveValues(list = NULL, conv = NULL)
+  lake_data <- reactiveValues(df = NULL)
+  obs_plot <- reactiveValues(hist = NULL, future = NULL)
+  
   observeEvent(input$table01_rows_selected, {
     row_selected = neon_sites[input$table01_rows_selected, ]
     siteID$lab <- neon_sites$siteID[input$table01_rows_selected]
@@ -54,93 +57,36 @@ shinyServer(function(input, output, session) {
     }
     # set new value to reactiveVal
     prev_row(row_selected)
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = "Loading NEON data",
+                 detail = "This may take a while. This window will disappear
+                     when it is downloaded.", value = 0.33)
+    #load NEON data and format for input into EnKF
+    lake_data$df <- format_enkf_inputs(siteID = siteID$lab, neon_vars = neon_vars)
 
-    # Load Chl-a observations
-    read_var <- neon_vars$id[which(neon_vars$Short_name == "Chlorophyll-a")]
-    units <- neon_vars$units[which(neon_vars$Short_name == "Chlorophyll-a")]
-    file <- file.path("data", "neon", paste0(siteID$lab, "_", read_var, "_", units, ".csv"))
-    if(file.exists(file)) {
-      chla <- read.csv(file)
-      chla[, 1] <- as.POSIXct(chla[, 1], tz = "UTC")
-    }
-    neon_chla$df <- chla
-
-    # Load one airt fc
-    fpath <- file.path("data", "NOAAGEFS_1hr", siteID$lab)
-    fc_date <- list.files(fpath)[1]
-    fpath2 <- file.path(fpath, fc_date[1], "00")
-    fils <- list.files(fpath2, full.names = TRUE)
-    fils <- fils[-c(grep("ens00", fils))]
-    fid <- ncdf4::nc_open(file.path(fils[1]))
-    vars <- fid$var # Extract variable names for selection
-    fc_vars <- names(vars)[c(1)] # Extract air temp
-    membs <- 1 #length(fils)
-    ncdf4::nc_close(fid)
-
-    out <- lapply(fc_date, function(dat) {
-      idx <- which(fc_date == dat)
-
-      fpath2 <- file.path(fpath, dat, "00")
-      fils <- list.files(fpath2)
-      fils <- fils[-c(grep("ens00", fils))]
-      fils <- fils[1]
-
-      for( i in seq_len(length(fils))) {
-
-        fid <- ncdf4::nc_open(file.path("data", "NOAAGEFS_1hr", siteID$lab, dat,
-                                        "00", fils[i]))
-        tim = ncvar_get(fid, "time")
-        tunits = ncatt_get(fid, "time")
-        lnam = tunits$long_name
-        tustr <- strsplit(tunits$units, " ")
-        step = tustr[[1]][1]
-        tdstr <- strsplit(unlist(tustr)[3], "-")
-        tmonth <- as.integer(unlist(tdstr)[2])
-        tday <- as.integer(unlist(tdstr)[3])
-        tyear <- as.integer(unlist(tdstr)[1])
-        tdstr <- strsplit(unlist(tustr)[4], ":")
-        thour <- as.integer(unlist(tdstr)[1])
-        tmin <- as.integer(unlist(tdstr)[2])
-        origin <- as.POSIXct(paste0(tyear, "-", tmonth,
-                                    "-", tday, " ", thour, ":", tmin),
-                             format = "%Y-%m-%d %H:%M", tz = "UTC")
-        if (step == "hours") {
-          tim <- tim * 60 * 60
-        }
-        if (step == "minutes") {
-          tim <- tim * 60
-        }
-        time = as.POSIXct(tim, origin = origin, tz = "UTC")
-        var_list <- lapply(fc_vars, function(x) {
-          if(x == "air_temperature") {
-            data.frame(time = time, value = (ncdf4::ncvar_get(fid, x) -  273.15))
-          } else {
-            data.frame(time = time, value = (ncdf4::ncvar_get(fid, x)))
-          }
-        })
-
-        ncdf4::nc_close(fid)
-        names(var_list) <- fc_vars
-
-        mlt1 <- reshape::melt(var_list, id.vars = "time")
-        mlt1 <- mlt1[, c("time", "L1", "value")]
-
-        # df <- get_vari(file.path("data", fils[i]), input$fc_var, print = F)
-        cnam <- paste0("mem", formatC(i, width = 2, format = "d", flag = "0"))
-        # if(i == 1) {
-          df2 <- mlt1
-          colnames(df2)[3] <- cnam
-        df3 <- data.frame(Date = as.character(as.Date(df2$time)),
-                          value = df2$mem01)
-        # df2$Date <- as.character(as.Date(df2$time))
-        df4 <- plyr::ddply(df3, c("Date"), function(x) data.frame(value = mean(x[, 2], na.rm = TRUE)))
-        df4$Date <- as.Date(df4$Date)
-        df4 <- df4[df4$Date <= "2020-10-02", ]
-
-      }
-      return(df4)
-    })
-    airt1_fc$df <- out[[1]]
+    progress$set(message = "Loading NOAA forecast data",
+                 detail = "This may take a while. This window will disappear
+                     when it is downloaded.", value = 0.67)
+    noaa_fc$list <- load_noaa_forecast(siteID = siteID$lab, start_date = start_date)
+    
+    idx <- which(lake_data$df$Date == start_date)
+    
+    # Historical data
+    df <- lake_data$df[(idx-7):(idx+1), ]
+    df$chla[nrow(df)] <- NA
+    df$Date <- as.Date(df$datetime)
+    df$maxUptake <- as.numeric(NA)
+    obs_plot$hist <- df
+    
+    # Future data
+    df <- lake_data$df[(idx+1):(idx+35), ]
+    df$Date <- as.Date(df$datetime)
+    df$maxUptake <- as.numeric(NA)
+    obs_plot$future <- df
+    
   })
 
   # Neon map ----
@@ -371,7 +317,7 @@ shinyServer(function(input, output, session) {
   })
 
 
-  # Variable relaationships plot ----
+  # Variable relationships plot ----
   output$xy_plot <- renderPlotly({
     
     validate(
@@ -431,6 +377,457 @@ shinyServer(function(input, output, session) {
       theme_minimal(base_size = 12)
     return(ggplotly(p, dynamicTicks = TRUE))
     
+  })
+  
+  
+  #** Save air and water temp ----
+  selected2 <- reactiveValues(sel = NULL)
+  observeEvent(input$clear_sel2, {
+    selected2$sel <- NULL
+    lm_wt$sub <- NULL
+    lm_wt$m <- NULL
+    lm_wt$b <- NULL
+    lm_wt$r2 <- NULL
+    lm_wt$sigma <- NULL
+  })
+  
+  #selected
+  observe({
+    # suppress warnings
+    storeWarn<- getOption("warn")
+    options(warn = -1)
+    selected2$sel <- event_data(event = "plotly_selected", source = "B")
+    
+    #restore warnings, delayed so plot is completed
+    shinyjs::delay(expr =({
+      options(warn = storeWarn)
+    }) ,ms = 100)
+  })
+  
+  lm_wt <- reactiveValues(sub = NULL, m = NULL, b = NULL, r2 = NULL, sigma = NULL)
+  
+  observeEvent(input$add_lm2, {
+    if(is.null(selected2$sel)) {
+      df <- wtemp_airtemp()$data
+    } else {
+      df <- selected2$sel[, 2:4]
+    }
+    fit <- lm(df[, 3] ~ df[, 2])
+    coeffs <- fit$coefficients
+    lm_wt$sub <- df
+    lm_wt$m <- round(coeffs[2], 2)
+    lm_wt$b <- round(coeffs[1], 2)
+    lm_wt$r2 <- round(summary(fit)$r.squared, 2)
+    lm_wt$sigma <- sigma(fit)
+  })
+  
+  output$lm2_r2 <- renderText({
+    validate(
+      need(!is.null(lm_wt$r2),
+           message = "Please click 'Add linear regression'.")
+    )
+    if(!is.null(lm_wt$r2)) {
+      paste0("R2 = ", lm_wt$r2)
+    } else {
+      "R2 = NULL"
+    }
+  })
+  
+  output$lm2_eqn <- renderUI({
+    validate(
+      need(!is.null(lm_wt$m),
+           message = "Please click 'Add linear regression'.")
+    )
+    formula <- "$$ wtemp = %s * airtemp + %s   ;   r^2 = %s $$"
+    text <- sprintf(formula, lm_wt$m, lm_wt$b, lm_wt$r2)
+    withMathJax(
+      tags$p(text)
+    )
+  })
+  
+  wtemp_airtemp <- reactive({ # view_var
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    df <- na.exclude(lake_data$df[, c("datetime", "airt", "wtemp")])
+    
+    validate(
+      need(nrow(df) > 0, message = "No variables at matching timesteps.")
+    )
+    colnames(df)[-1] <- c("X", "Y")
+    sel <- tryCatch(df[(selected2$sel$pointNumber+1),,drop=FALSE] , error=function(e){NULL})
+    return(list(data = df, sel = sel))
+  })
+  
+  # Air temp vs Water temp plot ----
+  output$at_wt <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    obj <- wtemp_airtemp()$sel
+    
+    p <- ggplot() +
+      geom_point(data = wtemp_airtemp()$data, aes_string(names(wtemp_airtemp()$data)[2], names(wtemp_airtemp()$data)[3]), color = "black") +
+      ylab("Surface water temperature (\u00B0C)") +
+      xlab("Air temperature (\u00B0C)") +
+      theme_minimal(base_size = 12)
+    
+    if(nrow(obj) != 0) {
+      p <- p +
+        geom_point(data = obj, aes_string(names(obj)[2], names(obj)[3]), color = cols[2])
+    }
+    if(!is.null(lm_wt$m)) {
+      p <- p +
+        geom_abline(slope = lm_wt$m, intercept = lm_wt$b, color = cols[2], linetype = "dashed")
+    }
+    return(ggplotly(p, dynamicTicks = TRUE, source = "B"))
+  })
+  
+  #** Save SWR and uPAR ----
+  selected3 <- reactiveValues(sel = NULL)
+  observeEvent(input$clear_sel3, {
+    selected3$sel <- NULL
+    lm_upar$sub <- NULL
+    lm_upar$m <- NULL
+    lm_upar$b <- NULL
+    lm_upar$r2 <- NULL
+    lm_upar$sigma <- NULL
+  })
+  
+  #selected
+  observe({
+    # suppress warnings
+    storeWarn<- getOption("warn")
+    options(warn = -1)
+    selected3$sel <- event_data(event = "plotly_selected", source = "C")
+    
+    #restore warnings, delayed so plot is completed
+    shinyjs::delay(expr =({
+      options(warn = storeWarn)
+    }) ,ms = 100)
+  })
+  
+  swr_upar <- reactive({ # view_var
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    df <- na.exclude(lake_data$df[, c("datetime", "swr", "par")])
+    validate(
+      need(nrow(df) > 0, message = "No variables at matching timesteps.")
+    )
+    colnames(df)[-1] <- c("X", "Y")
+    sel <- tryCatch(df[(selected3$sel$pointNumber+1),,drop=FALSE] , error=function(e){NULL})
+    return(list(data = df, sel = sel))
+  })
+  
+  lm_upar <- reactiveValues(sub = NULL, m = NULL, b = NULL, r2 = NULL, sigma = NULL)
+  
+  observeEvent(input$add_lm3, {
+    if(is.null(selected3$sel)) {
+      df <- swr_upar()$data
+    } else {
+      df <- selected3$sel[, 2:4]
+    }
+    fit <- lm(df[, 3] ~ df[, 2])
+    coeffs <- fit$coefficients
+    lm_upar$sub <- df
+    lm_upar$m <- round(coeffs[2], 2)
+    lm_upar$b <- round(coeffs[1], 2)
+    lm_upar$r2 <- round(summary(fit)$r.squared, 2)
+    lm_upar$sigma <- sigma(fit)
+  })
+  
+  output$lm3_r2 <- renderText({
+    validate(
+      need(!is.null(lm_upar$r2),
+           message = "Please click 'Add linear regression'.")
+    )
+    if(!is.null(lm_upar$m)) {
+      r2 <- round(lm_upar$r2, 2)
+      paste0("R2 = ", r2)
+    } else {
+      "R2 = NULL"
+    }
+  })
+  
+  output$lm3_eqn <- renderUI({
+    validate(
+      need(!is.null(lm_upar$m),
+           message = "Please click 'Add linear regression'.")
+    )
+    if(lm_upar$b < 0) {
+      formula <- "$$ uPAR = %s * SWR %s   ;   r^2 = %s $$"
+    } else {
+      formula <- "$$ uPAR = %s * SWR + %s   ;   r^2 = %s $$"
+    }
+    text <- sprintf(formula, lm_upar$m, lm_upar$b, lm_upar$r2)
+    withMathJax(
+      tags$p(text)
+    )
+  })
+  
+  # SWR vs uPAR plot ----
+  output$sw_upar <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    
+    obj <- swr_upar()$sel
+    
+    p <- ggplot() +
+      geom_point(data = swr_upar()$data, aes_string(names(swr_upar()$data)[2], names(swr_upar()$data)[3]), color = "black") +
+      ylab("Underwater PAR (micromolesPerSquareMeterPerSecond)") +
+      xlab("Shortwave radiation (wattsPerSquareMeter)") +
+      theme_minimal(base_size = 12)
+    
+    if(nrow(obj) != 0) {
+      p <- p +
+        geom_point(data = obj, aes_string(names(obj)[2], names(obj)[3]), color = cols[2])
+    }
+    if(!is.null(lm_upar$m)) {
+      p <- p +
+        geom_abline(slope = lm_upar$m, intercept = lm_upar$b, color = cols[2], linetype = "dashed")
+    }
+    
+    return(ggplotly(p, dynamicTicks = TRUE, source = "C"))
+    
+  })
+  
+  #** Convert NOAA forecast data ----
+  observeEvent(input$conv_fc, {
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$m),
+           message = "Please add a regression line for the air vs. water temperature.")
+    )
+    validate(
+      need(!is.null(lm_upar$m),
+           message = "Please add a regression line for the SWR vs. uPAR.")
+    )
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = paste0("Converting NOAA data."),
+                 detail = "This window will disappear when it is finished converting.", value = 0.01)
+    
+    mlt1 <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, noaa_fc = noaa_fc, start_date = start_date)
+    progress$set(value = 1)
+    noaa_fc$conv <- mlt1
+    if(min(mlt1$upar, na.rm = TRUE) <= 0) {
+      showModal(modalDialog(
+        title = "Uh oh!",
+        "Inspect your Underwater PAR plot. It looks like you have negative values which isn't possible!
+        Adjust your linear regression and convert the forecast again."
+      ))
+    }
+  })
+  
+  #** Plot of converted data
+  output$conv_plot <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$m),
+           message = "Please add a regression line for the air vs. water temperature.")
+    )
+    validate(
+      need(!is.null(lm_upar$m),
+           message = "Please add a regression line for the SWR vs. uPAR.")
+    )
+    validate(
+      need(!is.null(noaa_fc$conv),
+           message = "Click 'Convert forecast'.")
+    )
+    validate(
+      need(input$conv_fc > 0, "Click 'Convert forecast'.")
+    )
+    
+    mlt1 <- noaa_fc$conv
+    mlt2 <- reshape2::melt(mlt1, id.vars = c("date", "fc_date", "L1"))
+    
+    p <- ggplot()
+    p <- p +
+      geom_line(data = mlt2, aes(date, value, group = L1, color = fc_date)) +
+      scale_color_manual(values = p.cols[2]) +
+      facet_wrap(~variable, scales = "free_y", nrow = 2,
+                 strip.position = "left",
+                 labeller = as_labeller(c(wtemp = "Water temperature (\u00B0C)", upar = "Underwater PAR (µmol m-2 s-1)") )) +
+      labs(color = "Forecast date") +
+      xlab("Time") +
+      theme_minimal(base_size = 12) +
+      ylab(NULL) +
+      theme(strip.background = element_blank(),
+            strip.placement = "outside")
+    
+    gp <- ggplotly(p, dynamicTicks = TRUE)
+    return(gp)
+  })
+  
+  #** Initial Condition Uncertainty ----
+  ic_dist <- reactiveValues(df = NULL)
+  
+  #** Generate IC distribution ----
+  observeEvent(input$gen_ic, {
+    req(input$table01_rows_selected != "")
+    req(!is.null(lake_data$df))
+    mn_chla <- lake_data$df$chla[lake_data$df$Date == start_date]
+    ic_dist$df <- data.frame(value = rnorm(1000, mn_chla, input$ic_uc))
+  })
+  
+  #** Plot - IC distribution ----
+  output$ic_uc_plot <- renderPlot({
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(ic_dist$df), "Click 'Generate distribution")
+    )
+    df <- data.frame(x = lake_data$df$chla[lake_data$df$Date == start_date],
+                     label = "Observed")
+    
+    xlims <- c(df$x -1.5, df$x + 1.5)
+    ylims <- c(0,7)
+    
+    p <- ggplot() +
+      geom_vline(xintercept = df$x) +
+      geom_density(data = ic_dist$df, aes(value), fill = l.cols[2], alpha = 0.3) +
+      ylab("Chlorophyll-a (μg/L)") +
+      ylab("Density") +
+      coord_cartesian(xlim = xlims, ylim = ylims) +
+      theme_bw(base_size = 18)
+    
+    return(p)
+  })
+  
+  #** Recent obs timeseries ----
+  output$ic_obs_plot <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$m) & !is.null(lm_upar$m),
+           message = "Please prepare inputs in Objective 5.")
+    )
+
+
+    p <- ggplot()
+
+    if(!is.null(ic_dist$df)) {
+      quants <- quantile(ic_dist$df$value, c(0.25, 0.75))
+
+      err_bar <- data.frame(x = as.Date(start_date), ymin = quants[1], ymax = quants[2])
+      p <- p +
+        geom_errorbar(data = err_bar, aes(x, ymin = ymin, ymax = ymax, width = 0.5))
+    }
+
+    p <- p +
+      geom_point(data = obs_plot$hist, aes(Date, chla, color = "Chlorophyll-a")) +
+      geom_vline(xintercept = as.Date(start_date), linetype = "dashed") +
+      ylab("Chlorophyll-a (μg/L)") +
+      xlab("Date") +
+      scale_color_manual(values = c("Chlorophyll-a" = cols[2])) +
+      theme_bw(base_size = 12) +
+      theme(legend.position = "none")
+    return(ggplotly(p, dynamicTicks = TRUE))
+  })
+  
+  #** Run IC forecast ----
+  est_out1 <- reactiveValues(out = NULL)
+  observeEvent(input$run_fc1, {
+    
+    req(input$table01_rows_selected != "")
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = "Running forecast of chlorophyll-a",
+                 detail = "This may take a while. This window will disappear
+                     when it is downloaded.", value = 0.1)
+    
+    obs_file <- create_data_assim_inputs(freq_chla = 36,
+                                         freq_din = 36,
+                                         lake_data = lake_data$df,
+                                         start_date = start_date)
+    driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, noaa_fc = noaa_fc, start_date = start_date)
+    
+    #get initial conditions for forecast
+    yini <- get_yini(lake_data = lake_data$df,
+                     start_date = start_date)
+    
+    progress$set(value = 0.3)
+    est_out <- EnKF(n_en = input$n_mem1, 
+                   start = '2020-09-25', # start date 
+                   stop = '2020-10-29', # stop date
+                   time_step = 'days',
+                   obs_file = obs_file,
+                   driver_file = driver_file,
+                   n_states_est = 2, 
+                   n_params_est = 1,
+                   n_params_obs = 0,
+                   maxUptake_init = 0.12, 
+                   obs_cv = c(0.01,0.05),#cv for chl-a and DIN, respectively
+                   param_cv = 0.1,#for maxUptake
+                   init_cond_cv = c(input$ic_uc, 0.1),#cv for chl-a and DIN, respectively
+                   state_names = c("chla", "nitrate"),
+                   yini = yini)
+    
+    progress$set(value = 0.9)
+    out <- format_enkf_output(est_out = est_out, lake_data = lake_data$df)
+    
+    est_out1$out <- out
+    progress$set(value = 1)
+  })
+  
+  #** Plot - FC1 - chla UC ----
+  output$chla_fc1 <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(est_out1$out),
+           message = "Click 'Run forecast'.")
+    )
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type1, est_out = est_out1$out, var = "chla")
+  })
+  
+  #** Plot - FC1 - nitrate UC ----
+  output$nitrate_fc1 <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(any(!is.null(est_out1$out)),
+           message = "Click 'Run forecast'.")
+    )
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type1, est_out = est_out1$out, var = "nitrate")
+  })
+
+  #** Plot - FC1 - maxUptake UC ----
+  output$maxUptake_fc1 <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(any(!is.null(est_out1$out)),
+           message = "Click 'Run forecast'.")
+    )
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type1, est_out = est_out1$out, var = "maxUptake")
   })
   
 })
