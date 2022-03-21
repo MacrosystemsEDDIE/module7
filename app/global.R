@@ -7,13 +7,15 @@ suppressPackageStartupMessages(library(leaflet, quietly = TRUE))
 suppressPackageStartupMessages(library(plotly, quietly = TRUE))
 suppressPackageStartupMessages(library(ggpubr, quietly = TRUE))
 suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
+suppressPackageStartupMessages(library(magrittr, quietly = TRUE))
+suppressPackageStartupMessages(library(mvtnorm, quietly = TRUE))
 
 # Colors for plots
 scale_colour_discrete <- ggthemes::scale_colour_colorblind
 scale_fill_discrete <- ggthemes::scale_fill_colorblind
 cols <- RColorBrewer::brewer.pal(8, "Dark2")
 cols2 <- ggthemes::ggthemes_data$colorblind$value
-l.cols <- RColorBrewer::brewer.pal(8, "Set2")[-c(1, 2)]
+l.cols <- RColorBrewer::brewer.pal(8, "Set2")
 p.cols <- RColorBrewer::brewer.pal(12, "Paired")
 
 # Plot saving
@@ -25,25 +27,33 @@ l_siz <- 0.6
 p_siz <- 1.6
 
 # Functions required
-source("R/download_phenocam.R")
-source("R/get_html.R")
-source("R/textAreaInput2.R")
+invisible(sapply(list.files("R", full.names = TRUE), source))
 
 # Load and format questions
 quest <- read.csv("data/student_questions.csv", row.names = 1)
 
 idx <- which(grepl("Name of selected ", quest$Question))
 idx2 <- which(grepl("Elevation", quest$Question))
+idx3 <- which(grepl("Air temperature", quest$Question))
+idx4 <- which(grepl("Underwater PAR", quest$Question))
+
+l1 <- length(idx:idx2)
+l2 <- length(idx3:idx4)
+
 # Number rows
 row.names(quest) <- NULL
 row.names(quest)[1:(idx-1)] <- paste0("q", 1:(idx-1))
-row.names(quest)[idx:(idx2)] <- paste0("q", (idx-1), letters[1:length(idx:idx2)])
-row.names(quest)[(idx2+1):nrow(quest)] <- paste0("q", ((idx2+1):nrow(quest) - 6))
+row.names(quest)[idx:idx2] <- paste0("q", (idx-1), letters[1:l1])
+row.names(quest)[(idx2+1):(idx3-1)] <- paste0("q", ((idx2+1):(idx3 -1) - l1))
+row.names(quest)[idx3:idx4] <- paste0("q", (idx3-1-l1), letters[1:l2])
+row.names(quest)[(idx4+1):nrow(quest)] <- paste0("q", (((idx4+1):nrow(quest)) -(l1+l2)))
 qid <- row.names(quest)
 # Number questions
 quest$Question[1:(idx-1)] <- paste0("Q.", 1:(idx-1), " ", quest$Question[1:(idx-1)])
-quest$Question[idx:(idx2)] <- paste0(letters[1:length(idx:idx2)], ". ", quest$Question[idx:idx2])
-quest$Question[(idx2+1):nrow(quest)] <- paste0("Q.", ((idx2+1):nrow(quest) - 6), " ", quest$Question[(idx2+1):nrow(quest)])
+quest$Question[idx:idx2] <- paste0(letters[1:l1], ". ", quest$Question[idx:idx2])
+quest$Question[(idx2+1):(idx3-1)] <- paste0("Q.", (((idx2+1):(idx3 -1))-l1), " ", quest$Question[(((idx2+1):(idx3 -1)))])
+quest$Question[idx3:idx4] <- paste0(letters[1:l2], ". ", quest$Question[idx3:idx4])
+quest$Question[(idx4+1):nrow(quest)] <- paste0("Q.", ((idx4+1):nrow(quest)-(l1+l2)), " ", quest$Question[(idx4+1):nrow(quest)])
 # Number location
 quest$location[1:(idx-1)] <- paste0(quest$location[1:(idx-1)], " - Q.", 1:(idx-1))
 # quest$location[idx:(idx2)] <- paste0(quest$location[idx:idx2],letters[1:length(idx:idx2)], ". ", )
