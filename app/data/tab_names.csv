@@ -12,10 +12,10 @@ stab5,Objective 5 - Prepare inputs
 stab6,Objective 6 - Forecast!
 mtab6,Activity B
 stab7,Overview
-stab8,Objective 7 - Assimilate data
+stab8,Objective 7 - Data assimilation
 stab9,Objective 8 - Explore observation uncertainty
-stab10,Objective 9 - Explore data frequency
-mtab7,Summary
-stab11,Activity C
+stab10,Objective 9 - Explore data assimilation frequency
+stab11,Summary
+mtab7,Activity C
 stab12,Objective 10 - Management scenario
 stab13,Summary
