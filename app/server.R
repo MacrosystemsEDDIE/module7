@@ -673,87 +673,220 @@ shinyServer(function(input, output, session) {
     return(gp)
   })
   
+  #** Slickr Initial conditions UC slides ----
+  output$ic_uc_slides <- renderSlickR({
+    slickR(ic_uc_slides) + settings(dots = TRUE, autoplay = TRUE, autoplaySpeed = 7000)
+  })
+  
   #** Initial Condition Uncertainty ----
   ic_dist <- reactiveValues(df = NULL)
   
   #** Generate IC distribution ----
+  ic_plot <- reactiveValues(plot = NULL)
   observeEvent(input$gen_ic, {
     req(input$table01_rows_selected != "")
     req(!is.null(lake_data$df))
     mn_chla <- lake_data$df$chla[lake_data$df$Date == start_date]
-    ic_dist$df <- data.frame(value = rnorm(1000, mn_chla, input$ic_uc))
+    dat <- data.frame(value = rnorm(1000, input$ic_val, input$ic_uc))
+    dat$value[dat$value < 0.1] <- 0.1 # If below the min, set to a non-zero value
+    ic_dist$df <- dat
+    
+    df <- data.frame(x = lake_data$df$chla[lake_data$df$Date == start_date],
+                     label = "Observed")
+    
+    dens <- density(ic_dist$df$value)
+    df <- data.frame(x = dens$x, y = dens$y)
+    probs <- c(0, 0.025, 0.125, 0.875, 0.975, 1)
+    quantiles <- quantile(ic_dist$df$value, prob = probs)
+    df$quant <- findInterval(df$x, quantiles)
+    df$quant[df$quant == 4] <- 2
+    df$quant[df$quant == 5] <- 1
+    df$quant[df$quant == 6] <- 0
+    df$quant <- factor(df$quant)
+    
+    xlims <- c(input$ic_val - (3 * input$ic_uc), input$ic_val + (3 * input$ic_uc))
+    ylims <- c(0, max(df$y) + 1)
+    
+    ic_plot$plot <- ggplot(df, aes(x,y)) + 
+      geom_ribbon(aes(ymin = 0, ymax = y, fill = quant)) + 
+      geom_vline(xintercept = input$ic_val, linetype = "dashed") + 
+      scale_fill_brewer(guide = "none", palette = "OrRd") +
+      xlab("Chlorophyll-a (μg/L)") +
+      ylab("Density") +
+      coord_cartesian(xlim = xlims, ylim = ylims) +
+      theme_bw(base_size = 18)
   })
   
   #** Plot - IC distribution ----
   output$ic_uc_plot <- renderPlot({
-    
     validate(
       need(input$table01_rows_selected != "",
            message = "Please select a site in Objective 1.")
     )
     validate(
-      need(!is.null(ic_dist$df), "Click 'Generate distribution")
+      need(!is.null(ic_plot$plot), "Click 'Generate distribution")
     )
-    df <- data.frame(x = lake_data$df$chla[lake_data$df$Date == start_date],
-                     label = "Observed")
-    
-    xlims <- c(df$x -1.5, df$x + 1.5)
-    ylims <- c(0,7)
-    
-    p <- ggplot() +
-      geom_vline(xintercept = df$x) +
-      geom_density(data = ic_dist$df, aes(value), fill = l.cols[2], alpha = 0.3) +
-      ylab("Chlorophyll-a (μg/L)") +
-      ylab("Density") +
-      coord_cartesian(xlim = xlims, ylim = ylims) +
-      theme_bw(base_size = 18)
-    
-    return(p)
+    ic_plot$plot
   })
   
-  #** Recent obs timeseries ----
-  output$ic_obs_plot <- renderPlotly({
-    validate(
-      need(input$table01_rows_selected != "",
-           message = "Please select a site in Objective 1.")
-    )
-    validate(
-      need(!is.null(lm_wt$m) & !is.null(lm_upar$m),
-           message = "Please prepare inputs in Objective 5.")
-    )
-
-
-    p <- ggplot()
-
-    if(!is.null(ic_dist$df)) {
-      quants <- quantile(ic_dist$df$value, c(0.25, 0.75))
-
-      err_bar <- data.frame(x = as.Date(start_date), ymin = quants[1], ymax = quants[2])
-      p <- p +
-        geom_errorbar(data = err_bar, aes(x, ymin = ymin, ymax = ymax, width = 0.5))
-    }
-
-    p <- p +
-      geom_point(data = obs_plot$hist, aes(Date, chla, color = "Chlorophyll-a")) +
-      geom_vline(xintercept = as.Date(start_date), linetype = "dashed") +
-      ylab("Chlorophyll-a (μg/L)") +
-      xlab("Date") +
-      scale_color_manual(values = c("Chlorophyll-a" = cols[2])) +
-      theme_bw(base_size = 12) +
-      theme(legend.position = "none")
-    return(ggplotly(p, dynamicTicks = TRUE))
+  # Reset plot
+  observeEvent(input$ic_val, {
+    ic_plot$plot <- NULL
   })
+  observeEvent(input$ic_uc, {
+    ic_plot$plot <- NULL
+  })
+  
+  
+  #** Recent obs timeseries ----
+  # output$ic_obs_plot <- renderPlotly({
+  #   validate(
+  #     need(input$table01_rows_selected != "",
+  #          message = "Please select a site in Objective 1.")
+  #   )
+  #   validate(
+  #     need(!is.null(lm_wt$m) & !is.null(lm_upar$m),
+  #          message = "Please prepare inputs in Objective 5.")
+  #   )
+  # 
+  # 
+  #   p <- ggplot()
+  # 
+  #   if(!is.null(ic_dist$df)) {
+  #     quants <- quantile(ic_dist$df$value, c(0.25, 0.75))
+  # 
+  #     err_bar <- data.frame(x = as.Date(start_date), ymin = quants[1], ymax = quants[2])
+  #     p <- p +
+  #       geom_errorbar(data = err_bar, aes(x, ymin = ymin, ymax = ymax, width = 0.5))
+  #   }
+  # 
+  #   p <- p +
+  #     geom_point(data = obs_plot$hist, aes(Date, chla, color = "Chlorophyll-a")) +
+  #     geom_vline(xintercept = as.Date(start_date), linetype = "dashed") +
+  #     ylab("Chlorophyll-a (μg/L)") +
+  #     xlab("Date") +
+  #     scale_color_manual(values = c("Chlorophyll-a" = cols[2])) +
+  #     theme_bw(base_size = 12) +
+  #     theme(legend.position = "none")
+  #   return(ggplotly(p, dynamicTicks = TRUE))
+  # })
   
   #** Run IC forecast ----
   est_out1 <- reactiveValues(out = NULL)
+  observeEvent(input$n_mem1, {
+    est_out1$out <- NULL
+  })
   observeEvent(input$run_fc1, {
     
     req(input$table01_rows_selected != "")
+    req(!is.null(lm_wt$m) & !is.null(lm_upar$m))
     
     progress <- shiny::Progress$new()
     # Make sure it closes when we exit this reactive, even if there's an error
     on.exit(progress$close())
-    progress$set(message = "Running forecast of chlorophyll-a",
+    progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem1, " members."),
+                 detail = "This may take a while. This window will disappear
+                     when it is downloaded.", value = 0.1)
+    
+    obs_file <- create_data_assim_inputs(freq_chla = 36,
+                                         freq_din = 36,
+                                         lake_data = lake_data$df,
+                                         start_date = start_date)
+    driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, noaa_fc = noaa_fc, start_date = start_date)
+    
+    #get initial conditions for forecast
+    yini <- get_yini(lake_data = lake_data$df,
+                     start_date = start_date)
+    yini[1] <- input$ic_val
+    
+    chla_cv <- ((input$ic_uc / input$ic_val))
+
+    progress$set(value = 0.3)
+    est_out <- EnKF(n_en = input$n_mem1, 
+                   start = '2020-09-25', # start date 
+                   stop = '2020-10-29', # stop date
+                   time_step = 'days',
+                   obs_file = obs_file,
+                   driver_file = driver_file,
+                   n_states_est = 2, 
+                   n_params_est = 1,
+                   n_params_obs = 0,
+                   maxUptake_init = 0.12, 
+                   obs_cv = c(0.01,0.05),# cv for chl-a and DIN, respectively
+                   param_cv = 0.1, # for maxUptake
+                   init_cond_cv = c(chla_cv, 0.1),#cv for chl-a and DIN, respectively
+                   state_names = c("chla", "nitrate"),
+                   yini = yini)
+    
+    progress$set(value = 0.9)
+    out <- format_enkf_output(est_out = est_out, lake_data = lake_data$df)
+    out$chla$obs$obs[1] <- NA
+    
+    est_out1$out <- out
+    progress$set(value = 1)
+  })
+  
+  #** Plot - FC1 - chla UC ----
+  output$chla_fc1 <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$r2) & !is.null(lm_upar$r2),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(!is.null(est_out1$out),
+           message = "Click 'Run forecast'.")
+    )
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type1, est_out = est_out1$out, var = "chla",
+                  n_days = input$run_fc1_nday)
+  })
+  
+  #** Plot - FC1 - nitrate UC ----
+  output$nitrate_fc1 <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(any(!is.null(est_out1$out)),
+           message = "Click 'Run forecast'.")
+    )
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type1, est_out = est_out1$out, var = "nitrate",
+                  n_days = input$run_fc1_nday)
+  })
+  
+  #** Catch for distribution plot ----
+  observeEvent(input$plot_type1, {
+    if(input$plot_type1 == "Distribution") {
+      updateSliderInput(session, inputId = "run_fc1_nday", value = 35)
+      shinyjs::disable("run_fc1_nday")
+    } else {
+      shinyjs::enable("run_fc1_nday")
+    }
+  })
+
+  # Objective 7 ----
+  #** Submit Hypothesis Rank ----
+  observeEvent(input$submit_hyp, {
+    
+    shinyalert::shinyalert(title = "Hypothesis Submitted!",
+                           "Now continue below and generate the forecasts and we will see how it matches with your hypothesis.")
+  })
+  
+  #* Run Forecast with NO DA ----
+  est_out_no_da <- reactiveValues(out = NULL)
+  observeEvent(input$run_fc_no_da, {
+    
+    req(input$table01_rows_selected != "")
+    req(!is.null(lm_wt$m) & !is.null(lm_upar$m))
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem_no_da, " members."),
                  detail = "This may take a while. This window will disappear
                      when it is downloaded.", value = 0.1)
     
@@ -768,66 +901,798 @@ shinyServer(function(input, output, session) {
                      start_date = start_date)
     
     progress$set(value = 0.3)
-    est_out <- EnKF(n_en = input$n_mem1, 
-                   start = '2020-09-25', # start date 
-                   stop = '2020-10-29', # stop date
-                   time_step = 'days',
-                   obs_file = obs_file,
-                   driver_file = driver_file,
-                   n_states_est = 2, 
-                   n_params_est = 1,
-                   n_params_obs = 0,
-                   maxUptake_init = 0.12, 
-                   obs_cv = c(0.01,0.05),#cv for chl-a and DIN, respectively
-                   param_cv = 0.1,#for maxUptake
-                   init_cond_cv = c(input$ic_uc, 0.1),#cv for chl-a and DIN, respectively
-                   state_names = c("chla", "nitrate"),
-                   yini = yini)
+    est_out <- EnKF(n_en = input$n_mem_no_da, 
+                    start = '2020-09-25', # start date 
+                    stop = '2020-10-29', # stop date
+                    time_step = 'days',
+                    obs_file = obs_file,
+                    driver_file = driver_file,
+                    n_states_est = 2, 
+                    n_params_est = 1,
+                    n_params_obs = 0,
+                    maxUptake_init = 0.12, 
+                    obs_cv = c(0.01,0.05), #cv for chl-a and DIN, respectively
+                    param_cv = 0.1, #for maxUptake
+                    init_cond_cv = c(0.05, 0.1), #cv for chl-a and DIN, respectively
+                    state_names = c("chla", "nitrate"),
+                    yini = yini)
     
     progress$set(value = 0.9)
-    out <- format_enkf_output(est_out = est_out, lake_data = lake_data$df)
-    
-    est_out1$out <- out
+    est_out_no_da$out <- format_enkf_output(est_out = est_out, lake_data = lake_data$df)
     progress$set(value = 1)
   })
   
-  #** Plot - FC1 - chla UC ----
-  output$chla_fc1 <- renderPlotly({
-    validate(
-      need(input$table01_rows_selected != "",
-           message = "Please select a site in Objective 1.")
-    )
-    validate(
-      need(!is.null(est_out1$out),
-           message = "Click 'Run forecast'.")
-    )
-    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type1, est_out = est_out1$out, var = "chla")
+  #** Reset forecast when slider is moved
+  observeEvent(input$n_mem_no_da, {
+    est_out_no_da$out <- NULL
   })
   
-  #** Plot - FC1 - nitrate UC ----
-  output$nitrate_fc1 <- renderPlotly({
-    validate(
-      need(input$table01_rows_selected != "",
-           message = "Please select a site in Objective 1.")
-    )
-    validate(
-      need(any(!is.null(est_out1$out)),
-           message = "Click 'Run forecast'.")
-    )
-    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type1, est_out = est_out1$out, var = "nitrate")
+  #** Assess forecast with NO DA ----
+  fc_no_da <- reactiveValues(plot = NULL, rmse = NA)
+  observeEvent(input$assess_fc_no_da, {
+    req(input$table01_rows_selected != "")
+    req(!is.null(est_out_no_da$out))
+    
+    fc_no_da$rmse <- rmse(est_out = est_out_no_da$out, lake_data = lake_data$df, var = "chla")
+    fc_no_da$plot <- pred_v_obs(obs_plot = obs_plot, est_out = est_out_no_da$out, var = "chla")
   })
-
-  #** Plot - FC1 - maxUptake UC ----
-  output$maxUptake_fc1 <- renderPlotly({
+  
+  #** Plot Forecast with NO DA ----
+  output$chla_fc_no_da <- renderPlotly({
     validate(
       need(input$table01_rows_selected != "",
            message = "Please select a site in Objective 1.")
     )
     validate(
-      need(any(!is.null(est_out1$out)),
+      need(!is.null(lm_wt$r2) & !is.null(lm_upar$r2),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(!is.null(est_out_no_da$out),
            message = "Click 'Run forecast'.")
     )
-    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type1, est_out = est_out1$out, var = "maxUptake")
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type_no_da,
+                  est_out = est_out_no_da$out, var = "chla", add_obs = input$add_obs_no_da, n_days = input$nday_no_da)
+  })
+  
+  #** Catch for distribution plot ----
+  observeEvent(input$plot_type_no_da, {
+    if(input$plot_type_no_da == "Distribution") {
+      updateSliderInput(session, inputId = "nday_no_da", value = 35)
+      shinyjs::disable("nday_no_da")
+    } else {
+      shinyjs::enable("nday_no_da")
+    }
+  })
+  
+  #** Calculate RMSE with NO DA ----
+  output$rmse_no_da <- renderText({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(est_out_no_da$out),
+           message = "Click 'Run forecast'.")
+    )
+    validate(
+      need(!is.na(fc_no_da$rmse),
+           message = "Click 'Assess forecast'.")
+    )
+    paste0("Chlorophyll-a RMSE = ", fc_no_da$rmse, " μg/L") 
+  })
+  
+  #** Plot Pred vs. Obs with NO DA ----
+  output$chla_fc_assess_no_da <- renderPlot({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(est_out_no_da$out),
+           message = "Click 'Run forecast'.")
+    )
+    validate(
+      need(!is.null(fc_no_da$plot),
+           message = "Click 'Assess forecast'.")
+    )
+    fc_no_da$plot
+  })
+  
+  #* Run Forecast with chl-a DA ----
+  est_out_chla_assim <- reactiveValues(out = NULL)
+  observeEvent(input$run_fc_chla_assim, {
+    
+    req(input$table01_rows_selected != "")
+    req(!is.null(lm_wt$m) & !is.null(lm_upar$m))
+
+    # Reset assessment data
+    fc_chla_assim$plot <- NULL
+    fc_chla_assim$rmse <- NULL
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem_chla_assim, " members."),
+                 detail = "This may take a while. This window will disappear
+                     when it is downloaded.", value = 0.1)
+    
+    obs_file <- create_data_assim_inputs(freq_chla = 7,
+                                         freq_din = 36,
+                                         lake_data = lake_data$df,
+                                         start_date = start_date)
+    driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, noaa_fc = noaa_fc, start_date = start_date)
+    
+    #get initial conditions for forecast
+    yini <- get_yini(lake_data = lake_data$df,
+                     start_date = start_date)
+    
+    progress$set(value = 0.3)
+    est_out <- EnKF(n_en = input$n_mem_chla_assim, 
+                    start = '2020-09-25', # start date 
+                    stop = '2020-10-29', # stop date
+                    time_step = 'days',
+                    obs_file = obs_file,
+                    driver_file = driver_file,
+                    n_states_est = 2, 
+                    n_params_est = 1,
+                    n_params_obs = 0,
+                    maxUptake_init = 0.12, 
+                    obs_cv = c(0.01,0.05), #cv for chl-a and DIN, respectively
+                    param_cv = 0.1, #for maxUptake
+                    init_cond_cv = c(0.05, 0.1), #cv for chl-a and DIN, respectively
+                    state_names = c("chla", "nitrate"),
+                    yini = yini)
+    
+    progress$set(value = 0.9)
+    est_out_chla_assim$out <- format_enkf_output(est_out = est_out, lake_data = lake_data$df)
+    progress$set(value = 1)
+  })
+  
+  #** Reset forecast when slider is moved
+  observeEvent(input$ndays_chla_assim, {
+    est_out_chla_assim$out <- NULL
+    fc_chla_assim$plot <- NULL
+    fc_chla_assim$rmse <- NULL
+  })
+  
+  
+  #** Assess forecast with chl-a DA ----
+  fc_chla_assim <- reactiveValues(plot = NULL, rmse = NA)
+  observeEvent(input$assess_fc_chla_assim, {
+    req(input$table01_rows_selected != "")
+    req(!is.null(est_out_chla_assim$out))
+    
+    fc_chla_assim$rmse <- rmse(est_out = est_out_chla_assim$out, lake_data = lake_data$df, var = "chla")
+    fc_chla_assim$plot <- pred_v_obs(obs_plot = obs_plot, est_out = est_out_chla_assim$out, var = "chla")
+  })
+  
+  #** Plot Forecast with chl-a DA ----
+  output$chla_fc_chla_assim <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$r2) & !is.null(lm_upar$r2),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(!is.null(est_out_chla_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    var <- view_vars$sname[view_vars$lname == input$view_var_chla_assim]
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type_chla_assim,
+                  est_out = est_out_chla_assim$out, var = var, add_obs = input$add_obs_chla_assim, n_days = input$nday_chla_assim)
+  })
+  
+  #** Catch for distribution plot ----
+  observeEvent(input$plot_type_chla_assim, {
+    if(input$plot_type_chla_assim == "Distribution") {
+      updateSliderInput(session, inputId = "nday_chla_assim", value = 35)
+      shinyjs::disable("nday_chla_assim")
+    } else {
+      shinyjs::enable("nday_chla_assim")
+    }
+  })
+  
+  #** Print RMSE with chl-a DA ----
+  output$rmse_chla_assim <- renderText({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(est_out_chla_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    validate(
+      need(!is.na(fc_chla_assim$rmse),
+           message = "Click 'Assess forecast'.")
+    )
+    paste0("Chlorophyll-a RMSE = ", fc_chla_assim$rmse, " μg/L") 
+  })
+  
+  #** Plot Pred vs. Obs with chl-a DA ----
+  output$chla_fc_assess_chla_assim <- renderPlot({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(est_out_chla_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    validate(
+      need(!is.null(fc_chla_assim$plot),
+           message = "Click 'Assess forecast'.")
+    )
+    fc_chla_assim$plot
+  })
+  
+  #* Run Forecast with nitrate DA ----
+  est_out_nitrate_assim <- reactiveValues(out = NULL)
+  observeEvent(input$run_fc_nitrate_assim, {
+    
+    req(input$table01_rows_selected != "")
+    req(!is.null(lm_wt$m) & !is.null(lm_upar$m))
+    
+    # Reset assessment data
+    fc_nitrate_assim$plot <- NULL
+    fc_nitrate_assim$rmse <- NULL
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem_nitrate_assim, " members."),
+                 detail = "This may take a while. This window will disappear
+                     when it is downloaded.", value = 0.1)
+    
+    obs_file <- create_data_assim_inputs(freq_chla = 36,
+                                         freq_din = 7,
+                                         lake_data = lake_data$df,
+                                         start_date = start_date)
+    driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, noaa_fc = noaa_fc, start_date = start_date)
+    
+    #get initial conditions for forecast
+    yini <- get_yini(lake_data = lake_data$df,
+                     start_date = start_date)
+    
+    progress$set(value = 0.3)
+    est_out <- EnKF(n_en = input$n_mem_nitrate_assim, 
+                    start = '2020-09-25', # start date 
+                    stop = '2020-10-29', # stop date
+                    time_step = 'days',
+                    obs_file = obs_file,
+                    driver_file = driver_file,
+                    n_states_est = 2, 
+                    n_params_est = 1,
+                    n_params_obs = 0,
+                    maxUptake_init = 0.12, 
+                    obs_cv = c(0.01,0.05), #cv for chl-a and DIN, respectively
+                    param_cv = 0.1, #for maxUptake
+                    init_cond_cv = c(0.05, 0.1), #cv for chl-a and DIN, respectively
+                    state_names = c("chla", "nitrate"),
+                    yini = yini)
+    
+    progress$set(value = 0.9)
+    est_out_nitrate_assim$out <- format_enkf_output(est_out = est_out, lake_data = lake_data$df)
+    progress$set(value = 1)
+  })
+  
+  #** Reset forecast when slider is moved
+  observeEvent(input$ndays_nitrate_assim, {
+    est_out_nitrate_assim$out <- NULL
+    fc_nitrate_assim$plot <- NULL
+    fc_nitrate_assim$rmse <- NULL
+  })
+  
+  
+  #** Assess forecast with nitrate DA ----
+  fc_nitrate_assim <- reactiveValues(plot = NULL, rmse = NA)
+  observeEvent(input$assess_fc_nitrate_assim, {
+    req(input$table01_rows_selected != "")
+    req(!is.null(est_out_nitrate_assim$out))
+    
+    fc_nitrate_assim$rmse <- rmse(est_out = est_out_nitrate_assim$out, lake_data = lake_data$df, var = "chla")
+    fc_nitrate_assim$plot <- pred_v_obs(obs_plot = obs_plot, est_out = est_out_nitrate_assim$out, var = "chla")
+  })
+  
+  #** Plot Forecast with nitrate DA ----
+  output$chla_fc_nitrate_assim <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$r2) & !is.null(lm_upar$r2),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(!is.null(est_out_nitrate_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    var <- view_vars$sname[view_vars$lname == input$view_var_nitrate_assim]
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type_nitrate_assim,
+                  est_out = est_out_nitrate_assim$out, var = var, add_obs = input$add_obs_nitrate_assim, n_days = input$nday_nitrate_assim)
+  })
+  
+  #** Catch for distribution plot ----
+  observeEvent(input$plot_type_nitrate_assim, {
+    if(input$plot_type_nitrate_assim == "Distribution") {
+      updateSliderInput(session, inputId = "nday_nitrate_assim", value = 35)
+      shinyjs::disable("nday_nitrate_assim")
+    } else {
+      shinyjs::enable("nday_nitrate_assim")
+    }
+  })
+  
+  #** Calculate RMSE with nitrate DA ----
+  output$rmse_nitrate_assim <- renderText({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(est_out_nitrate_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    validate(
+      need(!is.na(fc_nitrate_assim$rmse),
+           message = "Click 'Assess forecast'.")
+    )
+    paste0("Chlorophyll-a RMSE = ", fc_nitrate_assim$rmse, " μg/L") 
+  })
+  
+  #** Plot Pred vs. Obs with nitrate DA ----
+  output$chla_fc_assess_nitrate_assim <- renderPlot({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(est_out_nitrate_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    validate(
+      need(!is.null(fc_nitrate_assim$plot),
+           message = "Click 'Assess forecast'.")
+    )
+    fc_nitrate_assim$plot
+  })
+  
+  #* Run Forecast with BOTH DA ----
+  est_out_both_assim <- reactiveValues(out = NULL)
+  observeEvent(input$run_fc_both_assim, {
+    
+    req(input$table01_rows_selected != "")
+    req(!is.null(lm_wt$m) & !is.null(lm_upar$m))
+    
+    # Reset assessment data
+    fc_both_assim$plot <- NULL
+    fc_both_assim$rmse <- NULL
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem_both_assim, " members."),
+                 detail = "This may take a while. This window will disappear
+                     when it is downloaded.", value = 0.1)
+    
+    obs_file <- create_data_assim_inputs(freq_chla = 7,
+                                         freq_din = 7,
+                                         lake_data = lake_data$df,
+                                         start_date = start_date)
+    driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, noaa_fc = noaa_fc, start_date = start_date)
+    
+    #get initial conditions for forecast
+    yini <- get_yini(lake_data = lake_data$df,
+                     start_date = start_date)
+    
+    progress$set(value = 0.3)
+    est_out <- EnKF(n_en = input$n_mem_both_assim, 
+                    start = '2020-09-25', # start date 
+                    stop = '2020-10-29', # stop date
+                    time_step = 'days',
+                    obs_file = obs_file,
+                    driver_file = driver_file,
+                    n_states_est = 2, 
+                    n_params_est = 1,
+                    n_params_obs = 0,
+                    maxUptake_init = 0.12, 
+                    obs_cv = c(0.01,0.05), #cv for chl-a and DIN, respectively
+                    param_cv = 0.1, #for maxUptake
+                    init_cond_cv = c(0.05, 0.1), #cv for chl-a and DIN, respectively
+                    state_names = c("chla", "nitrate"),
+                    yini = yini)
+    
+    progress$set(value = 0.9)
+    est_out_both_assim$out <- format_enkf_output(est_out = est_out, lake_data = lake_data$df)
+    progress$set(value = 1)
+  })
+  
+  #** Reset forecast when slider is moved
+  observeEvent(input$ndays_both_assim, {
+    est_out_both_assim$out <- NULL
+    fc_both_assim$plot <- NULL
+    fc_both_assim$rmse <- NULL
+  })
+  
+  
+  #** Assess forecast with both DA ----
+  fc_both_assim <- reactiveValues(plot = NULL, rmse = NA)
+  observeEvent(input$assess_fc_both_assim, {
+    req(input$table01_rows_selected != "")
+    req(!is.null(est_out_both_assim$out))
+    
+    fc_both_assim$rmse <- rmse(est_out = est_out_both_assim$out, lake_data = lake_data$df, var = "chla")
+    fc_both_assim$plot <- pred_v_obs(obs_plot = obs_plot, est_out = est_out_both_assim$out, var = "chla")
+  })
+  
+  #** Plot Forecast with both DA ----
+  output$chla_fc_both_assim <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$r2) & !is.null(lm_upar$r2),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(!is.null(est_out_both_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    var <- view_vars$sname[view_vars$lname == input$view_var_both_assim]
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type_both_assim,
+                  est_out = est_out_both_assim$out, var = var, add_obs = input$add_obs_both_assim, n_days = input$nday_both_assim)
+  })
+  
+  #** Catch for distribution plot ----
+  observeEvent(input$plot_type_both_assim, {
+    if(input$plot_type_both_assim == "Distribution") {
+      updateSliderInput(session, inputId = "nday_both_assim", value = 35)
+      shinyjs::disable("nday_both_assim")
+    } else {
+      shinyjs::enable("nday_both_assim")
+    }
+  })
+  
+  #** Calculate RMSE with both DA ----
+  output$rmse_both_assim <- renderText({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.na(est_out_both_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    validate(
+      need(!is.null(fc_both_assim$rmse),
+           message = "Click 'Assess forecast'.")
+    )
+    paste0("Chlorophyll-a RMSE = ", fc_both_assim$rmse, " μg/L") 
+
+  })
+  
+  #** Plot Pred vs. Obs with both DA ----
+  output$chla_fc_assess_both_assim <- renderPlot({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(est_out_both_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    validate(
+      need(!is.null(fc_both_assim$plot),
+           message = "Click 'Assess forecast'.")
+    )
+    fc_both_assim$plot
+  })
+  
+  #** Compare all forecasts ----
+  da_method <- reactiveValues(dt = data.frame(RMSE = rep(NA, 4)), plot = NULL)
+  
+  observeEvent(input$compare_da, {
+    
+    req(input$table01_rows_selected != "")
+    
+    var <- view_vars$sname[view_vars$lname == input$view_var_da_method]
+    da_method$plot <- plot_four_forecasts(no_da = est_out_no_da$out, chla = est_out_chla_assim$out,
+                                          nitrate = est_out_nitrate_assim$out, both = est_out_both_assim$out, 
+                                          var = var, obs_plot = obs_plot, add_obs = TRUE)
+    
+    da_method$dt$RMSE[1] <- fc_no_da$rmse
+    da_method$dt$RMSE[2] <- fc_chla_assim$rmse
+    da_method$dt$RMSE[3] <- fc_nitrate_assim$rmse
+    da_method$dt$RMSE[4] <- fc_both_assim$rmse
+    
+    
+  })
+  
+  #** Table of RMSE ----
+  output$da_method_tab <- renderDT(da_method$dt, selection = "none",
+                           options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
+                                          columnDefs = list(list(width = '100%', targets = "_all")), scrollX = TRUE
+                           ), colnames = c("RMSE"),
+                           rownames = c("No DA", "Chl-a", "Nitrate", "Both"),
+                           server = FALSE, escape = FALSE)
+  
+  #** Plot of all DA methods ----
+  output$da_method_plot <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$r2) & !is.null(lm_upar$r2),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(!is.null(da_method$plot),
+           message = "Click 'Compare DA methods'.")
+    )
+    da_method$plot
+  })
+  
+  # Objective 8 - Explore observation uncertainty ----
+  #** Slickr Chla slides ----
+  output$chla_slides <- renderSlickR({
+    slickR(chla_slides) + settings(dots = TRUE)
+  })
+  
+  #** Slickr Nitrate slides ----
+  output$nitrate_slides <- renderSlickR({
+    slickR(nitrate_slides) + settings(dots = TRUE)
+  })
+  
+  #* Run forecast w/ Observation Uncertainty ----
+  obs_uc <- reactiveValues(out = NULL, rmse = NA)
+  observeEvent(input$run_fc_obs_uc, {
+    
+    req(input$table01_rows_selected != "")
+    req(!is.null(lm_wt$m) & !is.null(lm_upar$m))
+
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = paste0("Running forecast of chlorophyll-a with 100 members."),
+                 detail = "This may take a while. This window will disappear
+                     when it is downloaded.", value = 0.1)
+    
+    freq_chla <- ifelse("Chlorophyll-a" %in% input$obs_uc_da, 7, 36) 
+    freq_din <- ifelse("Nitrate" %in% input$obs_uc_da, 7, 36) 
+    
+    obs_file <- create_data_assim_inputs(freq_chla = freq_chla,
+                                         freq_din = freq_din,
+                                         lake_data = lake_data$df,
+                                         start_date = start_date)
+    driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, noaa_fc = noaa_fc, start_date = start_date)
+    
+    #get initial conditions for forecast
+    yini <- get_yini(lake_data = lake_data$df,
+                     start_date = start_date)
+    
+    chla_cv <- ((input$obs_uc_chla / mean(obs_plot$hist$chla, na.rm = TRUE)))
+
+    progress$set(value = 0.3)
+    est_out <- EnKF(n_en = 100, 
+                    start = '2020-09-25', # start date 
+                    stop = '2020-10-29', # stop date
+                    time_step = 'days',
+                    obs_file = obs_file,
+                    driver_file = driver_file,
+                    n_states_est = 2, 
+                    n_params_est = 1,
+                    n_params_obs = 0,
+                    maxUptake_init = 0.12, 
+                    obs_cv = c(chla_cv, 0.05), #cv for chl-a and DIN, respectively
+                    param_cv = 0.1, #for maxUptake
+                    init_cond_cv = c(0.05, 0.1), #cv for chl-a and DIN, respectively
+                    state_names = c("chla", "nitrate"),
+                    yini = yini)
+    
+    progress$set(value = 0.9)
+    obs_uc$out <- format_enkf_output(est_out = est_out, lake_data = lake_data$df)
+    obs_uc$rmse <- rmse(est_out = obs_uc$out, lake_data = lake_data$df, var = "chla")
+    progress$set(value = 1)
+  })
+  
+  #** Plot Forecast with Observational Uncertainty ----
+  output$fc_obs_uc_plot <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$r2) & !is.null(lm_upar$r2),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(!is.null(obs_uc$out),
+           message = "Click 'Run forecast'.")
+    )
+    var <- "chla" #view_vars$sname[view_vars$lname == input$view_var_both_assim]
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type_obs_uc,
+                  est_out = obs_uc$out, var = var, add_obs = input$add_obs_obs_uc, n_days = input$nday_obs_uc)
+  })
+  
+  #** Print RMSE with Observational Uncertainty ----
+  output$rmse_obs_uc <- renderText({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(obs_uc$out),
+           message = "Click 'Run forecast'.")
+    )
+    paste0("Chlorophyll-a RMSE = ", obs_uc$rmse, " μg/L") 
+  })
+  
+  #** Reset forecast when slider is moved
+  observeEvent(input$obs_uc_chla, {
+    obs_uc$out <- NULL
+  })
+  
+  #** Catch for distribution plot ----
+  observeEvent(input$plot_type_obs_uc, {
+    if(input$plot_type_obs_uc == "Distribution") {
+      updateSliderInput(session, inputId = "nday_obs_uc", value = 35)
+      shinyjs::disable("nday_obs_uc")
+    } else {
+      shinyjs::enable("nday_obs_uc")
+    }
+  })
+  
+  # Objective 9 ----
+  #** Slickr Chla slides ----
+  output$chla_slides2 <- renderSlickR({
+    slickR(chla_slides) + settings(dots = TRUE)
+  })
+  
+  #** Slickr Nitrate slides ----
+  output$nitrate_slides2 <- renderSlickR({
+    slickR(nitrate_slides) + settings(dots = TRUE)
+  })
+  
+  #* Run forecast w/ different DA Frequencies ----
+  da_freq <- reactiveValues(out = NULL, rmse = NA)
+  observeEvent(input$run_fc_da_freq, {
+    
+    req(input$table01_rows_selected != "")
+    req(!is.null(lm_wt$m) & !is.null(lm_upar$m))
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = paste0("Running forecast of chlorophyll-a with 100 members."),
+                 detail = "This may take a while. This window will disappear
+                     when it is downloaded.", value = 0.1)
+    
+    freq_chla <- ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 36) 
+    freq_din <- ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 36) 
+    
+    obs_file <- create_data_assim_inputs(freq_chla = freq_chla,
+                                         freq_din = freq_din,
+                                         lake_data = lake_data$df,
+                                         start_date = start_date)
+    driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, noaa_fc = noaa_fc, start_date = start_date)
+    
+    #get initial conditions for forecast
+    yini <- get_yini(lake_data = lake_data$df,
+                     start_date = start_date)
+    
+    # Carried over from the previous exercise?
+    # chla_cv <- ((input$obs_uc_chla / mean(obs_plot$hist$chla, na.rm = TRUE)))
+    chla_cv <- 0.05
+    
+    progress$set(value = 0.3)
+    est_out <- EnKF(n_en = 100, 
+                    start = '2020-09-25', # start date 
+                    stop = '2020-10-29', # stop date
+                    time_step = 'days',
+                    obs_file = obs_file,
+                    driver_file = driver_file,
+                    n_states_est = 2, 
+                    n_params_est = 1,
+                    n_params_obs = 0,
+                    maxUptake_init = 0.12, 
+                    obs_cv = c(chla_cv, 0.05), #cv for chl-a and DIN, respectively
+                    param_cv = 0.1, #for maxUptake
+                    init_cond_cv = c(0.05, 0.1), #cv for chl-a and DIN, respectively
+                    state_names = c("chla", "nitrate"),
+                    yini = yini)
+    
+    progress$set(value = 0.9)
+    da_freq$out <- format_enkf_output(est_out = est_out, lake_data = lake_data$df)
+    da_freq$rmse <- rmse(est_out = da_freq$out, lake_data = lake_data$df, var = "chla")
+    progress$set(value = 1)
+  })
+  
+  #** Plot Forecast with DA Frequencies ----
+  output$fc_da_freq_plot <- renderPlotly({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lm_wt$r2) & !is.null(lm_upar$r2),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(!is.null(da_freq$out),
+           message = "Click 'Run forecast'.")
+    )
+    var <- "chla" #view_vars$sname[view_vars$lname == input$view_var_both_assim]
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, plot_type = input$plot_type_da_freq,
+                  est_out = da_freq$out, var = var, add_obs = input$add_obs_da_freq, n_days = input$nday_da_freq)
+  })
+  
+  #** Print RMSE with DA frequencies ----
+  output$rmse_da_freq <- renderText({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(da_freq$out),
+           message = "Click 'Run forecast'.")
+    )
+    paste0("Chlorophyll-a RMSE = ", da_freq$rmse, " μg/L") 
+  })
+  
+  #** Table with RMSE & DA freq ---
+  da_freq_rmse <- reactiveValues(dt = da_freq_df)
+  output$da_freq_rmse <- renderDT(da_freq_rmse$dt, selection = "single",
+                              options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
+                                             columnDefs = list(list(width = '10%', targets = "_all"))
+                              ), colnames = c("Chla freq", "Nitrate freq", "RMSE"),
+                              server = FALSE, escape = FALSE)
+  
+  #** Save RMSE & Frequencies in a table ----
+  observeEvent(input$save_rmse, {
+    
+    req(!is.na(da_freq$rmse))
+    
+    freq_chla <- ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 0) 
+    freq_din <- ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 0) 
+    
+    idx <- input$da_freq_rmse_rows_selected
+    if(is.null(idx)) {
+      idx <- which(is.na(da_freq_rmse$dt[, 1]))[1]
+    }
+    da_freq_rmse$dt$chla[idx] <- freq_chla
+    da_freq_rmse$dt$nitrate[idx] <- freq_din
+    da_freq_rmse$dt$rmse[idx] <- da_freq$rmse
+  })
+  
+  #** Reset forecast when slider is moved
+  observeEvent(input$da_freq_chla, {
+    da_freq$out <- NULL
+  })
+  
+  #** Disable Save button when no RMSE available ----
+  observe({
+    if(is.na(da_freq$rmse)) {
+      shinyjs::disable("save_rmse")
+    } else {
+      shinyjs::enable("save_rmse")
+      
+    }
+  })
+  
+  #** Catch for distribution plot ----
+  observeEvent(input$plot_type_da_freq, {
+    if(input$plot_type_da_freq == "Distribution") {
+      updateSliderInput(session, inputId = "nday_da_freq", value = 35)
+      shinyjs::disable("nday_da_freq")
+    } else {
+      shinyjs::enable("nday_da_freq")
+    }
   })
   
 })
