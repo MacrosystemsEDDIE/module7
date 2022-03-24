@@ -14,15 +14,15 @@ format_enkf_output <- function(est_out, lake_data) {
   for(i in 1:length(out)) {
     mean_est = apply(est_out$Y[i, , ] , 1, FUN = mean)
     # Calculate distributions
-    dat <- apply(est_out$Y[1, , ], 1, function(x){
-      quantile(x, c(0.05, 0.5, 0.95))
+    dat <- apply(est_out$Y[i, , ], 1, function(x){
+      quantile(x, c(0.05, 0.125, 0.5, 0.875, 0.95))
     })
     dat <- as.data.frame(t(dat))
     colnames(dat) <- paste0("p", gsub("%", "", colnames(dat)))
     dat$Date <- est_out$dates
     out[[i]]$dist <- dat
     
-    df2 <- as.data.frame(est_out$Y[1, , ])
+    df2 <- as.data.frame(est_out$Y[i, , ])
     df2$Date <- est_out$dates
     out[[i]]$ens <- reshape::melt(df2, id.vars = "Date")
     
