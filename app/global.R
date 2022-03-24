@@ -18,6 +18,14 @@ cols2 <- ggthemes::ggthemes_data$colorblind$value
 l.cols <- RColorBrewer::brewer.pal(8, "Set2")
 p.cols <- RColorBrewer::brewer.pal(12, "Paired")
 
+# Code for viewing colors
+# COL <- l.cols
+# plot(seq_len(length(COL)), rep_len(1, length(COL)),
+#      col = COL, pch = 16, cex = 3, xaxt = 'n', yaxt = 'n', xlab = '', ylab = '')
+
+# Create scale for plots
+da_method_fill_scale <- scale_fill_manual(values = c("No DA" = l.cols[1], "Chl-a" = l.cols[2], "Nitrate" = l.cols[3], "Both" = l.cols[4]))
+
 # Plot saving
 png_dpi <- 120
 p_wid <- 213
@@ -66,11 +74,26 @@ answers[, 1] <- ""
 
 # Slides
 recap_slides <- list.files("www/shiny_slides", full.names = TRUE)
+ic_uc_slides <- list.files("www/ic_uc_slides", full.names = TRUE)
+chla_slides <- list.files("www/chla_data_collection", full.names = TRUE)
+nitrate_slides <- list.files("www/nitrate_data_collection/", full.names = TRUE)
 
 # Load in sp format with coordinates
 neon_sites <- readRDS("data/neon_sites.rds")
 # neon_sites <- neon_sites[which(neon_sites$siteID %in% c("BARC", "PRPO", "LIRO")), ]
 neon_sites$uid <- paste0("M", seq_len(nrow(neon_sites)))
+
+# data collection methods
+data_collection_methods <- read.csv("data/data_collection_method.csv", fileEncoding = "UTF-8-BOM")
+data_frequency_latency <- read.csv("data/data_frequency_latency.csv", fileEncoding = "UTF-8-BOM")
+rownames(data_frequency_latency) <- data_frequency_latency[, 1]
+
+# RMSE dataframe for da_freq
+da_freq_df <- data.frame(
+  "chla" = rep(NA, 5),
+  "nitrate" = rep(NA, 5),
+  "rmse" = rep(NA, 5)
+)
 
 #Load in the dataframe
 neon_sites_df <- read.csv("data/neon_sites.csv")
@@ -117,6 +140,11 @@ png_theme <- theme(legend.position = "bottom",
 
 # Forecast Date
 fc_date <- "2020-09-25"
+
+# Assimilation methods
+assim_methods <- c("No data assimilation", "Chl-a assimilation", "Nitrate assimilation", "Chla and nitrate assimilation")
+view_vars <- data.frame(lname = c("Chlorophyll-a", "Nitrate", "Max uptake"),
+                        sname = c("chla", "nitrate", "maxUptake"))
 
 # Sampling frequency
 samp_freq <- c("Monthly", "Fortnightly", "Weekly", "Daily")
