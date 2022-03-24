@@ -319,26 +319,3 @@ EnKF = function(n_en = 30,
   return(out)
 }
 
-#' calculate RMSE of ensemble mean vs. observations 
-#' 
-#' @param est_out forecast output from EnKF wrapper 
-#' @param lake_data NEON data for selected site formatted using format_enkf_inputs function
-
-rmse <- function(est_out, lake_data){
-  
-  #get ensemble mean
-  mean_chla_est = apply(est_out$Y[1,,] , 1, FUN = mean)
-  mean_din_est = apply(est_out$Y[2,,] , 1, FUN = mean)
-  
-  
-  #limit obs to forecast dates
-  lake_data1 <- lake_data %>%
-    mutate(datetime = as.Date(datetime)) %>%
-    filter(datetime %in% est_out$dates)
-  
-  #calculate RMSE
-  rmse_chla <- sqrt(mean((lake_data1$chla - mean_chla_est)^2, na.rm = TRUE))
-  rmse_nitrate <- sqrt(mean((lake_data1$din - mean_din_est)^2, na.rm = TRUE))
-  
-  return(list(rmse_chla = rmse_chla, rmse_nitrate = rmse_nitrate))
-}
