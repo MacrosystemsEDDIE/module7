@@ -1,0 +1,14 @@
+﻿category,item,Description,cost,Quantity or frequency,x,value
+Sensors,Chlorophyll-a sensor,Sensor which measures concentrations of chlorophyll-a every 10 minutes,2000,Valid entry is an integer,Expenditure,0
+Sensors,Nitrate sensor,Sensor which measures concentrations of nitrate every 10 minutes,2000,Valid entry is an integer,Expenditure,0
+Sensors,Wireless data streaming,Technology costs to wirelessly stream data from reservoir to lab computer,2000,Must be either 0 or 1,Expenditure,0
+Field equipment,Buoy,Needed to deploy sensors on the reservoir,4000,Valid entry is an integer,Expenditure,0
+Field equipment,Reservoir Access,"Boat, life jackets, paddles",1000,Purchase reservoir access equipment? Must be either 0 or 1,Expenditure,0
+Field equipment,Manual Sample Equipment,"Bottles for collecting samples, coolers, etc.",1000,Purchase manual sample equipment? Must be either 0 or 1,Expenditure,0
+Field equipment,Sensor Maintenance Equipment,"Cleaning tools, chemicals for calibrating sensors, toolkit, etc.",1000,Purchase sensor maintenance equipment? Must be either 0 or 1,Expenditure,0
+Field personnel,Deploy and/or maintain sensors,Cost of travel and wages for a field technician to travel to the reservoir to deploy or maintain sensors.,30,Number of visits: Valid entry is an integer,Expenditure,0
+Field personnel,Collect Chl-a samples,Costs of travel and wages for a field technician to travel to the reservoir to collect water samples.,15,Number of visits: Valid entry is an integer,Expenditure,0
+Field personnel,Collect nitrate samples,Costs of travel and wages for a field technician to travel to the reservoir to collect water samples.,15,Number of visits: Valid entry is an integer,Expenditure,0
+Laboratory analysis,Chl-a sample analysis,Analyze water samples for concentrations of chlorophyll-a,10,Number of samples: Valid entry is an integer,Expenditure,0
+Laboratory analysis,Nitrate sample analysis,Analyze water samples for concentrations of nitrate,10,Number of samples: Valid entry is an integer,Expenditure,0
+Budget,,,10000,,Budget,10000
