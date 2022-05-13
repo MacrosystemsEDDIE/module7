@@ -40,21 +40,7 @@ plot_four_forecasts <- function(no_da, chla, nitrate, both, var = "chla", obs_pl
     p <- p +
       geom_point(data = dat3, aes_string("Date", var, color = "col"))
   }
-  
-  # if(var != "maxUptake") {
-  #   if(!is.null(no_da[[var]]$dist)) dat3 <- no_da[[var]]$obs
-  #   if(!is.null(chla[[var]]$dist)) dat3 <- chla[[var]]$obs
-  #   if(!is.null(nitrate[[var]]$dist)) dat3 <- nitrate[[var]]$obs
-  #   if(!is.null(both[[var]]$dist)) dat3 <- both[[var]]$obs
-  #   
-  #   dat3[[var]][dat3$Date > (as.Date(start_date) + n_days)] <- NA
-  #   dat3$col <- "Assimilated"
-  #   p <- p +
-  #     geom_errorbar(data = dat3, aes(Date, ymin = obs - est_out[[var]]$state_sd, ymax = obs + est_out[[var]]$state_sd,
-  #                                    width = 1)) +
-  #     geom_point(data = dat3, aes_string("Date", "obs", color = "col"))
-  # }
-  
+
   p <- p +
     scale_color_manual(values = c("Chlorophyll-a" = cols[1], "Nitrate" = cols[7], "Max uptake" = cols[4],
                                   "Member" = l.cols[8], "median" = "black", "95%" = p.cols[5], "75%" = p.cols[6], "Obs" = p.cols[4],
