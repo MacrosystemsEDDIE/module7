@@ -9,6 +9,7 @@ suppressPackageStartupMessages(library(ggpubr, quietly = TRUE))
 suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
 suppressPackageStartupMessages(library(magrittr, quietly = TRUE))
 suppressPackageStartupMessages(library(mvtnorm, quietly = TRUE))
+suppressPackageStartupMessages(library(ggpubr, quietly = TRUE))
 
 # Colors for plots
 scale_colour_discrete <- ggthemes::scale_colour_colorblind
@@ -73,14 +74,18 @@ colnames(answers)[1] <- "Answer"
 answers[, 1] <- ""
 
 # Slides
-recap_slides <- list.files("www/shiny_slides", full.names = TRUE)
+recap_slides <- list.files("www/Mod7_key_slides", full.names = TRUE)
 ic_uc_slides <- list.files("www/ic_uc_slides", full.names = TRUE)
 chla_slides <- list.files("www/chla_data_collection", full.names = TRUE)
 nitrate_slides <- list.files("www/nitrate_data_collection/", full.names = TRUE)
 
+# Selected neon sites 
+sel_sites <- c("CRAM", "BARC", "SUGG", "PRPO", "PRLA", "LIRO")
+reservoir_sites <- c("Green Reservoir", "Brown Reservoir")
+
 # Load in sp format with coordinates
 neon_sites <- readRDS("data/neon_sites.rds")
-# neon_sites <- neon_sites[which(neon_sites$siteID %in% c("BARC", "PRPO", "LIRO")), ]
+neon_sites <- neon_sites[which(neon_sites$siteID %in% sel_sites), ]
 neon_sites$uid <- paste0("M", seq_len(nrow(neon_sites)))
 
 # data collection methods
@@ -99,7 +104,7 @@ da_freq_df <- data.frame(
 neon_sites_df <- read.csv("data/neon_sites.csv")
 neon_sites_df$long <- round(neon_sites_df$long, 3)
 neon_sites_df$lat <- round(neon_sites_df$lat, 3)
-# neon_sites_df <- neon_sites_df[which(neon_sites_df$siteID %in% c("BARC", "PRPO", "LIRO")), ]
+neon_sites_df <- neon_sites_df[which(neon_sites_df$siteID %in% sel_sites), ]
 neon_sites_df$uid <- paste0("M", seq_len(nrow(neon_sites_df))) # For leaflet map
 
 # Add type labels
@@ -119,6 +124,11 @@ mod_choices <- c("Negative", "No change", "Positive")
 # Sorting variables
 state_vars <- c("Phytoplankton", "Nitrogen")
 process_vars <- c("Mortality", "Uptake")
+
+# Budget options
+budget_options <- read.csv("data/wq_monitoring_budget2.csv", fileEncoding = "UTF-8-BOM")
+budget_options$label <- paste0(budget_options$item, " ($", formatC(budget_options$cost, big.mark = ",", format = "d"), ")")
+budget <- data.frame(variable = c("Budget"), value = c(10000), fill = c("Budget"))
 
 # ggplot theme
 mytheme <- theme(axis.line.x = element_line(colour = "black"), axis.line.y = element_line(colour = "black"),
