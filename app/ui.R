@@ -61,7 +61,7 @@ ui <- function(req) {
     navbarPage(title = "Module 7: Using Data to Improve Ecological Forecasts",
                position = "static-top", id = "maintab",
                
-               # 1. Module Overview ----
+               # 1. Overview ----
                tabPanel(introBox(tab_names["mtab1", 2],
                                  data.step = 2,
                                  data.intro = help_text["tab_nav1", 1]
@@ -175,6 +175,7 @@ ui <- function(req) {
                           h3("Summary"),
                           p(id = "txt_j", module_text["eco_forecast", ]),
                           p(id = "txt_j", module_text["this_module", ]),
+                          p(id = "txt_j", module_text["goal", ]),
                           h3("Learning Outcomes"),
                           tags$line(),
                           tags$ul(
@@ -202,7 +203,7 @@ ui <- function(req) {
                           hr(),
                           column(4,
                                  h3("Presentation"),
-                                 p("The presentation accompanying this module covers the introduction to data assimilation, sources of forecast uncertainty and the importance and relevance of quantifying uncertainty within ecological forecasts."),
+                                 p("The presentation accompanying this module reviews the forecast cycle, introduces the process of using ecological data to improve forecasts (data assimilation), and explains how the amount of uncertainty in observations and model predictions as well as the frequency of observations affect data assimilation."),
                                  p("What is data assimilation?"),
                                  tags$ul(
                                    tags$li(module_text["data_assimilation", ])
@@ -245,7 +246,7 @@ ui <- function(req) {
                           ),
                           column(6, align = "center", offset = 1,
                                  br(), br(),
-                                 img(src = "activity_outline.png", height = "80%", id = "bla_border",
+                                 img(src = "Mod7_Introduction.png", height = "80%", id = "bla_border",
                                      width = "80%", tags$style("border: solid 2px black;"))
                                  
                           )
@@ -520,7 +521,7 @@ border-color: #FFF;
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("We will build models that will allow us to predict water temperature."))
+                                                      p("We will build models that will allow us to predict water temperature and underwater light."))
                                              )
                                     ),
                                     #* Objective 3 - Explore variable relationships ====
@@ -566,12 +567,14 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   h4(quest["q7", 1]),
-                                                                   p("TABLE FOR ANSWERS"),
-                                                                   # DTOutput('q7_tab'),
-                                                                   br(),
-                                                                   h4(quest[qid[12], ]),
-                                                                   textAreaInput2(inputId = qid[12], label = "",
+                                                                   p(quest[qid[12], ]),
+                                                                   textAreaInput2(inputId = qid[13], label = quest[qid[13], ],
+                                                                                  width = "90%"),
+                                                                   textAreaInput2(inputId = qid[14], label = quest[qid[14], ],
+                                                                                  width = "90%"),
+                                                                   textAreaInput2(inputId = qid[15], label = quest[qid[15], ],
+                                                                                  width = "90%"),
+                                                                   textAreaInput2(inputId = qid[16], label = quest[qid[16], ],
                                                                                   width = "90%"),
                                                                    br()
                                                             )
@@ -614,16 +617,9 @@ border-color: #FFF;
                                                       )
                                                )
                                              ),
-                                             fluidRow(
-                                               column(12, align = "center",
-                                                      img(src = "02-build-model.png", height = "30%",
-                                                          width = "30%")
-                                               )
-                                             ), br(), br(), hr(),
                                              #* Intro text ====
-                                             fluidRow(
-                                               # conditionalPanel(condition = "input.site_html > 1",
                                                #** NEON Intro ----
+                                             fluidRow(
                                                column(4,
                                                       h3("What is a Model?"),
                                                       h4("Read through this section and scroll through the slides"),
@@ -650,7 +646,7 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   h4(quest[qid[12], 1]),
+                                                                   h4(quest[qid[17], 1]),
                                                                    radioButtons(qid[13], quest[qid[13], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    radioButtons(qid[14], quest[qid[14], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    radioButtons(qid[15], quest[qid[15], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
@@ -815,7 +811,7 @@ border-color: #FFF;
                                                column(4,
                                                       h3("Initial Condition Uncertainty"),
                                                       p(module_text["init_uncert", ]),
-                                                      p("Even though we have measurements of water temperature from our lake, we know that water temperature varies throughout the day so this measurement might not capture exactly the temperature in our lake at this time.")
+                                                      p("Even though we have measurements of chlorophyll-a from our lake, we know that chlorophyll-a varies throughout the day so this measurement might not capture exactly the chlorophyll-a in our lake at this time.")
                                                ),
                                                column(8,
                                                       h5("Click the arrows to navigate through the slides", align = "center"),
@@ -829,7 +825,7 @@ border-color: #FFF;
                                                column(4,
                                                       h4("Forecasting with Initial Conditions Uncertainty"),
                                                       p("To account for initial condition uncertainty we can generate a distribution around this value and then run our model with slightly different initial conditions to account for this uncertainty."),
-                                                      p("Use the input below to set the value of the initial conditions"),
+                                                      p("Use the input below to set the value of the initial conditions for chlorophyll-a."),
                                                       numericInput("ic_val", "Initial conditions value:", min = 0.5,
                                                                    value = 7, max = 20, step = 0.5),
                                                       p("Use the slider below to adjust the standard deviation and then generate a normal distribution around the observation"),
@@ -968,7 +964,7 @@ border-color: #FFF;
                                                       h2("Make a Hypothesis")
                                                ),
                                                column(3,
-                                                      p("QXX. Rank the four forecasts in order from the forecast you expect to be most accurate to the forecast you expect to be least accurate.")
+                                                      p("QXX. Rank the four forecasts in order from the forecast you expect to be most accurate (top) to the forecast you expect to be least accurate (bottom).")
                                                ),
                                                column(9,
                                                       box(id = "box7", width = 12, status = "primary",
@@ -988,9 +984,9 @@ border-color: #FFF;
                                                                        text = tags$b("Hypothesis Ranking"),
                                                                        labels = NULL,
                                                                        input_id = "rank_hyp_2"
+                                                                       )
                                                                      )
                                                                    ),
-                                                            ),
                                                             column(2,
                                                                    useShinyjs(),  # Set up shinyjs
                                                                    actionButton("submit_hyp", "Submit hypothesis")
@@ -1007,7 +1003,8 @@ border-color: #FFF;
                                                       p("Click the button below to generate and plot your first forecast"),
                                                       actionButton("run_fc_no_da", label = div("Run Forecast", icon("running"))),
                                                       sliderInput("n_mem_no_da", "No. of members", min = 5, max = 100, value = 30, step = 5),
-                                                      p("You can use the slider underneath the plan to advance the forecasts each day OR you can click the play button on the right side of the slider to animate the forecast over time.")
+                                                      p("You can use the slider underneath the plan to advance the forecasts each day OR you can click the play button on the right side of the slider to animate the forecast over time."),
+                                                      p(tags$b("Note:"), " The play button only works when the 'Plot type' is set to 'Line'.")
                                                ),
                                                column(8,
                                                       h3("Forecast with NO DA"),
@@ -1201,7 +1198,34 @@ border-color: #FFF;
                                                       h3("Plot of all DA methods forecasts"),
                                                       wellPanel(
                                                         plotlyOutput("da_method_plot")
+                                                      ),
+                                                      wellPanel(
+                                                        plotOutput("all_assess_plot")
                                                       )
+                                               ),
+                                               fluidRow(
+                                                 column(6,
+                                                        p("Q.XX Using RMSE from the table above, rank your forecasts from most accurate (top) to least accurate (bottom). Remember, a lower RMSE value indicates a more accurate forecast."),
+                                                        bucket_list(
+                                                          header = "",
+                                                          group_name = "bucket_list_group2",
+                                                          orientation = "horizontal",
+                                                          add_rank_list(
+                                                            text = tags$b("Drag from here"),
+                                                            labels = sample(assim_methods),
+                                                            input_id = "rank_hyp_3"
+                                                          ),
+                                                          add_rank_list(
+                                                            text = tags$b("Hypothesis Ranking"),
+                                                            labels = NULL,
+                                                            input_id = "rank_hyp_4"
+                                                            )
+                                                          )
+                                                        ),
+                                                 column(6,
+                                                        actionButton("view_hyp1", "View original hypothesis."),
+                                                        DTOutput("hyp1")
+                                                        )
                                                )
                                              ),
                                              hr(),
@@ -1246,9 +1270,7 @@ border-color: #FFF;
                                                column(3,
                                                       h3("Sensor"),
                                                       p(data_collection_methods[7, 3], id = "txt_j"),
-                                                      p(data_collection_methods[7, 4], id = "txt_j"),
-                                                      p("Example range of uncertainty:"),
-                                                      p(data_collection_methods[7, 5], id = "txt_j")
+                                                      p(data_collection_methods[7, 4], id = "txt_j")
                                                ),
                                                column(6,
                                                       wellPanel(
@@ -1258,9 +1280,7 @@ border-color: #FFF;
                                                column(3,
                                                       h3("Lab Measurement"),
                                                       p(data_collection_methods[8, 3], id = "txt_j"),
-                                                      p(data_collection_methods[8, 4], id = "txt_j"),
-                                                      p("Example range of uncertainty:"),
-                                                      p(data_collection_methods[8, 5], id = "txt_j")
+                                                      p(data_collection_methods[8, 4], id = "txt_j")
                                                )
                                              ),
                                              hr(),
@@ -1272,9 +1292,7 @@ border-color: #FFF;
                                                column(3,
                                                       h3("Sensor"),
                                                       p(data_collection_methods[5, 3], id = "txt_j"),
-                                                      p(data_collection_methods[5, 4], id = "txt_j"),
-                                                      p("Example range of uncertainty:"),
-                                                      p(data_collection_methods[5, 5], id = "txt_j")
+                                                      p(data_collection_methods[5, 4], id = "txt_j")
                                                ),
                                                column(6,
                                                       wellPanel(
@@ -1284,9 +1302,7 @@ border-color: #FFF;
                                                column(3,
                                                       h3("Lab Measurement"),
                                                       p(data_collection_methods[6, 3], id = "txt_j"),
-                                                      p(data_collection_methods[6, 4], id = "txt_j"),
-                                                      p("Example range of uncertainty:"),
-                                                      p(data_collection_methods[6, 5], id = "txt_j")
+                                                      p(data_collection_methods[6, 4], id = "txt_j")
                                                )
                                              ),
                                              hr(),
@@ -1315,7 +1331,9 @@ border-color: #FFF;
                                                       p("Use the slider below to adjust the observation uncertainty and then generate a forecast that assimilates observations with the observation uncertainty you specified."),
                                                       checkboxGroupInput("obs_uc_da", label = "Data to assimilate:", 
                                                                          choices = view_vars$lname[1:2]),
-                                                      sliderInput("obs_uc_chla", "Observation uncertainty (standard deviation)",
+                                                      sliderInput("obs_uc_chla", "Chl-a observation uncertainty",
+                                                                  min = 0, max = 5, step = 0.5, value = 0.5),
+                                                      sliderInput("obs_uc_nitrate", "Nitrate observation uncertainty",
                                                                   min = 0, max = 5, step = 0.5, value = 0.5),
                                                       actionButton("run_fc_obs_uc", label = div("Run Forecast", icon("running"))),
                                                       h4("RMSE of forecast"),
@@ -1529,34 +1547,176 @@ border-color: #FFF;
                                  )
                           ),
                         ),
-                        fluidRow(
-                          column(10, offset = 1,
-                                 h2("Ideas"),
-                                 p("Students, in pairs, are presented with a scenario where they must make decisions about how they should prioritize the data collection and assimilation methods to maximize the utility of forecasts to end users. Students will have a limited budget: different sensors or monitoring activities will be assigned different costs and there will be a running account of the remaining budget that automatically updates as students select options. Students then test their monitoring program by generating forecasts, with the option to revise their monitoring program design as desired. Finally, each pair presents their monitoring program and forecast output to the class and explains their design process and choices."),
-                                 tags$ol(
-                                   tags$li("Management scenario #1: A drinking water supply reservoir that suffers from algal blooms of taxa that release toxins. Managers are interested in having forecasts of chl-a so they can pre-emptively issue drinking water warnings. This scenario will focus on chl-a as the target forecast variable."),
-                                   tags$li("Management scenario #2: A reservoir in a heavily agricultural county in the Midwest in the Upper Mississippi watershed. The reservoir has outtakes installed at several depths in the water column and has been exceeding its TMDL for nitrate loading downstream. Managers are interested in forecasts of nitrate concentrations at different depths so they can plan to release water from the outtake valve with the lowest concentration and minimize downstream loading. This scenario will focus on nitrate as the target forecast variable.")
-                                   )
-                                 )
-                          ),
                         tabsetPanel(id = "tabseries4",
                                     #* Objective 10 - Management Scenario ====
                                     tabPanel(title = tab_names["stab12", 2], value = "stab12",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab11", 2]),
+                                                                h3(tab_names["stab12", 2]),
                                                                 p(id = "txt_j", module_text["obj_10", ])
                                                       )
                                                )
-                                             )
-                                    ),
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(3, offset = 2,
+                                                 h3("Select a scenario:"),
+                                                 radioButtons("scen_select", label = "", choices = reservoir_sites, selected = character(0))
+                                               )
+                                             ),
+                                             hr(),
+                                             conditionalPanel("input.scen_select == null",
+                                                              wellPanel(
+                                                                p(tags$em("Select a scenario above."))
+                                                              )
+                                             ),
+                                             conditionalPanel("input.scen_select == 'Green Reservoir'",
+                                                              fluidRow(
+                                                                column(4, offset = 1,
+                                                                       h3("Scenario"),
+                                                                       p(id = "txt_j", module_text["scenario1", ]),
+                                                                       img(src = "Objective10_Scenario1.jpg", height = "80%", id = "bla_border",
+                                                                           width = "80%", tags$style("border: solid 2px black;")),
+                                                                       p("Algal Bloom - Kelly's Island, Lake Erie by NOAA Great Lakes Environmental Research Laboratory")
+                                                                       ),
+                                                                column(6, offset = 1,
+                                                                       h3("Chlorophyll-a Data Collection"),
+                                                                       wellPanel(
+                                                                         slickROutput("chla_slides3")
+                                                                         )
+                                                                       )
+                                                                ),
+                                                              ),
+                                             conditionalPanel("input.scen_select == 'Brown Reservoir'",
+                                                              fluidRow(
+                                                                column(4, offset = 1,
+                                                                       h3("Scenario"),
+                                                                       p(id = "txt_j", module_text["scenario2", ]),
+                                                                       img(src = "Objective10_Scenario2.jpg", height = "80%", id = "bla_border",
+                                                                           width = "80%", tags$style("border: solid 2px black;")),
+                                                                       p("Sao Simao Reservoir, Brazil (NASA, International Space Station Science, 11/22/07) by NASA's Marshall Space Flight Center.")
+                                                                       ),
+                                                                column(6, offset = 1,
+                                                                       h3("Nitrate Data Collection"),
+                                                                       wellPanel(
+                                                                         slickROutput("nitrate_slides3")
+                                                                         )
+                                                                       )
+                                                                )
+                                                              ),
+                                             hr(),
+                                             fluidRow(
+                                               column(5,
+                                                      h3("Design Water Quality Monitoring Program"),
+                                                      p(id = "txt_j", module_text["reservoir_monitoring_program", ]),
+                                                      br(),
+                                                      p(tags$b("Target period:"), "1 year"),
+                                                      p(tags$b("Budget:"), "$10,000"),
+                                                      br(),
+                                                      h4("Things to consider:"),
+                                                      wellPanel(
+                                                        tags$ol(
+                                                          tags$li(id = "txt_j", tags$b("If you choose to purchase sensors:")),
+                                                          tags$ul(
+                                                            tags$li("Be sure to purchase a buoy, reservoir access field equipment, and at least one field personnel trip to the reservoir (all of these are needed to deploy the sensors in the reservoir). "),
+                                                            tags$li("Consider whether you would like to invest in wireless data streaming capability. Wireless data streaming will reduce your data latency. If you do not invest in wireless data streaming, you MUST budget for personnel trips to the reservoir to maintain sensors and collect data in order to retrieve data from the sensors."),
+                                                            tags$li("Consider whether you would like to invest in personnel hours for a field technician to maintain the sensors. Regular sensor maintenance by a field technician reduces the likelihood of sensor malfunction. Maintenance is recommended at least twice a month. With no investment in personnel to maintain sensors, sensor data streams cannot be restored once they malfunction (in other words, once your sensor goes down, you’re out of luck!).")
+                                                          ),
+                                                          tags$br(),
+                                                          tags$li(tags$b("If you choose to invest in personnel hours to collect field samples:")),
+                                                          tags$ul(
+                                                            tags$li("Be sure you purchase reservoir access and manual sampling field equipment (required equipment to collect water samples)."),
+                                                            tags$li("You must budget for the cost of analyzing those samples in the laboratory as well.")
+                                                          )
+                                                        )
+                                                      )
+                                               ),
+                                               column(6, offset = 1,
+                                                      h3("Budgetary items"),
+                                                      wellPanel(
+                                                        DTOutput("wq_monitoring_tab")
+                                                        )
+                                                      )
+                                               ),
+                                             hr(),
+                                             fluidRow(
+                                               column(4,
+                                                      h4("Check the items below which you want to include in your monitoring program."),
+                                                      p(tags$b("Sensors")),
+                                                      checkboxInput("chla_sens", budget_options$label[1]),
+                                                      checkboxInput("nitrate_sens", budget_options$label[2]),
+                                                      checkboxInput("data_stream", budget_options$label[3]),
+                                                      p(tags$b("Field Equipment")),
+                                                      checkboxInput("buoy", budget_options$label[4]),
+                                                      checkboxInput("res_access", budget_options$label[5]),
+                                                      checkboxInput("man_samp", budget_options$label[6]),
+                                                      checkboxInput("sens_main", budget_options$label[7]),
+                                                      p(tags$b("Field Personnel")),
+                                                      checkboxInput("deploy_sens", budget_options$label[8]),
+                                                      conditionalPanel("input.deploy_sens",
+                                                                       wellPanel(
+                                                                         radioButtons("ndeploy_sens", "Visits for the year", choices = c(1, 12, 24), inline = TRUE)
+                                                                         )
+                                                                       ),
+                                                      checkboxInput("chla_samp", budget_options$label[9]),
+                                                      conditionalPanel("input.chla_samp",
+                                                                       # numericInput("nchla_samp", "Frequency per week", value = 1, min = 1, max = 7)
+                                                                       radioButtons("nchla_samp", "Frequency per week", choices = c(1, 2, 7), inline = TRUE)
+                                                      ),
+                                                      checkboxInput("nitrate_samp", budget_options$label[10]),
+                                                      conditionalPanel("input.nitrate_samp",
+                                                                       radioButtons("nnitrate_samp", "Frequency per week", choices = c(1, 2, 7), inline = TRUE)
+                                                      ),
+                                                      p(tags$b("Laboratory Analysis")),
+                                                      checkboxInput("analyze_chla", budget_options$label[11]),
+                                                      conditionalPanel("input.analyze_chla",
+                                                                       radioButtons("nanalyze_chla", "Number of samples per week", choices = c(1, 2, 7), inline = TRUE)
+                                                      ),
+                                                      checkboxInput("analyze_nitrate", budget_options$label[12]),
+                                                      conditionalPanel("input.analyze_nitrate",
+                                                                       radioButtons("nanalyze_nitrate", "Number of samples per week", choices = c(1, 2, 7), inline = TRUE)
+                                                                       )
+                                                      ),
+                                               column(8,
+                                                      h4("Budget plot"),
+                                                      wellPanel(
+                                                        plotOutput("budget_plot")
+                                                        ),
+                                                      h3("Budget summary"),
+                                                      DTOutput("budget_table"),
+                                                      wellPanel(
+                                                        textOutput("total_exp")
+                                                      ),
+                                                      actionButton("submit_budget", "Submit budget")
+                                                      )
+                                               ),
+                                             hr(),
+                                             conditionalPanel("input.submit_budget > 0",
+                                                              fluidRow(
+                                                                column(10, offset = 1,
+                                                                       box(id = "box4", width = 12, status = "primary",
+                                                                           solidHeader = TRUE,
+                                                                           fluidRow(
+                                                                             column(10, offset = 1,
+                                                                                    h3("Questions"),
+                                                                                    textAreaInput2(inputId = qid[35], label = quest[qid[35], ], width = "90%"),
+                                                                                    textAreaInput2(inputId = qid[36], label = quest[qid[36], ], width = "90%"),
+                                                                                    textAreaInput2(inputId = qid[37], label = quest[qid[37], ], width = "90%"),
+                                                                                    )
+                                                                             )
+                                                                           )
+                                                                       )
+                                                                )
+                                                              ),
+                                             hr()
+                                             ),
                                     #* Activity C - Summary ====
                                     tabPanel(title = tab_names["stab13", 2], value = "stab13",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab12", 2])
+                                                                h3(tab_names["stab13", 2])
                                                       )
                                                )
                                              ),

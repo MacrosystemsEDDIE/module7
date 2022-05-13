@@ -15,6 +15,10 @@ met_pars <- read.csv("data/met_params.csv", fileEncoding = "UTF-8-BOM")
 
 shinyServer(function(input, output, session) {
 
+  #** Recap Presentation slides ----
+  output$slides <- renderSlickR({
+    slickR(slides) + settings(dots = TRUE)
+  })
 
   # NEON Sites datatable ----
   output$table01 <- DT::renderDT(
@@ -438,7 +442,7 @@ shinyServer(function(input, output, session) {
       need(!is.null(lm_wt$m),
            message = "Please click 'Add linear regression'.")
     )
-    formula <- "$$ wtemp = %s * airtemp + %s   ;   r^2 = %s $$"
+    formula <- "$$ wtemp = %s \times airtemp + %s   ;   r^2 = %s $$"
     text <- sprintf(formula, lm_wt$m, lm_wt$b, lm_wt$r2)
     withMathJax(
       tags$p(text)
@@ -559,9 +563,9 @@ shinyServer(function(input, output, session) {
            message = "Please click 'Add linear regression'.")
     )
     if(lm_upar$b < 0) {
-      formula <- "$$ uPAR = %s * SWR %s   ;   r^2 = %s $$"
+      formula <- "$$ uPAR = %s \times SWR %s   ;   r^2 = %s $$"
     } else {
-      formula <- "$$ uPAR = %s * SWR + %s   ;   r^2 = %s $$"
+      formula <- "$$ uPAR = %s \times SWR + %s   ;   r^2 = %s $$"
     }
     text <- sprintf(formula, lm_upar$m, lm_upar$b, lm_upar$r2)
     withMathJax(
@@ -1300,7 +1304,7 @@ shinyServer(function(input, output, session) {
                     n_params_est = 1,
                     n_params_obs = 0,
                     maxUptake_init = 0.12, 
-                    obs_cv = c(0.01,0.05), #cv for chl-a and DIN, respectively
+                    obs_cv = c(0.01, 0.05), #cv for chl-a and DIN, respectively
                     param_cv = 0.1, #for maxUptake
                     init_cond_cv = c(0.05, 0.1), #cv for chl-a and DIN, respectively
                     state_names = c("chla", "nitrate"),
@@ -1409,8 +1413,6 @@ shinyServer(function(input, output, session) {
     da_method$dt$RMSE[2] <- fc_chla_assim$rmse
     da_method$dt$RMSE[3] <- fc_nitrate_assim$rmse
     da_method$dt$RMSE[4] <- fc_both_assim$rmse
-    
-    
   })
   
   #** Table of RMSE ----
@@ -1437,6 +1439,42 @@ shinyServer(function(input, output, session) {
     )
     da_method$plot
   })
+  
+  #** Plot of all assessment plots ----
+  output$all_assess_plot <- renderPlot({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(est_out_both_assim$out),
+           message = "Click 'Run forecast'.")
+    )
+    validate(
+      need(!is.null(fc_both_assim$plot),
+           message = "Click 'Assess forecast'.")
+    )
+    fc_both_assim$plot
+    ggpubr::ggarrange(plotlist = list(fc_no_da$plot, fc_chla_assim$plot, fc_nitrate_assim$plot, fc_both_assim$plot), nrow = 2)
+  })
+  
+  hyp1 <- reactiveValues(dt = NULL)
+  observe({
+    hyp1$dt <- data.frame(Hypothesis = input$rank_hyp_2)
+    
+  })
+  
+  output$hyp1 <- renderDT({
+    validate(
+      need(length(input$rank_hyp_4) == 4,
+           "Add rankings across!")
+    )
+    hyp1$dt
+    }, selection = "none",
+                          options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
+                                         columnDefs = list(list(width = '20%', targets = "_all")), scrollX = TRUE
+                          ), colnames = c("Hypothesis"),
+                          server = FALSE, escape = FALSE)
   
   # Objective 8 - Explore observation uncertainty ----
   #** Slickr Chla slides ----
@@ -1476,8 +1514,9 @@ shinyServer(function(input, output, session) {
     yini <- get_yini(lake_data = lake_data$df,
                      start_date = start_date)
     
-    chla_cv <- ((input$obs_uc_chla / mean(obs_plot$hist$chla, na.rm = TRUE)))
-
+    chla_cv <-  ((input$obs_uc_chla / mean(obs_plot$hist$chla, na.rm = TRUE)))
+    nitrate_cv <- ((input$obs_uc_nitrate / 2)) # mean(obs_plot$hist$nitrate, na.rm = TRUE)))
+    
     progress$set(value = 0.3)
     est_out <- EnKF(n_en = 100, 
                     start = '2020-09-25', # start date 
@@ -1489,7 +1528,7 @@ shinyServer(function(input, output, session) {
                     n_params_est = 1,
                     n_params_obs = 0,
                     maxUptake_init = 0.12, 
-                    obs_cv = c(chla_cv, 0.05), #cv for chl-a and DIN, respectively
+                    obs_cv = c(chla_cv, nitrate_cv), #cv for chl-a and DIN, respectively
                     param_cv = 0.1, #for maxUptake
                     init_cond_cv = c(0.05, 0.1), #cv for chl-a and DIN, respectively
                     state_names = c("chla", "nitrate"),
@@ -1693,6 +1732,432 @@ shinyServer(function(input, output, session) {
     } else {
       shinyjs::enable("nday_da_freq")
     }
+  })
+  
+  #* Activity C ----
+  #** Objective 10 -Management Scenario ----
+  
+  #** Slickr Chla slides ----
+  output$chla_slides3 <- renderSlickR({
+    slickR(chla_slides) + settings(dots = TRUE)
+  })
+  
+  #** Slickr Nitrate slides ----
+  output$nitrate_slides3<- renderSlickR({
+    slickR(nitrate_slides) + settings(dots = TRUE)
+  })
+  
+  #*** Budget plot
+  budget_exp <- reactiveValues(df = budget_options)
+
+  #** Sensors ----
+  observeEvent(input$chla_sens, {
+    if(input$chla_sens) {
+      budget_exp$df$value[1] <- budget_options$cost[1]
+    } else {
+      budget_exp$df$value[1] <- 0
+    }
+  })
+  observeEvent(input$nitrate_sens, {
+    if(input$nitrate_sens) {
+      budget_exp$df$value[2] <- budget_options$cost[2]
+    } else {
+      budget_exp$df$value[2] <- 0
+    }
+  })
+  
+  observeEvent(input$data_stream, {
+    if(input$data_stream) {
+      budget_exp$df$value[3] <- budget_options$cost[3]
+    } else {
+      budget_exp$df$value[3] <- 0
+    }
+  })
+  
+  #** Field Equipment ----
+  observeEvent(input$buoy, {
+    if(input$buoy) {
+      budget_exp$df$value[4] <- budget_options$cost[4]
+    } else {
+      budget_exp$df$value[4] <- 0
+    }
+  })
+  observeEvent(input$res_access, {
+    if(input$res_access) {
+      budget_exp$df$value[5] <- budget_options$cost[5]
+    } else {
+      budget_exp$df$value[5] <- 0
+    }
+  })
+  observeEvent(input$man_samp, {
+    if(input$man_samp) {
+      budget_exp$df$value[6] <- budget_options$cost[6]
+    } else {
+      budget_exp$df$value[6] <- 0
+    }
+  })
+  observeEvent(input$sens_main, {
+    if(input$sens_main) {
+      budget_exp$df$value[7] <- budget_options$cost[7]
+    } else {
+      budget_exp$df$value[7] <- 0
+    }
+  })
+  
+  #** Field Personnel ----
+  observeEvent(input$deploy_sens, {
+    if(input$deploy_sens) {
+      budget_exp$df$value[8] <- budget_options$cost[8] * as.numeric(input$ndeploy_sens)
+    } else {
+      budget_exp$df$value[8] <- 0
+    }
+  })
+  observeEvent(input$ndeploy_sens, {
+    if(input$deploy_sens) {
+      budget_exp$df$value[8] <- budget_options$cost[8] * as.numeric(input$ndeploy_sens)
+    } else {
+      budget_exp$df$value[8] <- 0
+    }
+  })
+  
+  observeEvent(input$chla_samp, {
+    if(input$chla_samp) {
+      budget_exp$df$value[9] <- budget_options$cost[9] * as.numeric(input$nchla_samp) * 52
+    } else {
+      budget_exp$df$value[9] <- 0
+    }
+  })
+  observeEvent(input$nchla_samp, {
+    if(input$chla_samp) {
+      budget_exp$df$value[9] <- budget_options$cost[9] * as.numeric(input$nchla_samp) * 52
+    } else {
+      budget_exp$df$value[9] <- 0
+    }
+  })
+  
+  observeEvent(input$nitrate_samp, {
+    if(input$nitrate_samp) {
+      budget_exp$df$value[10] <- budget_options$cost[10] * as.numeric(input$nnitrate_samp) * 52
+    } else {
+      budget_exp$df$value[10] <- 0
+    }
+  })
+  observeEvent(input$nnitrate_samp, {
+    if(input$nitrate_samp) {
+      budget_exp$df$value[10] <- budget_options$cost[10] * as.numeric(input$nnitrate_samp) * 52
+    } else {
+      budget_exp$df$value[10] <- 0
+    }
+  })
+
+  #** Laboratory Analysis ----
+  observeEvent(input$analyze_chla, {
+    if(input$analyze_chla) {
+      budget_exp$df$value[11] <- budget_options$cost[11] * as.numeric(input$nanalyze_chla) * 52
+    } else {
+      budget_exp$df$value[11] <- 0
+    }
+  })
+  observeEvent(input$nanalyze_chla, {
+    if(input$analyze_chla) {
+      budget_exp$df$value[11] <- budget_options$cost[11] * as.numeric(input$nanalyze_chla) * 52
+    } else {
+      budget_exp$df$value[11] <- 0
+    }
+  })
+  
+  observeEvent(input$analyze_nitrate, {
+    if(input$analyze_nitrate) {
+      budget_exp$df$value[12] <- budget_options$cost[12] * as.numeric(input$nanalyze_nitrate) * 52
+    } else {
+      budget_exp$df$value[12] <- 0
+    }
+  })
+  observeEvent(input$nanalyze_nitrate, {
+    if(input$analyze_nitrate) {
+      budget_exp$df$value[12] <- budget_options$cost[12] * as.numeric(input$nanalyze_nitrate) * 52
+    } else {
+      budget_exp$df$value[12] <- 0
+    }
+  })
+  
+  #* Budget Plot ----
+  output$budget_plot <- renderPlot({
+    
+    budget_exp$df$value[nrow(budget_exp$df)] <- budget_exp$df$cost[nrow(budget_exp$df)] - sum(budget_exp$df$value[1:(nrow(budget_exp$df) - 1)])
+
+
+    validate(
+      need(budget_exp$df$value[nrow(budget_exp$df)] >= 0, "It looks like you overspent your budget. You will need to re-draft your budget to make sure you do not overspend.")
+    )
+    
+    
+    p <- ggplot() +
+      geom_bar(data = budget_exp$df, aes(x, value, fill = category), stat = "identity", position = "stack") +
+      ylab("Money ($)") +
+      xlab("") +
+      coord_cartesian(ylim= c(0, max(budget_options$cost))) +
+      theme_bw(base_size = 20)
+    return(p)
+    # return(ggplotly(p))
+  })
+  
+  
+  output$wq_monitoring_tab <- renderDT({
+    budget_exp$df[1:(nrow(budget_exp$df) - 1), c(1:3)]
+  }, selection = "none",
+  options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
+                 columnDefs = list(list(width = '20%', targets = "_all")), scrollX = FALSE
+  ), colnames = c("Category", "Item", "Description"), rownames = NULL,
+  server = FALSE, escape = FALSE)
+  
+  output$budget_table <- renderDT({
+    budget_exp$df[1:(nrow(budget_exp$df) - 1), c(1, 2, 7)]
+  }, selection = "none",
+  options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
+                 columnDefs = list(list(width = '20%', targets = "_all")), scrollX = FALSE
+  ), colnames = c("Item", "Cost", "Sub-total"), rownames = NULL,
+  server = FALSE, escape = FALSE)
+  
+  output$total_exp <- renderText({
+    paste0("Total expenditure = $", formatC(sum(budget_exp$df$value[1:(nrow(budget_exp$df) - 1)]), big.mark = ",", format = "s")) 
+  })
+  
+  #** Submit Budget ----
+  observeEvent(input$submit_budget, {
+    shinyjs::disable("chla_sens")
+    shinyjs::disable("nitrate_sens")
+    shinyjs::disable("data_stream")
+    shinyjs::disable("buoy")
+    shinyjs::disable("res_access")
+    shinyjs::disable("man_samp")
+    shinyjs::disable("sens_main")
+    shinyjs::disable("deploy_sens")
+    shinyjs::disable("ndeploy_sens")
+    shinyjs::disable("chla_samp")
+    shinyjs::disable("nchla_samp")
+    shinyjs::disable("nitrate_samp")
+    shinyjs::disable("nnitrate_samp")
+    shinyjs::disable("analyze_chla")
+    shinyjs::disable("nanalyze_chla")
+    shinyjs::disable("analyze_nitrate")
+    shinyjs::disable("nanalyze_nitrate")
+    shinyjs::disable("submit_budget")
+    shinyalert::shinyalert(title = "Budget Submitted!",
+                           "Great job! Now answer the questions below with regards to why you made the decisions you did.")
+  })
+  
+  
+  
+  
+  
+  
+  
+  # Navigating Tabs ----
+  #* Main Tab ====
+  rv1 <- reactiveValues(prev = 0, nxt = 2)
+  observeEvent(input$maintab, {
+    curr_tab1 <- input$maintab
+    rv1$prev <- readr::parse_number(curr_tab1) - 1
+    rv1$nxt <- readr::parse_number(curr_tab1) + 1
+  })
+  
+  #* Tab 1a ----
+  rv1a <- reactiveValues(prev = 0, nxt = 2)
+  observeEvent(input$tabseries1, {
+    curr_tab1 <- input$tabseries1
+    rv1a$prev <- readr::parse_number(curr_tab1) - 1
+    rv1a$nxt <- readr::parse_number(curr_tab1) + 1
+  })
+  
+  #* Tab 2a ----
+  rv2a <- reactiveValues(prev = 0, nxt = 2)
+  observeEvent(input$tabseries2, {
+    curr_tab1 <- input$tabseries2
+    rv2a$prev <- readr::parse_number(curr_tab1) - 1
+    rv2a$nxt <- readr::parse_number(curr_tab1) + 1
+  })
+  
+  #* Tab 3a ----
+  rv3a <- reactiveValues(prev = 0, nxt = 2)
+  observeEvent(input$tabseries3, {
+    curr_tab1 <- input$tabseries3
+    rv3a$prev <- readr::parse_number(curr_tab1) - 1
+    rv3a$nxt <- readr::parse_number(curr_tab1) + 1
+    print(rv3a$nxt )
+  })
+  
+  #* Tab 4a ----
+  rv4a <- reactiveValues(prev = 0, nxt = 2)
+  observeEvent(input$tabseries4, {
+    curr_tab1 <- input$tabseries4
+    rv4a$prev <- readr::parse_number(curr_tab1) - 1
+    rv4a$nxt <- readr::parse_number(curr_tab1) + 1
+  })
+  
+  observe({
+    toggleState(id = "prevBtn1", condition = rv1$prev > 0)
+    if(rv1$nxt > 7 & rv4a$nxt > 13) {
+      shinyjs::disable("nextBtn1")
+    } else {
+      shinyjs::enable("nextBtn1")
+    }
+    hide(selector = ".page")
+  })
+  
+  
+  #** Next button labels ----
+  observe({
+    curr_tab1 <- input$maintab
+    idx <- which(tab_names$tab_id == curr_tab1)
+    new_nam <- tab_names$name[idx + 1]
+    if (curr_tab1 == "mtab4") {
+      curr_obj <- input$tabseries1
+      idx2 <- which(tab_names$tab_id == curr_obj)
+      new_nam <- tab_names$name[idx2 + 1]
+    }
+    if (curr_tab1 == "mtab5") {
+      curr_obj <- input$tabseries2
+      idx2 <- which(tab_names$tab_id == curr_obj)
+      new_nam <- tab_names$name[idx2 + 1]
+    }
+    if (curr_tab1 == "mtab6") {
+      curr_obj <- input$tabseries3
+      idx2 <- which(tab_names$tab_id == curr_obj)
+      new_nam <- tab_names$name[idx2 + 1]
+    }
+    if(curr_tab1 == "mtab7") {
+      curr_obj <- input$tabseries4
+      idx2 <- which(tab_names$tab_id == curr_obj)
+      new_nam <- tab_names$name[idx2 + 1]
+    }
+    if(curr_tab1 == "mtab7" & rv4a$nxt > 13) {
+      updateActionButton(session, inputId = "nextBtn1", label = paste("Next >"))
+    } else {
+      updateActionButton(session, inputId = "nextBtn1", label = paste(new_nam, ">"))
+    }
+  })
+  
+  #** Previous button labels ----
+  observe({
+    curr_tab1 <- input$maintab
+    idx <- which(tab_names$tab_id == curr_tab1)
+    new_nam <- tab_names$name[idx - 1]
+    
+    if (curr_tab1 == "mtab4") {
+      curr_obj <- input$tabseries1
+      idx2 <- which(tab_names$tab_id == curr_obj)
+      if(curr_obj == "stab1") idx2 <- idx2 - 1 # Move off Activity A label
+      new_nam <- tab_names$name[idx2 - 1]
+    }
+    if (curr_tab1 == "mtab5") {
+      curr_obj <- input$tabseries2
+      idx2 <- which(tab_names$tab_id == curr_obj)
+      if(curr_obj == "stab4") idx2 <- idx2 - 1 # Move off Activity B label
+      new_nam <- tab_names$name[idx2 - 1]
+    }
+    if (curr_tab1 == "mtab6") {
+      curr_obj <- input$tabseries3
+      idx2 <- which(tab_names$tab_id == curr_obj)
+      if(curr_obj == "stab7") idx2 <- idx2 - 1 # Move off Activity C label
+      new_nam <- tab_names$name[idx2 - 1]
+    }
+    if(curr_tab1 == "mtab7") {
+      curr_obj <- input$tabseries4
+      idx2 <- which(tab_names$tab_id == curr_obj)
+      if(curr_obj == "stab12") idx2 <- idx2 - 1 # Move off Activity C label
+      new_nam <- tab_names$name[idx2 - 1]
+    }
+    if(curr_tab1 == "mtab1") {
+      updateActionButton(session, inputId = "prevBtn1", label = paste("< Previous"))
+    } else {
+      # shinyjs::show(id = "prevBtn1")
+      updateActionButton(session, inputId = "prevBtn1", label = paste("<", new_nam))
+    }
+  })
+  
+  #** Advancing Tabs ----
+  observeEvent(input$nextBtn1, {
+    
+    if(input$nextBtn1 %in% c(5, 10, 15)) {
+      showModal(
+        modalDialog(
+          title = "Save Progress",
+          "Don't forget to save your progress as you go just in case you lose connection with the server. Click 'Download user input' at the bottom of the page to save a snapshot of your answers so far.")
+      )
+    } else {
+      curr_tab1 <- input$maintab
+      idx <- which(tab_names$tab_id == curr_tab1)
+      if (curr_tab1 == "mtab4" & rv1a$nxt < 4) {
+        curr_obj <- input$tabseries1
+        updateTabsetPanel(session, "tabseries1",
+                          selected = paste0("stab", rv1a$nxt))
+        
+      } else if (curr_tab1 == "mtab5" & rv2a$nxt < 7) {
+        curr_obj <- input$tabseries2
+        
+        updateTabsetPanel(session, "tabseries2",
+                          selected = paste0("stab", rv2a$nxt))
+        
+      } else if (curr_tab1 == "mtab6" & rv3a$nxt < 12) {
+        curr_obj <- input$tabseries3
+        updateTabsetPanel(session, "tabseries3",
+                          selected = paste0("stab", rv3a$nxt))
+      } else if (curr_tab1 == "mtab7" & rv4a$nxt < 14) {
+        curr_obj <- input$tabseries4
+        updateTabsetPanel(session, "tabseries4",
+                          selected = paste0("stab", rv4a$nxt))
+      } else {
+        updateTabsetPanel(session, "tabseries1",
+                          selected = "stab1")
+        updateTabsetPanel(session, "tabseries2",
+                          selected = "stab4")
+        updateTabsetPanel(session, "tabseries3",
+                          selected = "stab7")
+        updateTabsetPanel(session, "tabseries4",
+                          selected = "stab12")
+        updateTabsetPanel(session, "maintab",
+                          selected = paste0("mtab", rv1$nxt))
+      }
+      shinyjs::runjs("window.scrollTo(0, 0)") # scroll to top of page
+    }
+  })
+  
+  #** Moving back through tabs ----
+  observeEvent(input$prevBtn1, {
+    curr_tab1 <- input$maintab
+    idx <- which(tab_names$tab_id == curr_tab1)
+    if (curr_tab1 == "mtab4" & rv1a$prev > 0) {
+      curr_obj <- input$tabseries1
+      
+      updateTabsetPanel(session, "tabseries1",
+                        selected = paste0("stab", rv1a$prev))
+      
+    } else if (curr_tab1 == "mtab5" & rv2a$prev > 3) {
+      curr_obj <- input$tabseries2
+      
+      updateTabsetPanel(session, "tabseries2",
+                        selected = paste0("stab", rv2a$prev))
+      
+    } else if (curr_tab1 == "mtab6" & rv3a$prev > 6) {
+      curr_obj <- input$tabseries3
+      updateTabsetPanel(session, "tabseries3",
+                        selected = paste0("stab", rv3a$prev))
+    } else if (curr_tab1 == "mtab7" & rv4a$prev > 11) {
+      curr_obj <- input$tabseries4
+      updateTabsetPanel(session, "tabseries4",
+                        selected = paste0("stab", rv4a$prev))
+    } else {
+      updateTabsetPanel(session, "tabseries1",
+                        selected = "stab3")
+      updateTabsetPanel(session, "tabseries2",
+                        selected = "stab6")
+      updateTabsetPanel(session, "tabseries3",
+                        selected = "stab11")
+      updateTabsetPanel(session, "maintab",
+                        selected = paste0("mtab", rv1$prev))
+    }
+    shinyjs::runjs("window.scrollTo(0, 0)")
   })
   
 })
