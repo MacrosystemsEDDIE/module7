@@ -61,7 +61,7 @@ plot_enkf_out <- function(obs_plot, start_date, plot_type, est_out, var, add_obs
   
   if(var != "maxUptake") {
     dat3 <- est_out[[var]]$obs
-    dat3[[var]][dat3$Date > (as.Date(start_date) + n_days)] <- NA
+    dat3$obs[dat3$Date > (as.Date(start_date) + (n_days))] <- NA
     dat3$col <- "Assimilated"
     p <- p +
       geom_errorbar(data = dat3, aes(Date, ymin = obs - est_out[[var]]$state_sd, ymax = obs + est_out[[var]]$state_sd,
