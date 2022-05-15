@@ -17,7 +17,7 @@ shinyServer(function(input, output, session) {
 
   #** Recap Presentation slides ----
   output$slides <- renderSlickR({
-    slickR(slides) + settings(dots = TRUE)
+    slickR(recap_slides) + settings(dots = TRUE)
   })
 
   # NEON Sites datatable ----
@@ -1984,7 +1984,6 @@ shinyServer(function(input, output, session) {
     curr_tab1 <- input$tabseries3
     rv3a$prev <- readr::parse_number(curr_tab1) - 1
     rv3a$nxt <- readr::parse_number(curr_tab1) + 1
-    print(rv3a$nxt )
   })
   
   #* Tab 4a ----
