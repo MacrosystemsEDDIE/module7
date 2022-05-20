@@ -3,6 +3,7 @@
 ## Module 7: Using Data to Improve Ecological Forecasts
 [![](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://macrosystemseddie.shinyapps.io/module7/)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MacrosystemsEDDIE/module7/main?urlpath=shiny/app/)
+<a href="url"><img src="app/www/mod7_conceptual_figure.png" align="right" height="220" width="269" ></a>
 ### Summary
 Here is the code for running the Macrosystems EDDIE Module 7: _Using Data to Improve Ecological Forecasts_. Below are instructions on how to access the Shiny app *via* a web browser and also a detailed guide below for launching the R Shiny App locally on your own computer. For more details about teaching this module please visit our [website](https://serc.carleton.edu/eddie/teaching_materials/modules/module7.html).
 
