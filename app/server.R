@@ -2159,6 +2159,14 @@ shinyServer(function(input, output, session) {
     shinyjs::runjs("window.scrollTo(0, 0)")
   })
   
+  # Help buttons ----
+  observeEvent(input$help, {
+    introjs(session, events = list(onbeforechange = readCallback("switchTabs")))
+  })
+  observeEvent(input$help2, {
+    shinyalert(title = "Resume Progress", text = "Use this field to upload your '.eddie' file to resume your progress.", type = "info")
+  })
+  
 })
 
 # end

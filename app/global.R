@@ -10,6 +10,7 @@ suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
 suppressPackageStartupMessages(library(magrittr, quietly = TRUE))
 suppressPackageStartupMessages(library(mvtnorm, quietly = TRUE))
 suppressPackageStartupMessages(library(ggpubr, quietly = TRUE))
+library(shinyalert, quietly = TRUE, warn.conflicts = FALSE)
 
 # Colors for plots
 scale_colour_discrete <- ggthemes::scale_colour_colorblind
@@ -40,6 +41,9 @@ invisible(sapply(list.files("R", full.names = TRUE), source))
 
 # Load and format questions
 quest <- read.csv("data/student_questions.csv", row.names = 1)
+
+# Help documentation
+help_text <- read.csv("data/help_text.csv", row.names = 1)
 
 idx <- which(grepl("Name of selected ", quest$Question))
 idx2 <- which(grepl("Elevation", quest$Question))

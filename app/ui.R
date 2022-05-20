@@ -60,7 +60,16 @@ ui <- function(req) {
     ),
     navbarPage(title = "Module 7: Using Data to Improve Ecological Forecasts",
                position = "static-top", id = "maintab",
-               
+               tags$header(
+                 fluidRow(
+                   column(2,
+                          fileInput("upload_answers", "Resume Progress", accept = c(".eddie", ".rds"))
+                   ),
+                   column(2,
+                          actionButton("help2", label = "", icon = icon("question-circle")), data.step = 7, data.intro = help_text["help", 1]
+                   )
+                 )
+               ),
                # 1. Overview ----
                tabPanel(introBox(tab_names["mtab1", 2],
                                  data.step = 2,
@@ -235,7 +244,7 @@ ui <- function(req) {
                         img(src = "project-eddie-banner-2020_green.png", height = 100,
                             width = 1544, top = 5),
                         fluidRow(
-                          column(5,
+                          column(4, offset = 1,
                                  h3("Workflow for this module"),
                                  tags$ol(
                                    tags$li(id = "txt_j", module_text["workflow1", ]),
@@ -270,12 +279,17 @@ ui <- function(req) {
                         #* Generate report buttons ====
                         fluidRow(
                           column(4,offset = 1,
-                                 h3("Save your progress"),
-                                 p(id = "txt_j", module_text["save_progress", ]),
+                                 h3("Saving your progress"),
+                                 p(id = "txt_j", "If you run out of time to finish all the activities you can save your progress and return to it at a later date. Click the 'Save Progress' button at the bottom of the page and a file 'module6_answers_ID_number.eddie' will download. Store this file in a safe place locally on your computer."),
+                                 img(src = "save_button.png", height = "100%", id = "bla_border",
+                                     width = "100%", tags$style("border: solid 2px black;")),
                                  br(),
-                                 h3("Resume your progress"),
-                                 p(id = "txt_j", "To reload the app input you can upload the downloaded '.eddie' file below and it will populate your answers into the Shiny app."),
-                                 fileInput("upload_answers", "Upload data", accept = c(".eddie", ".rds")), # B77C2C
+                                 hr(),
+                                 h3("Resuming your progress"),
+                                 img(src = "resume_button.png", height = "100%", id = "bla_border",
+                                     width = "100%", tags$style("border: solid 2px black;")),
+                                 br(),
+                                 p(id = "txt_j", "To reload the app input you can upload the downloaded '.eddie' file at the top of this pae and it will populate your answers into the Shiny app."),
                                  p(id = "txt_j", HTML(paste0(tags$b("Note:"), " You will need to navigate to tabs Objective 1 in Activity A after uploading your file for the site selection to load there."))),
                                  p(id = "txt_j", "Currently the plots do not save to the file.  If you generated plots during your last session, you will need to reload the data and reproduce the plots before generating your report.")
                           ),
@@ -284,8 +298,6 @@ ui <- function(req) {
                                    h3("Generate Report"),
                                    p(module_text["generate_report", ]),
                                    actionButton("generate", "Generate Report (.docx)", icon = icon("file"), width = "190px", class = "btn-primary"
-                                                # id = "dl_btn", # This is the only button that shows up when the app is loaded
-                                                # style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
                                    ), br(), br(),
                                    data.step = 6, data.intro = help_text["finish", 1]
                                  ),
@@ -316,13 +328,12 @@ ui <- function(req) {
                                                 textAreaInput2(inputId = qid[1], label = quest[qid[1], 1]),
                                                 textAreaInput2(inputId = qid[2], label = quest[qid[2], 1]),
                                                 data.step = 5, data.intro = help_text["questions", 1]
+                                                )
                                               )
                                        )
-                                     ),
-                                     
-                                 ),
-                          )
-                        ),
+                                     )
+                                 )
+                          ),
                         hr(),
                         fluidRow(
                           column(6,
