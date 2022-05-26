@@ -67,13 +67,13 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = "Loading NEON data",
                  detail = "This may take a while. This window will disappear
-                     when it is downloaded.", value = 0.33)
+                     when it is loaded.", value = 0.33)
     #load NEON data and format for input into EnKF
     lake_data$df <- format_enkf_inputs(siteID = siteID$lab, neon_vars = neon_vars)
 
     progress$set(message = "Loading NOAA forecast data",
                  detail = "This may take a while. This window will disappear
-                     when it is downloaded.", value = 0.67)
+                     when it is loaded.", value = 0.67)
     noaa_fc$list <- load_noaa_forecast(siteID = siteID$lab, start_date = start_date)
     
     idx <- which(lake_data$df$Date == start_date)
@@ -790,7 +790,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem1, " members."),
                  detail = "This may take a while. This window will disappear
-                     when it is downloaded.", value = 0.1)
+                     when it is finished running the forecasts.", value = 0.1)
     
     obs_file <- create_data_assim_inputs(freq_chla = 36,
                                          freq_din = 36,
@@ -892,7 +892,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem_no_da, " members."),
                  detail = "This may take a while. This window will disappear
-                     when it is downloaded.", value = 0.1)
+                     when it is finished running the forecasts.", value = 0.1)
     
     obs_file <- create_data_assim_inputs(freq_chla = 36,
                                          freq_din = 36,
@@ -1019,7 +1019,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem_chla_assim, " members."),
                  detail = "This may take a while. This window will disappear
-                     when it is downloaded.", value = 0.1)
+                     when it is finished running the forecasts.", value = 0.1)
     
     obs_file <- create_data_assim_inputs(freq_chla = 7,
                                          freq_din = 36,
@@ -1150,7 +1150,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem_nitrate_assim, " members."),
                  detail = "This may take a while. This window will disappear
-                     when it is downloaded.", value = 0.1)
+                     when it is finished running the forecasts.", value = 0.1)
     
     obs_file <- create_data_assim_inputs(freq_chla = 36,
                                          freq_din = 7,
@@ -1281,7 +1281,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = paste0("Running forecast of chlorophyll-a with ", input$n_mem_both_assim, " members."),
                  detail = "This may take a while. This window will disappear
-                     when it is downloaded.", value = 0.1)
+                     when it is finished running the forecasts.", value = 0.1)
     
     obs_file <- create_data_assim_inputs(freq_chla = 7,
                                          freq_din = 7,
@@ -1499,7 +1499,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = paste0("Running forecast of chlorophyll-a with 100 members."),
                  detail = "This may take a while. This window will disappear
-                     when it is downloaded.", value = 0.1)
+                     when it is finished running the forecasts.", value = 0.1)
     
     freq_chla <- ifelse("Chlorophyll-a" %in% input$obs_uc_da, 7, 36) 
     freq_din <- ifelse("Nitrate" %in% input$obs_uc_da, 7, 36) 
@@ -1610,7 +1610,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = paste0("Running forecast of chlorophyll-a with 100 members."),
                  detail = "This may take a while. This window will disappear
-                     when it is downloaded.", value = 0.1)
+                     when it is finished running the forecasts.", value = 0.1)
     
     freq_chla <- ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 36) 
     freq_din <- ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 36) 
