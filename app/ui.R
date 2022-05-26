@@ -74,7 +74,7 @@ ui <- function(req) {
                tabPanel(introBox(tab_names["mtab1", 2],
                                  data.step = 2,
                                  data.intro = help_text["tab_nav1", 1]
-               ),
+                                 ),
                value = "mtab1",
                introjsUI(), # must include in UI
                introBox(
@@ -587,6 +587,8 @@ border-color: #FFF;
                                                                                   width = "90%"),
                                                                    textAreaInput2(inputId = qid[16], label = quest[qid[16], ],
                                                                                   width = "90%"),
+                                                                   textAreaInput2(inputId = qid[17], label = quest[qid[17], ],
+                                                                                  width = "90%"),
                                                                    br()
                                                             )
                                                           )
@@ -657,11 +659,10 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   h4(quest[qid[17], 1]),
-                                                                   radioButtons(qid[13], quest[qid[13], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   radioButtons(qid[14], quest[qid[14], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   radioButtons(qid[15], quest[qid[15], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   radioButtons(qid[16], quest[qid[16], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   h4(quest[qid[18], 1]),
+                                                                   radioButtons(qid[19], quest[qid[19], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   radioButtons(qid[20], quest[qid[20], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   radioButtons(qid[21], quest[qid[21], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    br()
                                                             )
                                                           )
@@ -682,7 +683,7 @@ border-color: #FFF;
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(8, offset = 1,
-                                                                   h4(quest[qid[16], 1]),
+                                                                   h4(quest[qid[22], 1]),
                                                                    bucket_list(
                                                                      header = "",
                                                                      group_name = "bucket_list_group",
@@ -704,9 +705,9 @@ border-color: #FFF;
                                                                      )
                                                                    ),
                                                                    br(),
-                                                                   h4(quest[qid[17], 1]),
-                                                                   radioButtons(qid[18], quest[qid[18], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   radioButtons(qid[19], quest[qid[19], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   h4(quest[qid[23], 1]),
+                                                                   radioButtons(qid[24], quest[qid[24], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   radioButtons(qid[25], quest[qid[25], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    br()
                                                             ),
                                                             column(2,
@@ -874,7 +875,11 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   # textAreaInput2(inputId = qid[26], label = quest[qid[26], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[26], label = quest[qid[26], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[27], label = quest[qid[27], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[28], label = quest[qid[28], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[29], label = quest[qid[29], ], width = "90%"),
+                                                                   br()
                                                             )
                                                           )
                                                       )
@@ -975,8 +980,17 @@ border-color: #FFF;
                                                       h2("Make a Hypothesis")
                                                ),
                                                column(3,
-                                                      p("QXX. Rank the four forecasts in order from the forecast you expect to be most accurate (top) to the forecast you expect to be least accurate (bottom).")
-                                               ),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(quest[qid[30], 1]),
+                                                                   br()
+                                                                   )
+                                                            )
+                                                          )
+                                                      ),
                                                column(9,
                                                       box(id = "box7", width = 12, status = "primary",
                                                           solidHeader = TRUE,
@@ -1030,25 +1044,41 @@ border-color: #FFF;
                                                )
                                              ),
                                              fluidRow(
-                                               column(4,
+                                               column(6,
                                                       h3("Assess the forecast"),
+                                                      p(module_text["fc_accur", ]),
+                                                      tags$ol(
+                                                        tags$li(tags$b("Predicted vs. observed plots: "), module_text["pred_v_obs_plot", ]),
+                                                        tags$li(tags$b("Root mean square error (RMSE): "), module_text["rmse2", ])
+                                                        ),
+                                                      div("$$RMSE = \\sqrt{\\sum_{n}^{i=1}\\frac{(P_{i} - O_{i})^2 }n}$$"),
+                                                      p(tags$em("where P is equal to the predicted value and O is equal to the observed value and n is equal to the total number of data points.")),
                                                       p("Click the button below to compare your forecast to observational data."),
                                                       actionButton('assess_fc_no_da', label = div("Assess forecast",
-                                                                                                  icon("clipboard-check")))
-                                               ),
-                                               column(4,
-                                                      h4("RMSE of forecast"),
-                                                      wellPanel(
-                                                        textOutput("rmse_no_da")
+                                                                                                  icon("clipboard-check"))),
+                                                      br(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[31], label = quest[qid[31], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[32], label = quest[qid[32], ], width = "90%"),
+                                                                   br()
+                                                            )
+                                                          )
                                                       )
                                                ),
-                                               column(4,
-                                                      h3("1:1 Plot with NO DA"),
+                                               column(4, offset = 1,
+                                                      h3("Predicted vs. Observed"),
                                                       wellPanel(
                                                         plotOutput("chla_fc_assess_no_da")
+                                                        ),
+                                                      wellPanel(
+                                                        textOutput("rmse_no_da")
+                                                        )
                                                       )
-                                               )
-                                             ),
+                                               ),
                                              hr(),
                                              #** Chl-a Assimilation ----
                                              fluidRow(
@@ -1085,15 +1115,27 @@ border-color: #FFF;
                                                       p("Click the button below to compare your forecast to observational data."),
                                                       actionButton('assess_fc_chla_assim', label = div("Assess forecast",
                                                                                                        icon("clipboard-check"))),
-                                                      h4("RMSE of forecast"),
-                                                      wellPanel(
-                                                        textOutput("rmse_chla_assim")
-                                                      )
-                                               ),
+                                                      br(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[33], label = quest[qid[33], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[34], label = quest[qid[34], ], width = "90%"),
+                                                                   br()
+                                                                   )
+                                                            )
+                                                          )
+                                                      ),
                                                column(4, offset = 2,
                                                       h3("1:1 Plot with chl-a DA"),
                                                       wellPanel(
                                                         plotOutput("chla_fc_assess_chla_assim")
+                                                      ),
+                                                      h4("RMSE of forecast"),
+                                                      wellPanel(
+                                                        textOutput("rmse_chla_assim")
                                                       )
                                                )
                                              ),
@@ -1133,15 +1175,27 @@ border-color: #FFF;
                                                       p("Click the button below to compare your forecast to observational data."),
                                                       actionButton('assess_fc_nitrate_assim', label = div("Assess forecast",
                                                                                                           icon("clipboard-check"))),
-                                                      h4("RMSE of forecast"),
-                                                      wellPanel(
-                                                        textOutput("rmse_nitrate_assim")
-                                                      )
-                                               ),
+                                                      br(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[35], label = quest[qid[35], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[36], label = quest[qid[36], ], width = "90%"),
+                                                                   br()
+                                                                   )
+                                                            )
+                                                          )
+                                                      ),
                                                column(4, offset = 2,
                                                       h3("1:1 Plot with nitrate DA"),
                                                       wellPanel(
                                                         plotOutput("chla_fc_assess_nitrate_assim")
+                                                      ),
+                                                      h4("RMSE of forecast"),
+                                                      wellPanel(
+                                                        textOutput("rmse_nitrate_assim")
                                                       )
                                                )
                                              ),
@@ -1181,18 +1235,30 @@ border-color: #FFF;
                                                       p("Click the button below to compare your forecast to observational data."),
                                                       actionButton('assess_fc_both_assim', label = div("Assess forecast",
                                                                                                        icon("clipboard-check"))),
+                                                      br(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[37], label = quest[qid[37], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[38], label = quest[qid[38], ], width = "90%"),
+                                                                   br()
+                                                                   )
+                                                            )
+                                                          )
+                                                      ),
+                                               column(4, offset = 2,
+                                                      h3("Assess Chl-a & Nitrate data assimilation"),
+                                                      wellPanel(
+                                                        plotOutput("chla_fc_assess_both_assim")
+                                                      ),
                                                       h4("RMSE of forecast"),
                                                       wellPanel(
                                                         textOutput("rmse_both_assim")
+                                                        )
                                                       )
                                                ),
-                                               column(4, offset = 2,
-                                                      h3("1:1 Plot with Chl-a & Nitrate DA"),
-                                                      wellPanel(
-                                                        plotOutput("chla_fc_assess_both_assim")
-                                                      )
-                                               )
-                                             ),
                                              hr(),
                                              #** Compare all forecasts ----
                                              fluidRow(
@@ -1209,36 +1275,45 @@ border-color: #FFF;
                                                       h3("Plot of all DA methods forecasts"),
                                                       wellPanel(
                                                         plotlyOutput("da_method_plot")
-                                                      ),
-                                                      wellPanel(
-                                                        plotOutput("all_assess_plot")
-                                                      )
+                                                      )#,
+                                                      # wellPanel(
+                                                      #   plotOutput("all_assess_plot")
+                                                      # )
                                                ),
+                                               hr(),
+                                               #** Revisit hypothesis ----
                                                fluidRow(
-                                                 column(6,
-                                                        p("Q.XX Using RMSE from the table above, rank your forecasts from most accurate (top) to least accurate (bottom). Remember, a lower RMSE value indicates a more accurate forecast."),
-                                                        bucket_list(
-                                                          header = "",
-                                                          group_name = "bucket_list_group2",
-                                                          orientation = "horizontal",
-                                                          add_rank_list(
-                                                            text = tags$b("Drag from here"),
-                                                            labels = sample(assim_methods),
-                                                            input_id = "rank_hyp_3"
-                                                          ),
-                                                          add_rank_list(
-                                                            text = tags$b("Hypothesis Ranking"),
-                                                            labels = NULL,
-                                                            input_id = "rank_hyp_4"
+                                                 column(8,
+                                                        box(id = "box7", width = 12, status = "primary",
+                                                            solidHeader = TRUE,
+                                                            fluidRow(
+                                                              column(10, offset = 1,
+                                                                     h4(quest[qid[39], ]),
+                                                                     bucket_list(
+                                                                       header = "",
+                                                                       group_name = "bucket_list_group2",
+                                                                       orientation = "horizontal",
+                                                                       add_rank_list(
+                                                                         text = tags$b("Drag from here"),
+                                                                         labels = sample(assim_methods),
+                                                                         input_id = "rank_hyp_3"
+                                                                       ),
+                                                                       add_rank_list(
+                                                                         text = tags$b("Hypothesis Ranking"),
+                                                                         labels = NULL,
+                                                                         input_id = "rank_hyp_4"
+                                                                         )
+                                                                       )
+                                                                     )
+                                                              )
                                                             )
-                                                          )
                                                         ),
-                                                 column(6,
+                                                 column(4,
                                                         actionButton("view_hyp1", "View original hypothesis."),
                                                         DTOutput("hyp1")
                                                         )
-                                               )
-                                             ),
+                                                 )
+                                               ),
                                              hr(),
                                              #*** Next step ----
                                              fluidRow(
@@ -1325,8 +1400,8 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[27], label = quest[qid[27], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[28], label = quest[qid[28], ], width = "90%")
+                                                                   textAreaInput2(inputId = qid[40], label = quest[qid[40], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[41], label = quest[qid[41], ], width = "90%")
                                                             )
                                                           )
                                                       )
@@ -1371,7 +1446,7 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[29], label = quest[qid[29], ], width = "90%")
+                                                                   textAreaInput2(inputId = qid[42], label = quest[qid[42], ], width = "90%")
                                                             )
                                                           )
                                                       )
@@ -1462,8 +1537,8 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[29], label = quest[qid[29], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[30], label = quest[qid[30], ], width = "90%")
+                                                                   textAreaInput2(inputId = qid[43], label = quest[qid[43], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[44], label = quest[qid[44], ], width = "90%")
                                                                    )
                                                             )
                                                           )
@@ -1512,9 +1587,9 @@ border-color: #FFF;
                                                                    fluidRow(
                                                                      column(10, offset = 1,
                                                                             h3("Questions"),
-                                                                            textAreaInput2(inputId = qid[32], label = quest[qid[32], ], width = "90%"),
-                                                                            textAreaInput2(inputId = qid[33], label = quest[qid[33], ], width = "90%"),
-                                                                            textAreaInput2(inputId = qid[34], label = quest[qid[34], ], width = "90%")
+                                                                            textAreaInput2(inputId = qid[45], label = quest[qid[45], ], width = "90%"),
+                                                                            textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%"),
+                                                                            textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
                                                                      )
                                                                    )
                                                                )
@@ -1572,7 +1647,7 @@ border-color: #FFF;
                                              hr(),
                                              fluidRow(
                                                column(3, offset = 2,
-                                                 h3("Select a scenario:"),
+                                                 h3(quest[qid[48], ]),
                                                  radioButtons("scen_select", label = "", choices = reservoir_sites, selected = character(0))
                                                )
                                              ),
@@ -1703,6 +1778,11 @@ border-color: #FFF;
                                                       )
                                                ),
                                              hr(),
+                                             conditionalPanel("input.submit_budget == 0",
+                                                              wellPanel(
+                                                                p(tags$em("Submit your budget using the button above."))
+                                                              )
+                                             ),
                                              conditionalPanel("input.submit_budget > 0",
                                                               fluidRow(
                                                                 column(10, offset = 1,
@@ -1711,10 +1791,10 @@ border-color: #FFF;
                                                                            fluidRow(
                                                                              column(10, offset = 1,
                                                                                     h3("Questions"),
-                                                                                    textAreaInput2(inputId = qid[35], label = quest[qid[35], ], width = "90%"),
-                                                                                    textAreaInput2(inputId = qid[36], label = quest[qid[36], ], width = "90%"),
-                                                                                    textAreaInput2(inputId = qid[37], label = quest[qid[37], ], width = "90%"),
-                                                                                    )
+                                                                                    textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%"),
+                                                                                    textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%"),
+                                                                                    textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%"),
+                                                                             )
                                                                              )
                                                                            )
                                                                        )
