@@ -2167,6 +2167,77 @@ shinyServer(function(input, output, session) {
     shinyalert(title = "Resume Progress", text = "Use this field to upload your '.eddie' file to resume your progress.", type = "info")
   })
   
+  #* Download '.eddie' file ----
+  # Save answers in .eddie file
+  ans_list <- reactiveValues()
+  observe({
+    for(i in 1:nrow(answers)) {
+      if(length(input[[qid[i]]]) != 0) {
+        answers[qid[i], 1] <<- input[[qid[i]]]
+      }
+    }
+    
+    ans_list <<- list(
+      name = input$name,
+      id_number = input$id_number,
+      answers = answers,
+      site_row = input$table01_rows_selected
+    )
+  })
+  
+  output$download_answers <- downloadHandler(
+    
+    # This function returns a string which tells the client
+    # browser what name to use when saving the file.
+    filename = function() {
+      paste0("module7_answers_", input$id_number, ".eddie") %>%
+        gsub(" ", "_", .)
+    },
+    
+    # This function should write data to a file given to it by
+    # the argument 'file'.
+    content = function(file) {
+      # write.csv(ans_list, file)
+      saveRDS(ans_list, file = file)
+    }
+  )
+  
+  #** Upload .eddie file ----
+  observeEvent(input$upload_answers, {
+    
+    up_answers <<- readRDS(input$upload_answers$datapath)
+    updateTextAreaInput(session, "name", value = up_answers$name)
+    updateTextAreaInput(session, "id_number", value = up_answers$id_number)
+    
+    for(i in 1:nrow(up_answers$answers)) {
+      if(qid[i] == "q7") {
+        updateRadioButtons(session, qid[i], selected = up_answers$answers[qid[i], 1])
+      } else if(!(qid[i] %in% c("q3", "q7"))) {
+        updateTextAreaInput(session, qid[i], value = up_answers$answers[qid[i], 1])
+      }
+    }
+    
+    showModal(
+      modalDialog(
+        title = "Upload complete!",
+        "All your answers have been uploaded. You will need to regenerate the plots within the Shiny app before generating your final report.")
+    )
+    
+  })
+  
+  # Select site when uploading answers
+  observe({
+    req(input$maintab == "mtab4" & exists("up_answers") & input$tabseries1 == "obj1")
+    req(!is.null(up_answers$site_row))
+    tryCatch(updateSelectizeInput(session, "row_num", selected = up_answers$site_row), error = function(e) {NA})
+  })
+  observe({
+    if(input$row_num != "") {
+      dt_proxy <- dataTableProxy("table01")
+      selectRows(dt_proxy, input$row_num)
+    }
+  })
+  
 })
 
 # end
