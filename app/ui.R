@@ -9,7 +9,6 @@ suppressPackageStartupMessages(library(ncdf4, quietly = TRUE))
 suppressPackageStartupMessages(library(ggplot2, quietly = TRUE))
 suppressPackageStartupMessages(library(stringr, quietly = TRUE))
 suppressPackageStartupMessages(library(hover, quietly = TRUE))
-# suppressPackageStartupMessages(library(ggforce, quietly = TRUE)) # Only for geom_ellipse (doesn't work in plotly!)
 
 # Help documentation
 help_text <- read.csv("data/help_text.csv", row.names = 1)
@@ -66,7 +65,7 @@ ui <- function(req) {
                           fileInput("upload_answers", "Resume Progress", accept = c(".eddie", ".rds"))
                    ),
                    column(2,
-                          actionButton("help2", label = "", icon = icon("question-circle")), data.step = 7, data.intro = help_text["help", 1]
+                          actionButton("help2", label = "", icon = icon("question-circle"))
                    )
                  )
                ),

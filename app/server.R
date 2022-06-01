@@ -2167,8 +2167,7 @@ shinyServer(function(input, output, session) {
     shinyalert(title = "Resume Progress", text = "Use this field to upload your '.eddie' file to resume your progress.", type = "info")
   })
   
-  #* Download '.eddie' file ----
-  # Save answers in .eddie file
+  #** Answers checklist ----
   ans_list <- reactiveValues()
   observe({
     for(i in 1:nrow(answers)) {
@@ -2184,6 +2183,57 @@ shinyServer(function(input, output, session) {
       site_row = input$table01_rows_selected
     )
   })
+  
+  # Checklist for user inputs
+  chk_list <- reactive({
+    out_chk <- c(
+      if(input$name == "") "Introduction: Name",
+      if(input$id_number == "") "Introduction: ID number"
+    )
+    
+    for(i in 1:nrow(answers)) {
+      
+      
+      
+      if(qid[i] == "q10") {
+        if(is.null(input[[qid[i]]])) out_chk <- c(out_chk, answers[qid[i], 2])
+      } else if(qid[i] == "q8") {
+        if(is.null(input[[qid[i]]])) out_chk <- c(out_chk, answers[qid[i], 2])
+      } else if(qid[i] == "q6") {
+        if(is.null(input[[qid[i]]])) out_chk <- c(out_chk, answers[qid[i], 2])
+      } else if(grepl("q3", qid[i])) {
+        if(!("Site Selection: Objective 1 - Q.3" %in% out_chk)) {
+          if(is.na(answers["q3", 1])) out_chk <- c(out_chk, answers[qid[i], 2])
+        }
+      } else {
+        if(is.null(input[[qid[i]]])) {
+          out_chk <- c(out_chk, answers[qid[i], 2])
+        } else if(input[[qid[i]]] == "") {
+          out_chk <- c(out_chk, answers[qid[i], 2])
+        }
+      }
+    }
+    
+    if(length(out_chk) == 0) {
+      out_chk <- "Finished! All answers have been input into the app."
+    }
+    
+    HTML(
+      paste(
+        out_chk,
+        collapse = "<br/>"
+      )
+    )
+  })
+  
+  
+  output$check_list <- renderUI({
+    chk_list()
+  })
+  output$check_list2 <- renderUI({
+    chk_list()
+  })
+  
   
   output$download_answers <- downloadHandler(
     
@@ -2237,6 +2287,88 @@ shinyServer(function(input, output, session) {
       selectRows(dt_proxy, input$row_num)
     }
   })
+  
+  #** Render Report ----
+  report <- reactiveValues(filepath = NULL) #This creates a short-term storage location for a filepath
+  report2 <- reactiveValues(filepath = NULL) #This creates a short-term storage location for a filepath
+  
+  observeEvent(input$generate, {
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = "Gathering data and building report.",
+                 detail = "This may take a while. This window will disappear
+                     when the report is ready.", value = 0)
+    
+    
+    # Set up parameters to pass to Rmd document
+    params <- list(name = input$name,
+                   id_number = input$id_number,
+                   answers = answers,
+                   pheno_file = pheno_file$img
+    )
+    print(params)
+    
+    
+    tmp_file <- paste0(tempfile(), ".docx") #Creating the temp where the .pdf is going to be stored
+    
+    rmarkdown::render("report.Rmd",
+                      output_format = "all",
+                      output_file = tmp_file,
+                      params = params,
+                      envir = new.env(parent = globalenv()))
+    progress$set(value = 1)
+    report$filepath <- tmp_file #Assigning in the temp file where the .docx is located to the reactive file created above
+  })
+  
+  # Hide download button until report is generated
+  output$reportbuilt <- reactive({
+    return(!is.null(report$filepath))
+  })
+  outputOptions(output, 'reportbuilt', suspendWhenHidden = FALSE)
+  
+  # Hide download button until report is generated
+  output$reportbuilt2 <- reactive({
+    return(!is.null(report2$filepath))
+  })
+  outputOptions(output, 'reportbuilt2', suspendWhenHidden = FALSE)
+  
+  #** Download Report ----
+  
+  #Download report
+  output$download <- downloadHandler(
+    
+    # This function returns a string which tells the client
+    # browser what name to use when saving the file.
+    filename = function() {
+      paste0("module7_report_", input$id_number, ".docx") %>%
+        gsub(" ", "_", .)
+    },
+    
+    # This function should write data to a file given to it by
+    # the argument 'file'.
+    content = function(file) {
+      file.copy(report$filepath, file)
+    }
+  )
+  
+  #Download report
+  output$download2 <- downloadHandler(
+    
+    # This function returns a string which tells the client
+    # browser what name to use when saving the file.
+    filename = function() {
+      paste0("report_", input$id_number, ".docx") %>%
+        gsub(" ", "_", .)
+    },
+    
+    # This function should write data to a file given to it by
+    # the argument 'file'.
+    content = function(file) {
+      file.copy(report2$filepath, file)
+    }
+  )
   
 })
 
