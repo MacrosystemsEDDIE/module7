@@ -90,9 +90,13 @@ quest$Question[(ab4[l4]+1):nrow(quest)] <- paste0("Q.", (((ab4[l4]+1):(nrow(ques
 
 
 # Number location
-quest$location[1:(ab1[1]-1)] <- paste0(quest$location[1:(ab1[1]-1)], " - Q.", 1:(ab1[1]-1))
+idx1 <- grep("Q.10", quest$Question)
+quest$location[1:(idx1-1)] <- paste0(quest$location[1:(idx1-1)], " - ", substr(quest$Question[1:(idx1-1)], 1, 3))
+quest$location[(idx1+1):(idx1+2)] <- paste0(quest$location[(idx1+1):(idx1+2)], " - ", substr(quest$Question[(idx1+1):(idx1+2)], 1, 3))
+quest$location[idx1] <- paste0(quest$location[idx1], " - ", substr(quest$Question[idx1], 1, 4))
+quest$location[(idx1+3):nrow(quest)] <- paste0(quest$location[(idx1+3):nrow(quest)], " - ", substr(quest$Question[(idx1+3):nrow(quest)], 1, 4))
 # quest$location[idx:(ab1[l1])] <- paste0(quest$location[idx:ab1[l1]],letters[1:length(idx:ab1[l1])], ". ", )
-quest$location[(ab1[l1]+1):nrow(quest)] <- paste0(quest$location[(ab1[l1]+1):nrow(quest)], " - Q.", ((ab1[l1]+1):nrow(quest) - 6))
+# quest$location[(ab1[l1]+1):(ab2[1]-1)] <- paste0(quest$location[(ab1[l1]+1):(ab2[1]-1)], " - Q.", ((ab1[l1]+1):(ab2[1]-1) - l1))
 # Create dataframe for answers
 answers <- quest
 quest$location <- NULL

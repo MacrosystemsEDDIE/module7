@@ -7,8 +7,6 @@ params:
   name: ""
   id_number: ""
   answers: ""
-  plot_list: ""
-  tab_list: ""
   pheno_file: NULL
 ---
 
@@ -25,21 +23,39 @@ app_update_txt <- paste0("This app was last updated on: ", app_time)
 # Read in assessment questions
 # Load and format questions
 quest <- read.csv("data/student_questions.csv", row.names = 1)
+# Number rows
+ab1 <- 4:9
+ab2 <- 13:16
+ab3 <- 19:21
+ab4 <- 24:25
 
-idx <- which(grepl("Name of selected ", quest$Question))
-idx2 <- which(grepl("Elevation", quest$Question))
+l1 <- length(ab1)
+l2 <- length(ab2)
+l3 <- length(ab3)
+l4 <- length(ab4)
+
 # Number rows
 row.names(quest) <- NULL
-row.names(quest)[1:(idx-1)] <- paste0("q", 1:(idx-1))
-row.names(quest)[idx:(idx2)] <- paste0("q", (idx-1), letters[1:length(idx:idx2)])
-row.names(quest)[(idx2+1):nrow(quest)] <- paste0("q", ((idx2+1):nrow(quest) - 6))
+row.names(quest)[1:(ab1[1]-1)] <- paste0("q", 1:(ab1[1] -1))
+row.names(quest)[ab1[1]:ab1[l1]] <- paste0("q", (ab1[1] -1), letters[1:l1])
+row.names(quest)[(ab1[l1]+1):(ab2[1]-1)] <- paste0("q", ((ab1[l1]+1):(ab2[1] -1) - l1))
+row.names(quest)[ab2[1]:ab2[l2]] <- paste0("q", (ab2[1]-1-l1), letters[1:l2])
+row.names(quest)[(ab2[l2]+1):(ab3[1] -1)] <- paste0("q", (((ab2[l2]+1):(ab3[1] -1)) -(l1+l2)))
+row.names(quest)[ab3[1]:ab3[l3]] <- paste0("q", (ab3[1]-1-l1-l2), letters[1:l3])
+row.names(quest)[(ab3[l3]+1):(ab4[1] -1)] <- paste0("q", (((ab3[l3]+1):(ab4[1] -1)) -(l1+l2+l3)))
+row.names(quest)[ab4[1]:ab4[l4]] <- paste0("q", (ab4[1]-1-l1-l2-l3), letters[1:l4])
+row.names(quest)[(ab4[l4]+1):nrow(quest)] <- paste0("q", (((ab4[l4]+1):nrow(quest)) -(l1+l2+l3+l4)))
+
+
+
 qid <- row.names(quest)
 # Number location
-quest$location[1:(idx-1)] <- paste0(quest$location[1:(idx-1)], " - Q.", 1:(idx-1))
-# quest$location[idx:(idx2)] <- paste0(quest$location[idx:idx2],letters[1:length(idx:idx2)], ". ", )
-quest$location[(idx2+1):nrow(quest)] <- paste0(quest$location[(idx2+1):nrow(quest)], " - Q.", ((idx2+1):nrow(quest) - 6))
+# quest$location[1:(idx-1)] <- paste0(quest$location[1:(idx-1)], " - Q.", 1:(idx-1))
+# # quest$location[idx:(idx2)] <- paste0(quest$location[idx:idx2],letters[1:length(idx:idx2)], ". ", )
+# quest$location[(idx2+1):nrow(quest)] <- paste0(quest$location[(idx2+1):nrow(quest)], " - Q.", ((idx2+1):nrow(quest) - 6))
 
 answers <- params$answers
+answers[is.na(answers[, 1]), 1] <- ""
 
 if(length(params$plot_list) == 1) {
   plot_list <- list(airt_wtemp_ts = NA,
@@ -245,6 +261,11 @@ if (!pheno_chk) {cat("-->")}
 
 ***
 
+```{r}
+
+```
+
+
 # Activity A - Build a Model with Uncertainty
 
 `r module_text["act_A", ]`
@@ -253,9 +274,6 @@ if (!pheno_chk) {cat("-->")}
 
 6. `r quest[qid[12], 1]`  
 \
-**Answer:** `r answers[qid[12], 1]`  
-\
-
 
 a. `r quest[qid[13], 1]`  
 \
@@ -267,7 +285,6 @@ b. `r quest[qid[14], 1]`
 **Answer:** `r answers[qid[14], 1]`  
 \
 
-\
 c. `r quest[qid[15], 1]`  
 \
 **Answer:** `r answers[qid[15], 1]`  
@@ -320,17 +337,12 @@ b. `r quest[qid[25], 1]`
 **Answer:** `r answers[qid[25], 1]`  
 \
 
-
-
 ## `r tab_names["stab5", 2]`\
 
 ***
 `r module_text["obj_05", ]`
 
 ***
-
-
-
 
 ## `r tab_names["stab6", 2]`\
 
@@ -356,18 +368,15 @@ b. `r quest[qid[25], 1]`
 **Answer:** `r answers[qid[29], 1]`  
 \
 
+
 # Activity B - Assimilate Data\
 
-`r answers["act_B", 1]`  
 
 ## `r tab_names["stab7", 2]`\
 
 ***
 `r module_text["act_B_overview", ]`
 ***
-
-
-
 
 
 ## `r tab_names["stab8", 2]`\
@@ -425,7 +434,6 @@ b. `r quest[qid[25], 1]`
 \
 **Answer:** `r answers[qid[39], 1]`  
 \
-
 
 ## `r tab_names["stab9", 2]`\
 
@@ -490,9 +498,6 @@ b. `r quest[qid[25], 1]`
 
 ***
 
-
-
-
 # Activity C: Management Scenario\
 
 `r module_text["act_C", ]`
@@ -523,6 +528,7 @@ b. `r quest[qid[25], 1]`
 \
 **Answer:** `r answers[qid[51], 1]`  
 \
+
 
 ## Think, Pair, Share!\
 `r module_text["tps1", 1]`\
