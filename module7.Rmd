@@ -30,7 +30,7 @@ read_neon_data <- function(siteID, var) {
   idx <- which(neon_vars$Short_name == var)
   read_var <- neon_vars$id[idx]
   units <- neon_vars$units[idx]
-  file <- file.path("data", "neon", paste0(siteID, "_", read_var, "_", units, ".csv"))
+  file <- file.path("app","data", "neon", paste0(siteID, "_", read_var, "_", units, ".csv"))
   if(file.exists(file)) {
     df <- read.csv(file)
     df[, 1] <- as.POSIXct(df[, 1], tz =  "UTC")
@@ -60,7 +60,7 @@ get_NEON_lm <- function(siteID,x,y,start_date){
     ref <- x
     x_var <- neon_vars$id[which(neon_vars$Short_name == ref)][1]
     x_units <- neon_vars$units[which(neon_vars$Short_name == ref)][1]
-    x_file <- file.path("data/neon", paste0(siteID, "_", x_var, "_", x_units, ".csv"))
+    x_file <- file.path("app/data/neon", paste0(siteID, "_", x_var, "_", x_units, ".csv"))
 
     xvar <- read.csv(x_file)
     xvar[, 1] <- as.POSIXct(xvar[, 1], tz = "UTC")
@@ -72,7 +72,7 @@ get_NEON_lm <- function(siteID,x,y,start_date){
     ref2 <- y
     y_var <- neon_vars$id[which(neon_vars$Short_name == ref2)][1]
     y_units <- neon_vars$units[which(neon_vars$Short_name == ref2)][1]
-    y_file <- file.path("data/neon", paste0(siteID, "_", y_var, "_", y_units, ".csv"))
+    y_file <- file.path("app/data/neon", paste0(siteID, "_", y_var, "_", y_units, ".csv"))
     
     yvar <- read.csv(y_file)
     yvar[, 1] <- as.POSIXct(yvar[, 1], tz = "UTC")
@@ -220,7 +220,7 @@ get_yini <- function(lake_data, start_date){
 
  load_noaa_forecast <- function(siteID, start_date){
     
-      fpath <- file.path("data", "NOAAGEFS_1hr", siteID)
+      fpath <- file.path("app","data", "NOAAGEFS_1hr", siteID)
       fpath2 <- file.path(fpath, start_date, "00")
       fils <<- list.files(fpath2)
       fils <<- fils[-c(grep("ens00", fils))]
@@ -238,7 +238,7 @@ get_yini <- function(lake_data, start_date){
         
         for( i in seq_len(length(fils))) {
           
-          fid <- ncdf4::nc_open(file.path("data", "NOAAGEFS_1hr", siteID, dat,
+          fid <- ncdf4::nc_open(file.path("app","data", "NOAAGEFS_1hr", siteID, dat,
                                           "00", fils[i]))
           tim = ncvar_get(fid, "time")
           tunits = ncatt_get(fid, "time")
@@ -1309,4 +1309,133 @@ plot_maxUptake(est_out)
 pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
 pred_v_obs_nitrate(est_out = est_out, lake_data = lake_data)
 rmse(est_out = est_out, lake_data = lake_data)
+```
+##Objective 10: Assess cost vs benefit of an expensive, more reliable sensor  
+This objective will ask students to choose between purchasing an inexpensive, less reliable sensor vs. an expensive, more reliable sensor to generate forecasts in a drinking water reservoir. I'm using BARC under the hood and the forecast is for 2020-10-02, so the data will look a little different from Activities A and B b/c students forecast from 2020-09-25 for those activities. (Hopefully avoiding students realizing it's just rehashed Barco data.)
+### Set-up
+```{r}
+# Load in NEON sites dataframe ----
+neon_sites_df <- read.csv("./app/data/neon_sites.csv")
+neon_sites_df$long <- round(neon_sites_df$long, 3)
+neon_sites_df$lat <- round(neon_sites_df$lat, 3)
+
+# Reference for downloading variables ----
+neon_vars <- read.csv("./app/data/neon_variables.csv")
+
+# Objective 1 - Site Selection ----
+print(neon_sites_df$siteID)
+#we have BARC, CRAM, LIRO, PRLA, PRPO, SUGG, TOOK
+#need to think about which sites we want to use for Mod 7 based on how they behave in app testing
+siteID <- "BARC"
+
+#set start date of forecast
+start_date = "2020-10-02" 
+
+#load NEON data and format for input into EnKF
+lake_data <- format_enkf_inputs(siteID = siteID, neon_vars = neon_vars)
+
+#get initial conditions for forecast
+yini <- get_yini(lake_data = lake_data,
+                 start_date = start_date)
+
+#load NOAA GEFS forecast
+fc <- load_noaa_forecast(siteID = siteID, start_date = start_date)
+
+#get regression for water temp
+lm_wt <- get_NEON_lm(siteID = siteID, x = "Air temperature",
+                     y = "Surface water temperature", start_date = start_date)
+
+#get regression for upar
+lm_upar <- get_NEON_lm(siteID = siteID, x = "Shortwave radiation",
+                     y = "Underwater PAR", start_date = start_date)
+
+#convert NOAA GEFS forecast to water temp and upar forecast
+driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar, fc = fc, start_date = start_date)
+```
+### Run forecast with "cheap" sensor  
+In this case, inserting 36 as the frequency of nitrate assimilation ensures that only the first observation in the 35 day observation period will be assimilated. We'll then manually introduce a data gap in the dataset and set the observation uncertainty to be greater than for the more expensive, reliable sensor. The length of the data gap and the exact magnitude of observation error are randomly drawn within specified limits. The idea behind drawing them randomly is that sometimes the forecast with the cheap sensor is "good enough" to avoid triggering a management action (which the scenario sets up to be triggered if chl-a is over 10 mg/L), and sometimes the cheap sensor incorrectly predicts that chl-a will be over 10 mg/L, thus triggering an unnecessary management action, depending on the duration of the data gap and magnitude of observation error. This means that different students could get different answers about whether investment in the expensive sensor is worth it. If we don't like this way of approaching it I'm totally happy to revisit!
+```{r}
+#format observation data file depending on selected frequency of data assimilation
+
+obs_file <- create_data_assim_inputs(freq_chla = 1,
+                                     freq_din = 36,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
+
+#manually introduce semi-random gap representing sensor malfunction
+start_gap <- sample(5:25,1)
+gap_length <- sample(1:5,1)
+gap = seq(start_gap, start_gap+gap_length, 1)
+obs_file[c(gap),"chla"] <- NA
+
+n_en = 30 # how many ensemble members 
+
+#randomly draw for observation uncertainty within limits
+obs_cv_chla <- runif(1,0.2,0.4)
+
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-10-02', # start date 
+           stop = '2020-10-31', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(obs_cv_chla,0.05),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data)
+abline(h = 10, col = "darkgreen",lty = "dashed",lwd = 3)
+
+pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
+
+rmse(est_out = est_out, lake_data = lake_data)
+
+
+```
+### Run forecast with expensive sensor  
+In this case, inserting 36 as the frequency of nitrate assimilation ensures that only the first observation in the 35 day observation period will be assimilated. We'll then set the observation uncertainty to be less than for the cheaper, less reliable sensor. We also won't introduce any data gaps. The forecast using the reliable sensor is always "good enough" to avoid triggering a management action (which the scenario sets up to be triggered if chl-a is over 10 mg/L). 
+```{r}
+#format observation data file depending on selected frequency of data assimilation
+
+obs_file <- create_data_assim_inputs(freq_chla = 1,
+                                     freq_din = 36,
+                                     lake_data = lake_data,
+                                     start_date = start_date)
+
+n_en = 30 # how many ensemble members 
+
+#run the forecast!
+est_out = EnKF(n_en = n_en, 
+           start = '2020-10-02', # start date 
+           stop = '2020-10-31', # stop date
+           time_step = 'days',
+           obs_file = obs_file,
+           driver_file = driver_file,
+           n_states_est = 2, 
+           n_params_est = 1,
+           n_params_obs = 0,
+           maxUptake_init = 0.12, 
+           obs_cv = c(0.1,0.05),#cv for chl-a and DIN, respectively
+           param_cv = 0.1,#for maxUptake
+           init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+           state_names = c("chla","din"),
+           yini = yini)
+
+#plot forecast output
+plot_chla(est_out = est_out, lake_data = lake_data)
+abline(h = 10, col = "darkgreen",lty = "dashed",lwd = 3)
+
+pred_v_obs_chla(est_out = est_out, lake_data = lake_data)
+
+rmse(est_out = est_out, lake_data = lake_data)
+
+
 ```
