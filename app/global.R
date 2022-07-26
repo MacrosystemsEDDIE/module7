@@ -10,6 +10,7 @@ suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
 suppressPackageStartupMessages(library(magrittr, quietly = TRUE))
 suppressPackageStartupMessages(library(mvtnorm, quietly = TRUE))
 suppressPackageStartupMessages(library(ggpubr, quietly = TRUE))
+suppressPackageStartupMessages(library(ncdf4, quietly = TRUE))
 library(shinyalert, quietly = TRUE, warn.conflicts = FALSE)
 
 # Colors for plots
@@ -234,5 +235,43 @@ scen_fc2$surf_lci[5] <- scen_fc2$surftemp[5] - max(ssd)
 
 scen_fc2$bot_uci <- scen_fc2$bottemp + bsd[order(bsd)]
 scen_fc2$bot_lci <- scen_fc2$bottemp - bsd[order(bsd)]
+
+data_collect_options <- data.frame(text = c("Cheap, unreliable sensor",
+                                            "Expensive, reliable sensor"),
+                                   chla_freq = c(1, 1), obs_cv = c(runif(1,0.2,0.4), 0.1))
+
+
+# Prep for Acti C
+#set start date of forecast
+actc_start_date <- "2020-10-02" 
+
+#load NEON data and format for input into EnKF
+actc_lake_data <- format_enkf_inputs(siteID = "BARC", neon_vars = neon_vars)
+
+#get initial conditions for forecast
+actc_yini <- get_yini(lake_data = actc_lake_data,
+                 start_date = actc_start_date)
+
+#load NOAA GEFS forecast
+actc_noaa_fc <- list(list =load_noaa_forecast(siteID = "BARC", start_date = actc_start_date))
+
+#get regression for water temp
+lm_wt <- get_NEON_lm(siteID = "BARC", x = "Air temperature",
+                     y = "Surface water temperature", start_date = actc_start_date)
+
+#get regression for upar
+lm_upar <- get_NEON_lm(siteID = "BARC", x = "Shortwave radiation",
+                       y = "Underwater PAR", start_date = actc_start_date)
+
+#convert NOAA GEFS forecast to water temp and upar forecast
+actc_driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar,
+                                noaa_fc = actc_noaa_fc, start_date = actc_start_date)
+
+# data_collect_options <- data.frame(text = c("High-quality manual data from all depths collected weekly",
+#                           "Sensor data that is high-frequency (hourly) and high-quality but fixed at one depth",
+#                           "Sensor data that is high-frequency but low-quality and at multiple depths"),
+#                           chla_freq = c(7, 1, 1), obs_cv = c(0.01, 0.02, 0.08))
+
+# data_collect_options <- data_collect_options[sample(1:3, size = 3, replace = FALSE)]
 
 # end

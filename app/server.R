@@ -1947,10 +1947,131 @@ shinyServer(function(input, output, session) {
                            "Great job! Now answer the questions below with regards to why you made the decisions you did.")
   })
   
+  # Activity C : New version ----
+  #* Decision 1 ----
+  actc1 <- reactiveValues(out = NULL, rmse = NA)
+  observeEvent(input$run_fc_dec1, {
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = paste0("Running forecast of chlorophyll-a with 100 members."),
+                 detail = "This may take a while. This window will disappear
+                     when it is finished running the forecasts.", value = 0.1)
+    
+    obs_file <- create_data_assim_inputs(freq_chla = 1,
+                                         freq_din = 36,
+                                         lake_data = actc_lake_data,
+                                         start_date = actc_start_date)
+    
+    n_en = 100 # how many ensemble members 
+    
+    #run the forecast!
+    
+    est_out <- EnKF(n_en = n_en, 
+                   start = '2020-10-02', # start date 
+                   stop = '2020-10-31', # stop date
+                   time_step = 'days',
+                   obs_file = obs_file,
+                   driver_file = actc_driver_file,
+                   n_states_est = 2, 
+                   n_params_est = 1,
+                   n_params_obs = 0,
+                   maxUptake_init = 0.12, 
+                   obs_cv = c(0.1,0.05),#cv for chl-a and DIN, respectively
+                   param_cv = 0.1,#for maxUptake
+                   init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+                   state_names = c("chla","nitrate"),
+                   yini = actc_yini)
+
+    progress$set(value = 0.9)
+    actc1$out <- format_enkf_output(est_out = est_out, lake_data = actc_lake_data)
+    actc1$rmse <- rmse(est_out = est_out, lake_data = actc_lake_data, var = "chla")
+    progress$set(value = 1)
+    
+  })
   
+  output$fc_dec1 <- renderPlotly({
+    
+    validate(
+      need(!is.null(actc1$out),
+           message = "Click 'Run forecast'.")
+    )
+    var <- "chla" #view_vars$sname[view_vars$lname == input$view_var_both_assim]
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, 
+                  plot_type = input$plot_type_actc1,
+                  est_out = actc1$out, var = var, 
+                  add_obs = input$add_obs_actc1, 
+                  n_days = 36, h_line = 10)
+    
+  })
   
+  #* Decision 2 - Cheap sensor ----
+  actc2 <- reactiveValues(out = NULL, rmse = NA)
+  observeEvent(input$run_fc_dec2, {
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = paste0("Running forecast of chlorophyll-a with 100 members."),
+                 detail = "This may take a while. This window will disappear
+                     when it is finished running the forecasts.", value = 0.1)
+    
+    obs_file <- create_data_assim_inputs(freq_chla = 1,
+                                         freq_din = 36,
+                                         lake_data = actc_lake_data,
+                                         start_date = actc_start_date)
+    
+    #manually introduce semi-random gap representing sensor malfunction
+    start_gap <- sample(5:25,1)
+    gap_length <- sample(1:5,1)
+    gap = seq(start_gap, start_gap+gap_length, 1)
+    obs_file[c(gap),"chla"] <- NA
+    
+    n_en = 100 # how many ensemble members 
+    
+    #randomly draw for observation uncertainty within limits
+    obs_cv_chla <- runif(1,0.2,0.4)
+    
+    #run the forecast!
+    
+    est_out <- EnKF(n_en = n_en, 
+                    start = '2020-10-02', # start date 
+                    stop = '2020-10-31', # stop date
+                    time_step = 'days',
+                    obs_file = obs_file,
+                    driver_file = actc_driver_file,
+                    n_states_est = 2, 
+                    n_params_est = 1,
+                    n_params_obs = 0,
+                    maxUptake_init = 0.12, 
+                    obs_cv = c(obs_cv_chla, 0.05),#cv for chl-a and DIN, respectively
+                    param_cv = 0.1,#for maxUptake
+                    init_cond_cv = c(0.1,0.1),#cv for chl-a and DIN, respectively
+                    state_names = c("chla","nitrate"),
+                    yini = actc_yini)
+    
+    progress$set(value = 0.9)
+    actc2$out <- format_enkf_output(est_out = est_out, lake_data = actc_lake_data)
+    actc2$rmse <- rmse(est_out = est_out, lake_data = actc_lake_data, var = "chla")
+    progress$set(value = 1)
+    
+  })
   
-  
+  output$fc_dec2 <- renderPlotly({
+    
+    validate(
+      need(!is.null(actc2$out),
+           message = "Click 'Run forecast'.")
+    )
+    var <- "chla" #view_vars$sname[view_vars$lname == input$view_var_both_assim]
+    plot_enkf_out(obs_plot = obs_plot, start_date = start_date, 
+                  plot_type = input$plot_type_actc2,
+                  est_out = actc2$out, var = var, 
+                  add_obs = input$add_obs_actc2, 
+                  n_days = 36, h_line = 10)
+    
+  })
   
   
   # Navigating Tabs ----

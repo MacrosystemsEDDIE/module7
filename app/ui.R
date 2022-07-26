@@ -181,7 +181,7 @@ ui <- function(req) {
                           #* Module text ====
                           h2("Using Data to Improve Ecological Forecasts"),
                           h3("Summary"),
-                          p(id = "txt_j", module_text["eco_forecast", ]),
+                          p(style = "text-align: justify;", module_text["eco_forecast", ]),
                           p(id = "txt_j", module_text["this_module", ]),
                           p(id = "txt_j", module_text["goal", ]),
                           h3("Learning Outcomes"),
@@ -1638,7 +1638,130 @@ border-color: #FFF;
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab12", 2]),
+                                                                h3(tab_names["stab12", 2], " - New version"),
+                                                                p(id = "txt_j", "Now that you have explored the effect of observation uncertainty and data collection frequency on data assimilation, you will apply your knowledge to a lake management scenario.")
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Scenario"),
+                                                      p("Green Reservoir, one of several drinking water supply reservoirs for a city of about 100,000 people, suffers from algal blooms which sometimes release toxins that could threaten the health of water consumers. Managers are interested in having forecasts of chl-a so they can plan to source water from other reservoirs and/or pre-emptively issue drinking water warnings."),
+                                                      p("The water authority of Green Reservoir has budgeted $15,000 for the forecasting system. After doing some market research, the forecast development team at the water authority has identified three options for collecting chlorophyll-a data: "),
+                                                      tags$ol(
+                                                        tags$li(data_collect_options$text[1]),
+                                                        tags$li(data_collect_options$text[2])
+                                                        # tags$li(data_collect_options$text[3])
+                                                        ),
+                                                      ),
+                                               column(6,
+                                                      img(src = "Objective10_Scenario1.jpg", height = "80%", id = "bla_border",
+                                                          width = "80%", tags$style("border: solid 2px black;")),
+                                                      p("Algal Bloom - Kelly's Island, Lake Erie by NOAA Great Lakes Environmental Research Laboratory")
+                                                      )
+                                               
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      p("As a forecasting expert, you have been brought in as a consultant to help the water authority’s forecasting team decide which method they should use for collecting chlorophyll-a data."),
+                                                      br(),
+                                                      wellPanel(
+                                                        h4("Make a decision"),
+                                                        radioButtons("data_collec1", "Based on what you have learned in Activities A and B, which sensor do you recommend?", choices = data_collect_options$text, selected = character(0)
+                                                                     )
+                                                        ),
+                                                      box(id = "box4", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   textAreaInput2(inputId = "qXY", label = "Q.XX Briefly explain your decision.", width = "90%")
+                                                                   )
+                                                            )
+                                                          )
+                                                      ),
+                                               column(6,
+                                                      img(src = "mgmt_tradeoff.png", height = "80%", id = "bla_border",
+                                                          width = "80%", tags$style("border: solid 2px black;")),
+                                                      p("Tradeoffs for management.")
+                                                      )
+                                             ),
+                                             hr(),
+                                             conditionalPanel("input.data_collec1 == 'Expensive, reliable sensor'",
+                                               fluidRow(
+                                                 column(4,
+                                                        h3("Run forecast with expensive sensor"),
+                                                        actionButton("run_fc_dec1", "Run forecast"),
+                                                        box(id = "box4", width = 12, status = "primary",
+                                                            solidHeader = TRUE,
+                                                            fluidRow(
+                                                              column(10, offset = 1,
+                                                                     h3("Questions"),
+                                                                     textAreaInput2(inputId = "qXX", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
+                                                              )
+                                                            )
+                                                        )
+                                                 ),
+                                                 column(8,
+                                                        wellPanel(
+                                                          h3("FORECAST"),
+                                                          plotlyOutput("fc_dec1"),
+                                                          checkboxInput("add_obs_actc1", "Add observations"),
+                                                          radioButtons("plot_type_actc1", "Plot type", c("Line", "Distribution"),
+                                                                       inline = TRUE)
+                                                        )
+                                                 )
+                                               ),
+                                             ),
+                                             #** Cheap sensor ----
+                                             conditionalPanel("input.data_collec1 == 'Cheap, unreliable sensor'",
+                                                              fluidRow(
+                                                                column(4,
+                                                                       h3("Run forecast with cheap sensor"),
+                                                                       actionButton("run_fc_dec2", "Run forecast"),
+                                                                       box(id = "box4", width = 12, status = "primary",
+                                                                           solidHeader = TRUE,
+                                                                           fluidRow(
+                                                                             column(10, offset = 1,
+                                                                                    h3("Questions"),
+                                                                                    textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
+                                                                             )
+                                                                           )
+                                                                       )
+                                                                ),
+                                                                column(8,
+                                                                       wellPanel(
+                                                                         h3("FORECAST"),
+                                                                         plotlyOutput("fc_dec2"),
+                                                                         checkboxInput("add_obs_actc2", "Add observations"),
+                                                                         radioButtons("plot_type_actc2", "Plot type", c("Line", "Distribution"),
+                                                                                      inline = TRUE)
+                                                                       )
+                                                                )
+                                                              ),
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Validate forecast"),
+                                                      actionButton("valid_fc_dec1", "Valid forecast")
+                                               ),
+                                               column(6,
+                                                      wellPanel(
+                                                        h3("VALIDATE PLOT"),
+                                                        plotlyOutput("valid_plot1")
+                                                      )
+                                               )
+                                             ),
+                                             
+                                             # Old version
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      wellPanel(style = paste0("background: ", obj_bg),
+                                                                h3(tab_names["stab12", 2], " - Old version"),
                                                                 p(id = "txt_j", module_text["obj_10", ])
                                                       )
                                                )
