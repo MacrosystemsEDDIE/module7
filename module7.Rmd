@@ -955,12 +955,12 @@ The desired learning outcome is for students to understand that data assimilatio
 ### Set-up
 ```{r}
 # Load in NEON sites dataframe ----
-neon_sites_df <- read.csv("./data/neon_sites.csv")
+neon_sites_df <- read.csv("./app/data/neon_sites.csv")
 neon_sites_df$long <- round(neon_sites_df$long, 3)
 neon_sites_df$lat <- round(neon_sites_df$lat, 3)
 
 # Reference for downloading variables ----
-neon_vars <- read.csv("./data/neon_variables.csv")
+neon_vars <- read.csv("./app/data/neon_variables.csv")
 
 # Objective 1 - Site Selection ----
 print(neon_sites_df$siteID)
