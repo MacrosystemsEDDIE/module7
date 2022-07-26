@@ -6,7 +6,7 @@
 #' @param var Can be 'chla', 'nitrate' or 'maxUptake'
 #' @param add_obs Add future observations. Defaults to FALSE
 
-plot_enkf_out <- function(obs_plot, start_date, plot_type, est_out, var, add_obs = FALSE, n_days) {
+plot_enkf_out <- function(obs_plot, start_date, plot_type, est_out, var, add_obs = FALSE, n_days, h_line = NULL) {
   
   dat2 <- obs_plot$hist
   if(var == "chla") {
@@ -74,6 +74,11 @@ plot_enkf_out <- function(obs_plot, start_date, plot_type, est_out, var, add_obs
                                   "Member" = l.cols[8], "median" = "black", "95%" = p.cols[5], "75%" = p.cols[6], "Obs" = p.cols[4],
                                   "Assimilated" = cols[4])) +
     scale_fill_manual(values = c("95%" = p.cols[3], "75%" = p.cols[4]))
+  
+  if(!is.null(h_line)) {
+    p <- p + 
+      geom_hline(yintercept = h_line, linetype = "dashed")
+  }
   
   gp <- ggplotly(p, dynamicTicks = TRUE)
   for (i in 1:length(gp$x$data)){
