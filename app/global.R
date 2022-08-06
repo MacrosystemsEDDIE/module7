@@ -267,6 +267,25 @@ lm_upar <- get_NEON_lm(siteID = "BARC", x = "Shortwave radiation",
 actc_driver_file <- convert_forecast(lm_wt = lm_wt, lm_upar = lm_upar,
                                 noaa_fc = actc_noaa_fc, start_date = actc_start_date)
 
+barc_df <- format_enkf_inputs(siteID = "BARC", neon_vars = neon_vars)
+
+idx <- which(barc_df$Date == actc_start_date)
+
+# Historical data
+df <- barc_df[(idx-7):(idx+1), ]
+df$chla[nrow(df)] <- NA
+df$Date <- as.Date(df$datetime)
+df$maxUptake <- as.numeric(NA)
+obs_plot_c <- list(hist = df)
+
+# Future data
+df <- barc_df[(idx+1):(idx+35), ]
+df$Date <- as.Date(df$datetime)
+df$maxUptake <- as.numeric(NA)
+obs_plot_c$future <- df
+
+gap_df <- obs_plot_c
+
 # data_collect_options <- data.frame(text = c("High-quality manual data from all depths collected weekly",
 #                           "Sensor data that is high-frequency (hourly) and high-quality but fixed at one depth",
 #                           "Sensor data that is high-frequency but low-quality and at multiple depths"),

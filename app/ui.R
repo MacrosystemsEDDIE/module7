@@ -1693,54 +1693,115 @@ border-color: #FFF;
                                                fluidRow(
                                                  column(4,
                                                         h3("Run forecast with expensive sensor"),
-                                                        actionButton("run_fc_dec1", "Run forecast"),
-                                                        box(id = "box4", width = 12, status = "primary",
-                                                            solidHeader = TRUE,
-                                                            fluidRow(
-                                                              column(10, offset = 1,
-                                                                     h3("Questions"),
-                                                                     textAreaInput2(inputId = "qXX", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
-                                                              )
-                                                            )
-                                                        )
-                                                 ),
+                                                        p("Managers of Green Reservoir know that concentrations of over 10 mg/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 10 mg/L as a trigger for issuing a drinking water warning to the public."),
+                                                        actionButton("run_fc_dec1a", "Run forecast"),
+                                                        conditionalPanel("input.run_fc_dec1a > 0",
+                                                                         box(id = "box4", width = 12, status = "primary",
+                                                                             solidHeader = TRUE,
+                                                                             fluidRow(
+                                                                               column(10, offset = 1,
+                                                                                      h3("Questions"),
+                                                                                      textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
+                                                                               )
+                                                                             )
+                                                                         ),
+                                                        ),
+                                                        p("Check the box below to see the observations during the forecast period"),
+                                                        checkboxInput("add_obs_actc1a", "Add observations")
+                                                        ),
                                                  column(8,
                                                         wellPanel(
-                                                          h3("FORECAST"),
-                                                          plotlyOutput("fc_dec1"),
-                                                          checkboxInput("add_obs_actc1", "Add observations"),
-                                                          radioButtons("plot_type_actc1", "Plot type", c("Line", "Distribution"),
+                                                          plotlyOutput("fc_dec1a"),
+                                                          radioButtons("plot_type_actc1a", "Plot type", c("Line", "Distribution"),
                                                                        inline = TRUE)
                                                         )
                                                  )
                                                ),
+                                               hr(),
+                                               fluidRow(
+                                                 column(4,
+                                                        h3("Run forecast with cheap sensor"),
+                                                        actionButton("run_fc_dec2a", "Run forecast"),
+                                                        conditionalPanel("input.run_fc_dec2a > 0",
+                                                                         box(id = "box4", width = 12, status = "primary",
+                                                                             solidHeader = TRUE,
+                                                                             fluidRow(
+                                                                               column(10, offset = 1,
+                                                                                      h3("Questions"),
+                                                                                      textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
+                                                                               )
+                                                                             )
+                                                                         ),
+                                                        ),
+                                                        p("Check the box below to see the observations during the forecast period"),
+                                                        checkboxInput("add_obs_actc2a", "Add observations")
+                                                        ),
+                                                 column(8,
+                                                        wellPanel(
+                                                          plotlyOutput("fc_dec2a"),
+                                                          radioButtons("plot_type_actc2a", "Plot type", c("Line", "Distribution"),
+                                                                       inline = TRUE)
+                                                        )
+                                                 )
+                                               )
                                              ),
                                              #** Cheap sensor ----
                                              conditionalPanel("input.data_collec1 == 'Cheap, unreliable sensor'",
                                                               fluidRow(
                                                                 column(4,
                                                                        h3("Run forecast with cheap sensor"),
-                                                                       actionButton("run_fc_dec2", "Run forecast"),
-                                                                       box(id = "box4", width = 12, status = "primary",
-                                                                           solidHeader = TRUE,
-                                                                           fluidRow(
-                                                                             column(10, offset = 1,
-                                                                                    h3("Questions"),
-                                                                                    textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
-                                                                             )
-                                                                           )
-                                                                       )
-                                                                ),
+                                                                       p("Managers of Green Reservoir know that concentrations of over 10 mg/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 10 mg/L as a trigger for issuing a drinking water warning to the public."),
+                                                                       p("Click the button below to see a daily forecast for the next 30 days generated using data from the cheaper sensor."),
+                                                                       actionButton("run_fc_dec2b", "Run forecast"),
+                                                                       conditionalPanel("input.run_fc_dec2b > 0",
+                                                                                        box(id = "box4", width = 12, status = "primary",
+                                                                                            solidHeader = TRUE,
+                                                                                            fluidRow(
+                                                                                              column(10, offset = 1,
+                                                                                                     h3("Questions"),
+                                                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
+                                                                                                     )
+                                                                                              )
+                                                                                            ),
+                                                                                        ),
+                                                                       p("Check the box below to see the observations during the forecast period"),
+                                                                       checkboxInput("add_obs_actc2b", "Add observations")
+                                                                       ),
                                                                 column(8,
                                                                        wellPanel(
-                                                                         h3("FORECAST"),
-                                                                         plotlyOutput("fc_dec2"),
-                                                                         checkboxInput("add_obs_actc2", "Add observations"),
-                                                                         radioButtons("plot_type_actc2", "Plot type", c("Line", "Distribution"),
+                                                                         plotlyOutput("fc_dec2b"),
+                                                                         radioButtons("plot_type_actc2b", "Plot type", c("Line", "Distribution"),
                                                                                       inline = TRUE)
                                                                        )
                                                                 )
                                                               ),
+                                                              hr(),
+                                                              fluidRow(
+                                                                column(4,
+                                                                       h3("Run forecast with expensive sensor"),
+                                                                       actionButton("run_fc_dec1b", "Run forecast"),
+                                                                       conditionalPanel("input.run_fc_dec1b > 0",
+                                                                                        box(id = "box4", width = 12, status = "primary",
+                                                                                            solidHeader = TRUE,
+                                                                                            fluidRow(
+                                                                                              column(10, offset = 1,
+                                                                                                     h3("Questions"),
+                                                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
+                                                                                              )
+                                                                                            )
+                                                                                        ),
+                                                                       ),
+                                                                       p("Check the box below to see the observations during the forecast period"),
+                                                                       checkboxInput("add_obs_actc1b", "Add observations")
+                                                                       ),
+                                                                column(8,
+                                                                       wellPanel(
+                                                                         plotlyOutput("fc_dec1b"),
+                                                                         radioButtons("plot_type_actc1b", "Plot type", c("Line", "Distribution"),
+                                                                                      inline = TRUE)
+                                                                       )
+                                                                )
+                                                              )
                                              ),
                                              hr(),
                                              fluidRow(

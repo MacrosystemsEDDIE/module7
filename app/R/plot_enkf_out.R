@@ -6,7 +6,7 @@
 #' @param var Can be 'chla', 'nitrate' or 'maxUptake'
 #' @param add_obs Add future observations. Defaults to FALSE
 
-plot_enkf_out <- function(obs_plot, start_date, plot_type, est_out, var, add_obs = FALSE, n_days, h_line = NULL) {
+plot_enkf_out <- function(obs_plot, start_date, plot_type, est_out, var, add_obs = FALSE, n_days, h_line = NULL, show_assim = TRUE) {
   
   dat2 <- obs_plot$hist
   if(var == "chla") {
@@ -59,7 +59,7 @@ plot_enkf_out <- function(obs_plot, start_date, plot_type, est_out, var, add_obs
       geom_point(data = dat3, aes_string("Date", var, color = "col"))
   }
   
-  if(var != "maxUptake") {
+  if(var != "maxUptake" & show_assim) {
     dat3 <- est_out[[var]]$obs
     dat3$obs[dat3$Date > (as.Date(start_date) + (n_days))] <- NA
     dat3$col <- "Assimilated"
