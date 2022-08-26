@@ -236,8 +236,8 @@ scen_fc2$surf_lci[5] <- scen_fc2$surftemp[5] - max(ssd)
 scen_fc2$bot_uci <- scen_fc2$bottemp + bsd[order(bsd)]
 scen_fc2$bot_lci <- scen_fc2$bottemp - bsd[order(bsd)]
 
-data_collect_options <- data.frame(text = c("Cheap, unreliable sensor",
-                                            "Expensive, reliable sensor"),
+data_collect_options <- data.frame(text = c("Sensor A", #cheap, unreliable sensor
+                                            "Sensor B"), #expensive, reliable sensor
                                    chla_freq = c(1, 1), obs_cv = c(runif(1,0.2,0.4), 0.1))
 
 
