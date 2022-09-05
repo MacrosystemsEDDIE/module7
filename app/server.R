@@ -2066,7 +2066,7 @@ shinyServer(function(input, output, session) {
     plot_enkf_out_actc(obs_plot = obs_plot_c, start_date = "2020-10-22", 
                   est_out = actc1$out, var = var, 
                   add_obs = input$add_obs_actc1a, 
-                  n_days = 36, h_line = 8, show_assim = FALSE)
+                  n_days = 36, h_line = 25, show_assim = FALSE)
     
   })
   output$fc_dec1b <- renderPlotly({
@@ -2079,7 +2079,7 @@ shinyServer(function(input, output, session) {
     plot_enkf_out_actc(obs_plot = obs_plot_c, start_date = "2020-10-22", 
                   est_out = actc1$out, var = var, 
                   add_obs = input$add_obs_actc1b, 
-                  n_days = 36, h_line = 8, show_assim = FALSE)
+                  n_days = 36, h_line = 25, show_assim = FALSE)
     
   })
   
@@ -2189,7 +2189,7 @@ shinyServer(function(input, output, session) {
     plot_enkf_out_actc(obs_plot = obs_plot_c, start_date = "2020-10-22", 
                   est_out = actc2$out, var = var, 
                   add_obs = input$add_obs_actc2a, 
-                  n_days = 36, h_line = 8, show_assim = FALSE)
+                  n_days = 36, h_line = 25, show_assim = FALSE)
     
   })
   output$fc_dec2b <- renderPlotly({
@@ -2202,7 +2202,7 @@ shinyServer(function(input, output, session) {
     plot_enkf_out_actc(obs_plot = obs_plot_c, start_date = "2020-10-22", 
                   est_out = actc2$out, var = var, 
                   add_obs = input$add_obs_actc2b, 
-                  n_days = 36, h_line = 8, show_assim = FALSE)
+                  n_days = 36, h_line = 25, show_assim = FALSE)
     
   })
   
@@ -2312,7 +2312,7 @@ shinyServer(function(input, output, session) {
     plot_enkf_out_actc(obs_plot = obs_plot_c, start_date = "2020-10-22", 
                   est_out = actc3$out, var = var, 
                   add_obs = input$add_obs_actc3a, 
-                  n_days = 36, h_line = 8, show_assim = FALSE)
+                  n_days = 36, h_line = 25, show_assim = FALSE)
     
   })
   output$fc_dec3b <- renderPlotly({
@@ -2325,7 +2325,7 @@ shinyServer(function(input, output, session) {
     plot_enkf_out_actc(obs_plot = obs_plot_c, start_date = "2020-10-22", 
                   est_out = actc3$out, var = var, 
                   add_obs = input$add_obs_actc3b, 
-                  n_days = 36, h_line = 8, show_assim = FALSE)
+                  n_days = 36, h_line = 25, show_assim = FALSE)
     
   })
   
