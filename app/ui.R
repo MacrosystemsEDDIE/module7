@@ -1686,66 +1686,14 @@ border-color: #FFF;
                                                       p("Tradeoffs for management.")
                                                       )
                                              ),
+                                             #** Expensive sensor ----
                                              hr(),
                                              conditionalPanel("input.data_collec1 == 'Sensor B'", #chose expensive sensor
-                                               fluidRow(
-                                                 #run forecast with chosen sensor (expensive)
-                                                 column(4,
-                                                        h3("Run forecast with expensive sensor"),
-                                                        p("Managers of Green Reservoir know that concentrations of over 8 ug/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 8 ug/L as a trigger for issuing a drinking water warning to the public."),
-                                                        actionButton("run_fc_dec1a", "Run forecast"),
-                                                        conditionalPanel("input.run_fc_dec1a > 0",
-                                                                         box(id = "box4", width = 12, status = "primary",
-                                                                             solidHeader = TRUE,
-                                                                             fluidRow(
-                                                                               column(10, offset = 1,
-                                                                                      h3("Questions"),
-                                                                                      textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
-                                                                               )
-                                                                             )
-                                                                         ),
-                                                        ),
-                                                        p("Check the box below to see the observations during the forecast period"),
-                                                        checkboxInput("add_obs_actc1a", "Add observations")
-                                                        ),
-                                                 column(8,
-                                                        wellPanel(
-                                                          plotlyOutput("fc_dec1a")
-                                                        )
-                                                 )
-                                               ),
-                                               #run forecast with non-chosen sensor (cheap)
-                                               hr(),
-                                               fluidRow(
-                                                 column(4,
-                                                        h3("Run forecast with cheap sensor"),
-                                                        actionButton("run_fc_dec2a", "Run forecast"),
-                                                        conditionalPanel("input.run_fc_dec2a > 0",
-                                                                         box(id = "box4", width = 12, status = "primary",
-                                                                             solidHeader = TRUE,
-                                                                             fluidRow(
-                                                                               column(10, offset = 1,
-                                                                                      h3("Questions"),
-                                                                                      textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
-                                                                               )
-                                                                             )
-                                                                         ),
-                                                        ),
-                                                        p("Check the box below to see the observations during the forecast period"),
-                                                        checkboxInput("add_obs_actc2a", "Add observations")
-                                                        ),
-                                                 column(8,
-                                                        wellPanel(
-                                                          plotlyOutput("fc_dec2a")
-                                                        )
-                                                 )
-                                               ),
-                                               #run forecast with no sensor
-                                               hr(),
                                                fluidRow(
                                                  column(4,
                                                         h3("Run forecast with no sensor"),
                                                         p("For comparison, click the button below to generate the forecast that managers are using now, without a sensor. In this case, the most recent observation occurred on Oct. 2, 2020, when water authority personnel traveled to Green Reservoir and collected a manual chlorophyll-a sample."),
+                                                        p("Managers of Green Reservoir know that concentrations of over 25 ug/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 25 ug/L as a trigger for issuing a drinking water warning to the public."),
                                                         actionButton("run_fc_dec3a", "Run forecast"),
                                                         conditionalPanel("input.run_fc_dec3a > 0",
                                                                          box(id = "box4", width = 12, status = "primary",
@@ -1753,7 +1701,7 @@ border-color: #FFF;
                                                                              fluidRow(
                                                                                column(10, offset = 1,
                                                                                       h3("Questions"),
-                                                                                      textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
+                                                                                      textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?", width = "90%")
                                                                                )
                                                                              )
                                                                          ),
@@ -1766,71 +1714,91 @@ border-color: #FFF;
                                                           plotlyOutput("fc_dec3a")
                                                         )
                                                  )
+                            
+                                               ),
+                                               
+                                               #run forecast with chosen sensor (expensive)
+                                               hr(),
+                                               fluidRow(
+                                                 column(4,
+                                                        h3("Run forecast with Sensor B (expensive sensor)"),
+                                                        actionButton("run_fc_dec1a", "Run forecast"),
+                                                        conditionalPanel("input.run_fc_dec1a > 0",
+                                                                         box(id = "box4", width = 12, status = "primary",
+                                                                             solidHeader = TRUE,
+                                                                             fluidRow(
+                                                                               column(10, offset = 1,
+                                                                                      h3("Questions"),
+                                                                                      textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?", width = "90%")
+                                                                               )
+                                                                             )
+                                                                         ),
+                                                        ),
+                                                        p("Check the box below to see the observations during the forecast period"),
+                                                        checkboxInput("add_obs_actc1a", "Add observations")
+                                                 ),
+                                                 column(8,
+                                                        wellPanel(
+                                                          plotlyOutput("fc_dec1a")
+                                                        )
+                                                 )
+                                               ),
+                                               
+                                               #run forecast with non-chosen sensor (cheap)
+                                               hr(),
+                                               fluidRow(
+                                                 column(4,
+                                                        h3("Run forecast with Sensor A (cheaper sensor)"),
+                                                        actionButton("run_fc_dec2a", "Run forecast"),
+                                                        conditionalPanel("input.run_fc_dec2a > 0",
+                                                                         box(id = "box4", width = 12, status = "primary",
+                                                                             solidHeader = TRUE,
+                                                                             fluidRow(
+                                                                               column(10, offset = 1,
+                                                                                      h3("Questions"),
+                                                                                      textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?", width = "90%")
+                                                                               )
+                                                                             )
+                                                                         ),
+                                                        ),
+                                                        p("Check the box below to see the observations during the forecast period"),
+                                                        checkboxInput("add_obs_actc2a", "Add observations")
+                                                 ),
+                                                 column(8,
+                                                        wellPanel(
+                                                          plotlyOutput("fc_dec2a")
+                                                        )
+                                                 )
+                                               ),
+                                               #** Questions ----
+                                               fluidRow(
+                                                 column(10, offset = 1,
+                                                        box(id = "box4", width = 12, status = "primary",
+                                                            solidHeader = TRUE,
+                                                            fluidRow(
+                                                              column(10, offset = 1,
+                                                                     h3("Questions"),
+                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor B (expensive sensor)?", width = "90%"),
+                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor A (cheaper sensor)?", width = "90%"),
+                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX How did the management decision made using a forecast with Sensor A (cheaper sensor) compare to the decision made using a forecast with Sensor B (expensive sensor)?", width = "90%"),
+                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Now that you can see forecasts generated with each sensor as well as all the data collected during the forecast period, would you change your recommendation to the water authority about which sensor to use? Why or why not?", width = "90%")
+                                                              )
+                                                            )
+                                                        )
+                                                 )
                                                )
                                              ),
+                                             
                                              
                                              #** Cheap sensor ----
                                   
                                              conditionalPanel("input.data_collec1 == 'Sensor A'",
-                                                              #run forecast with chosen sensor (cheap)
-                                                              fluidRow(
-                                                                column(4,
-                                                                       h3("Run forecast with cheap sensor"),
-                                                                       p("Managers of Green Reservoir know that concentrations of over 8 ug/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 8 ug/L as a trigger for issuing a drinking water warning to the public."),
-                                                                       p("Click the button below to see a daily forecast for the next 30 days generated using data from the cheaper sensor."),
-                                                                       actionButton("run_fc_dec2b", "Run forecast"),
-                                                                       conditionalPanel("input.run_fc_dec2b > 0",
-                                                                                        box(id = "box4", width = 12, status = "primary",
-                                                                                            solidHeader = TRUE,
-                                                                                            fluidRow(
-                                                                                              column(10, offset = 1,
-                                                                                                     h3("Questions"),
-                                                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
-                                                                                                     )
-                                                                                              )
-                                                                                            ),
-                                                                                        ),
-                                                                       p("Check the box below to see the observations during the forecast period"),
-                                                                       checkboxInput("add_obs_actc2b", "Add observations")
-                                                                       ),
-                                                                column(8,
-                                                                       wellPanel(
-                                                                         plotlyOutput("fc_dec2b")
-                                                                       )
-                                                                )
-                                                              ),
-                                                              #run forecast with non-chosen sensor (expensive)
-                                                              hr(),
-                                                              fluidRow(
-                                                                column(4,
-                                                                       h3("Run forecast with expensive sensor"),
-                                                                       actionButton("run_fc_dec1b", "Run forecast"),
-                                                                       conditionalPanel("input.run_fc_dec1b > 0",
-                                                                                        box(id = "box4", width = 12, status = "primary",
-                                                                                            solidHeader = TRUE,
-                                                                                            fluidRow(
-                                                                                              column(10, offset = 1,
-                                                                                                     h3("Questions"),
-                                                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
-                                                                                              )
-                                                                                            )
-                                                                                        ),
-                                                                       ),
-                                                                       p("Check the box below to see the observations during the forecast period"),
-                                                                       checkboxInput("add_obs_actc1b", "Add observations")
-                                                                       ),
-                                                                column(8,
-                                                                       wellPanel(
-                                                                         plotlyOutput("fc_dec1b")
-                                                                       )
-                                                                )
-                                                              ),
-                                                              #run forecast with no sensor 
-                                                              hr(),
+                                                              #run forecast with no sensor
                                                               fluidRow(
                                                                 column(4,
                                                                        h3("Run forecast with no sensor"),
                                                                        p("For comparison, click the button below to generate the forecast that managers are using now, without a sensor. In this case, the most recent observation occurred on Oct. 2, 2020, when water authority personnel traveled to Green Reservoir and collected a manual chlorophyll-a sample."),
+                                                                       p("Managers of Green Reservoir know that concentrations of over 25 ug/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 25 ug/L as a trigger for issuing a drinking water warning to the public."),
                                                                        actionButton("run_fc_dec3b", "Run forecast"),
                                                                        conditionalPanel("input.run_fc_dec3b > 0",
                                                                                         box(id = "box4", width = 12, status = "primary",
@@ -1838,7 +1806,7 @@ border-color: #FFF;
                                                                                             fluidRow(
                                                                                               column(10, offset = 1,
                                                                                                      h3("Questions"),
-                                                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning?", width = "90%")
+                                                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?", width = "90%")
                                                                                               )
                                                                                             )
                                                                                         ),
@@ -1851,6 +1819,61 @@ border-color: #FFF;
                                                                          plotlyOutput("fc_dec3b")
                                                                        )
                                                                 )
+                                                    
+                                                              ),
+                                                              #run forecast with chosen sensor (cheap)
+                                                              hr(),
+                                                              fluidRow(
+                                                                column(4,
+                                                                       h3("Run forecast with Sensor A (cheaper sensor)"),
+                                                                       p("Click the button below to see a daily forecast for the next 30 days generated using data from the cheaper sensor."),
+                                                                       actionButton("run_fc_dec2b", "Run forecast"),
+                                                                       conditionalPanel("input.run_fc_dec2b > 0",
+                                                                                        box(id = "box4", width = 12, status = "primary",
+                                                                                            solidHeader = TRUE,
+                                                                                            fluidRow(
+                                                                                              column(10, offset = 1,
+                                                                                                     h3("Questions"),
+                                                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?", width = "90%")
+                                                                                              )
+                                                                                            )
+                                                                                        ),
+                                                                       ),
+                                                                       p("Check the box below to see the observations during the forecast period"),
+                                                                       checkboxInput("add_obs_actc2b", "Add observations")
+                                                                ),
+                                                                column(8,
+                                                                       wellPanel(
+                                                                         plotlyOutput("fc_dec2b")
+                                                                       )
+                                                                )
+                                                                
+                                                              ),
+                                                              #run forecast with non-chosen sensor (expensive)
+                                                              hr(),
+                                                              fluidRow(
+                                                                column(4,
+                                                                       h3("Run forecast with Sensor B (expensive sensor)"),
+                                                                       actionButton("run_fc_dec1b", "Run forecast"),
+                                                                       conditionalPanel("input.run_fc_dec1b > 0",
+                                                                                        box(id = "box4", width = 12, status = "primary",
+                                                                                            solidHeader = TRUE,
+                                                                                            fluidRow(
+                                                                                              column(10, offset = 1,
+                                                                                                     h3("Questions"),
+                                                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?", width = "90%")
+                                                                                              )
+                                                                                            )
+                                                                                        ),
+                                                                       ),
+                                                                       p("Check the box below to see the observations during the forecast period"),
+                                                                       checkboxInput("add_obs_actc1b", "Add observations")
+                                                                ),
+                                                                column(8,
+                                                                       wellPanel(
+                                                                         plotlyOutput("fc_dec1b")
+                                                                       )
+                                                                )
                                                               ),
                                                               #** Questions ----
                                                               fluidRow(
@@ -1860,6 +1883,9 @@ border-color: #FFF;
                                                                            fluidRow(
                                                                              column(10, offset = 1,
                                                                                     h3("Questions"),
+                                                                                    textAreaInput2(inputId = "qXX2", label = "Q.XX How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor A (cheaper sensor)?", width = "90%"),
+                                                                                    textAreaInput2(inputId = "qXX2", label = "Q.XX How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor B (expensive sensor)?", width = "90%"),
+                                                                                    textAreaInput2(inputId = "qXX2", label = "Q.XX How did the management decision made using a forecast with Sensor A (cheaper sensor) compare to the decision made using a forecast with Sensor B (expensive sensor)?", width = "90%"),
                                                                                     textAreaInput2(inputId = "qXX2", label = "Q.XX Now that you can see forecasts generated with each sensor as well as all the data collected during the forecast period, would you change your recommendation to the water authority about which sensor to use? Why or why not?", width = "90%")
                                                                              )
                                                                            )

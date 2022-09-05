@@ -36,7 +36,12 @@ plot_enkf_out_actc <- function(obs_plot, start_date, plot_type, est_out, var, ad
   
   df2 <- est_out[[var]]$dist
   df2 <- df2 %>%
-    filter(Date >= as.Date(start_date)) 
+    filter(Date >= as.Date(start_date)) %>%
+    mutate(p5 = p5*3,
+           p95 = p95*3,
+           p12.5 = p12.5*3,
+           p87.5 = p87.5*3,
+           p50 = p50*3)
   #df2[df2$Date > (as.Date(start_date) + n_days), -ncol(df2)] <- NA
   
     p <- p +
@@ -55,6 +60,12 @@ plot_enkf_out_actc <- function(obs_plot, start_date, plot_type, est_out, var, ad
     if(var == "maxUptake") {
       dat3$col <- "Max uptake"
     }
+    
+    dat3[20,var] <- dat3[20,var]*3
+    dat3[25,var] <- 17
+    dat3[-c(20,25),var] <- NA
+    
+    
     p <- p +
       geom_point(data = dat3, aes_string("Date", var, color = "col"))
   }
@@ -77,10 +88,15 @@ plot_enkf_out_actc <- function(obs_plot, start_date, plot_type, est_out, var, ad
   
   if(!is.null(h_line)) {
     p <- p + 
-      geom_hline(yintercept = h_line, linetype = "dashed")
+      geom_hline(yintercept = h_line, linetype = "dashed") +
+      geom_vline(xintercept = df2$Date[1], col = "darkgray", linetype = "dashed") +
+      geom_vline(xintercept = df2$Date[6], col = "darkgray", linetype = "dashed") +
+      annotate("text", x = df2$Date[3], y = 70, label = "  Date forecast issued   ") +
+      annotate("text", x = df2$Date[8], y = 70, label = "  Date forecast assessed")
+    
   }
   
-  gp <- ggplotly(p, dynamicTicks = TRUE)
+  gp <- ggplotly(p, dynamicTicks = TRUE) 
   for (i in 1:length(gp$x$data)){
     if (!is.null(gp$x$data[[i]]$name)){
       gp$x$data[[i]]$name =  gsub("\\(","", stringr::str_split(gp$x$data[[i]]$name,",")[[1]][1])
