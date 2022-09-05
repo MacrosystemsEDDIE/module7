@@ -88,11 +88,11 @@ plot_enkf_out_actc <- function(obs_plot, start_date, plot_type, est_out, var, ad
   
   if(!is.null(h_line)) {
     p <- p + 
-      geom_hline(yintercept = h_line, linetype = "dashed") +
-      geom_vline(xintercept = df2$Date[1], col = "darkgray", linetype = "dashed") +
-      geom_vline(xintercept = df2$Date[6], col = "darkgray", linetype = "dashed") +
-      annotate("text", x = df2$Date[3], y = 70, label = "  Date forecast issued   ") +
-      annotate("text", x = df2$Date[8], y = 70, label = "  Date forecast assessed")
+      geom_hline(yintercept = h_line, linetype = "dashed") #+
+      # geom_vline(xintercept = df2$Date[1], col = "darkgray", linetype = "dashed") +
+      # geom_vline(xintercept = df2$Date[6], col = "darkgray", linetype = "dashed") +
+      # annotate("text", x = df2$Date[3], y = 70, label = "  Date forecast issued   ") +
+      # annotate("text", x = df2$Date[8], y = 70, label = "  Date forecast assessed")
     
   }
   
