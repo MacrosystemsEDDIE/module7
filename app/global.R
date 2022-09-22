@@ -27,7 +27,8 @@ p.cols <- RColorBrewer::brewer.pal(12, "Paired")
 #      col = COL, pch = 16, cex = 3, xaxt = 'n', yaxt = 'n', xlab = '', ylab = '')
 
 # Create scale for plots
-da_method_fill_scale <- scale_fill_manual(values = c("No DA" = l.cols[1], "Chl-a" = l.cols[2], "Nitrate" = l.cols[3], "Both" = l.cols[4]))
+da_method_fill_scale <- scale_fill_manual(values = c("No DA" = l.cols[1], "Chl-a DA" = l.cols[2]), name = "")
+#da_method_fill_scale <- scale_fill_manual(values = c("No DA" = l.cols[1], "Chl-a" = l.cols[2], "Nitrate" = l.cols[3], "Both" = l.cols[4]))
 
 # Plot saving
 png_dpi <- 120
@@ -103,6 +104,12 @@ answers <- quest
 quest$location <- NULL
 colnames(answers)[1] <- "Answer"
 answers[, 1] <- ""
+
+#Table for Q4
+q4_table <- data.frame(
+  Frequency = rep(NA, 6),
+  row.names = c("Air temperature", "Surface water temperature", "Shortwave radiation", "Underwater PAR", "Nitrogen", "Chlorophyll-a")
+)
 
 # Slides
 recap_slides <- list.files("www/Mod7_key_slides", full.names = TRUE)
@@ -183,7 +190,7 @@ png_theme <- theme(legend.position = "bottom",
 fc_date <- "2020-09-25"
 
 # Assimilation methods
-assim_methods <- c("No data assimilation", "Chl-a assimilation", "Nitrate assimilation", "Chla and nitrate assimilation")
+assim_methods <- c("increase", "decrease", "stay the same")
 view_vars <- data.frame(lname = c("Chlorophyll-a", "Nitrate", "Max uptake"),
                         sname = c("chla", "nitrate", "maxUptake"))
 

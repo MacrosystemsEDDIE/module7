@@ -7,7 +7,7 @@
 #' @param obs_plot list of historical and future dataframes of observations
 #' @param add_obs Add future observations. Defaults to FALSE
 
-plot_four_forecasts <- function(no_da, chla, nitrate, both, var = "chla", obs_plot, add_obs = FALSE) {
+plot_four_forecasts <- function(no_da, chla, var = "chla", obs_plot, add_obs = FALSE) {
   
   if(var == "chla") {
     y_lab <- "Chlorophyll-a (μg/L)"
@@ -23,8 +23,8 @@ plot_four_forecasts <- function(no_da, chla, nitrate, both, var = "chla", obs_pl
     xlab("Date") +
     {if(!is.null(no_da[[var]]$dist)) geom_ribbon(data = no_da[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "No DA"), alpha = 0.2)} +
     {if(!is.null(chla[[var]]$dist)) geom_ribbon(data = chla[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Chl-a"), alpha = 0.2)} +
-    {if(!is.null(nitrate[[var]]$dist)) geom_ribbon(data = nitrate[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Nitrate"), alpha = 0.2)} +
-    {if(!is.null(both[[var]]$dist)) geom_ribbon(data = both[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Both"), alpha = 0.2)} +
+    #{if(!is.null(nitrate[[var]]$dist)) geom_ribbon(data = nitrate[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Nitrate"), alpha = 0.2)} +
+    #{if(!is.null(both[[var]]$dist)) geom_ribbon(data = both[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Both"), alpha = 0.2)} +
     theme_bw(base_size = 12)
   p
   

@@ -315,6 +315,26 @@ shinyServer(function(input, output, session) {
     return(ggplotly(p, dynamicTicks = TRUE, source = "A"))
   })
 
+  # Q4 table
+  q4_ans <- reactiveValues(dt = q4_table) # %>% formatStyle(c(1:3), border = '1px solid #ddd'))
+  
+  output$q4_tab <- DT::renderDT(
+    q4_ans$dt, #%>% formatStyle(c(1:dim(q6_ans$dt)[2]), border = '1px solid #ddd'),
+    selection = "none", class = "cell-border stripe",
+    options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t"),
+    server = FALSE, escape = FALSE, rownames= c("Air temperature", "Surface water temperature", "Shortwave radiation", "Underwater PAR", "Nitrogen", "Chlorophyll-a"), colnames=c("Data collection frequency"), editable = TRUE
+  )
+  
+  q4_proxy <- dataTableProxy("q4_tab")
+  observeEvent(input$q4_tab_cell_edit, {
+    info = input$q4_tab_cell_edit
+    i = info$row
+    j = info$col
+    v = info$value
+    q4_ans$dt[i, j] <<- DT::coerceValue(v, q4_ans$dt[i, j])
+    # replaceData(q6_proxy, q6_ans$dt, resetPaging = FALSE)  # important
+  })
+  
   # Slickr model output
   output$slck_model <- renderSlickR({
     slickR(model_slides)
@@ -868,18 +888,18 @@ shinyServer(function(input, output, session) {
       updateSliderInput(session, inputId = "run_fc1_nday", value = 35)
       shinyjs::disable("run_fc1_nday")
     } else {
-      shinyjs::enable("run_fc1_nday")
+      shinyjs::enable("nday_no_da")
     }
   })
 
   # Objective 7 ----
   #** Submit Hypothesis Rank ----
   observeEvent(input$submit_hyp, {
-    
+
     shinyalert::shinyalert(title = "Hypothesis Submitted!",
                            "Now continue below and generate the forecasts and we will see how it matches with your hypothesis.")
   })
-  
+
   #* Run Forecast with NO DA ----
   est_out_no_da <- reactiveValues(out = NULL)
   observeEvent(input$run_fc_no_da, {
@@ -1398,21 +1418,21 @@ shinyServer(function(input, output, session) {
   })
   
   #** Compare all forecasts ----
-  da_method <- reactiveValues(dt = data.frame(RMSE = rep(NA, 4)), plot = NULL)
+  da_method <- reactiveValues(dt = data.frame(RMSE = rep(NA, 2)), plot = NULL)
   
   observeEvent(input$compare_da, {
     
     req(input$table01_rows_selected != "")
     
-    var <- view_vars$sname[view_vars$lname == input$view_var_da_method]
+    var <- "chla"
     da_method$plot <- plot_four_forecasts(no_da = est_out_no_da$out, chla = est_out_chla_assim$out,
-                                          nitrate = est_out_nitrate_assim$out, both = est_out_both_assim$out, 
+                                          #nitrate = est_out_nitrate_assim$out, both = est_out_both_assim$out, 
                                           var = var, obs_plot = obs_plot, add_obs = TRUE)
     
     da_method$dt$RMSE[1] <- fc_no_da$rmse
     da_method$dt$RMSE[2] <- fc_chla_assim$rmse
-    da_method$dt$RMSE[3] <- fc_nitrate_assim$rmse
-    da_method$dt$RMSE[4] <- fc_both_assim$rmse
+    # da_method$dt$RMSE[3] <- fc_nitrate_assim$rmse
+    # da_method$dt$RMSE[4] <- fc_both_assim$rmse
   })
   
   #** Table of RMSE ----
@@ -1420,7 +1440,7 @@ shinyServer(function(input, output, session) {
                            options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
                                           columnDefs = list(list(width = '100%', targets = "_all")), scrollX = TRUE
                            ), colnames = c("RMSE"),
-                           rownames = c("No DA", "Chl-a", "Nitrate", "Both"),
+                           rownames = c("No DA", "Chl-a"),
                            server = FALSE, escape = FALSE)
   
   #** Plot of all DA methods ----
@@ -1461,9 +1481,9 @@ shinyServer(function(input, output, session) {
   hyp1 <- reactiveValues(dt = NULL)
   observe({
     hyp1$dt <- data.frame(Hypothesis = input$rank_hyp_2)
-    
+
   })
-  
+
   output$hyp1 <- renderDT({
     validate(
       need(length(input$rank_hyp_4) == 4,
@@ -1475,7 +1495,7 @@ shinyServer(function(input, output, session) {
                                          columnDefs = list(list(width = '20%', targets = "_all")), scrollX = TRUE
                           ), colnames = c("Hypothesis"),
                           server = FALSE, escape = FALSE)
-  
+
   # Objective 8 - Explore observation uncertainty ----
   #** Slickr Chla slides ----
   output$chla_slides <- renderSlickR({
@@ -1501,8 +1521,8 @@ shinyServer(function(input, output, session) {
                  detail = "This may take a while. This window will disappear
                      when it is finished running the forecasts.", value = 0.1)
     
-    freq_chla <- ifelse("Chlorophyll-a" %in% input$obs_uc_da, 7, 36) 
-    freq_din <- ifelse("Nitrate" %in% input$obs_uc_da, 7, 36) 
+    freq_chla <- 7#ifelse("Chlorophyll-a" %in% input$obs_uc_da, 7, 36) 
+    freq_din <- 36#ifelse("Nitrate" %in% input$obs_uc_da, 7, 36) 
     
     obs_file <- create_data_assim_inputs(freq_chla = freq_chla,
                                          freq_din = freq_din,
@@ -1515,7 +1535,7 @@ shinyServer(function(input, output, session) {
                      start_date = start_date)
     
     chla_cv <-  ((input$obs_uc_chla / mean(obs_plot$hist$chla, na.rm = TRUE)))
-    nitrate_cv <- ((input$obs_uc_nitrate / 2)) # mean(obs_plot$hist$nitrate, na.rm = TRUE)))
+    nitrate_cv <- 0.25#((input$obs_uc_nitrate / 2)) # mean(obs_plot$hist$nitrate, na.rm = TRUE)))
     
     progress$set(value = 0.3)
     est_out <- EnKF(n_en = 100, 
@@ -1612,8 +1632,8 @@ shinyServer(function(input, output, session) {
                  detail = "This may take a while. This window will disappear
                      when it is finished running the forecasts.", value = 0.1)
     
-    freq_chla <- ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 36) 
-    freq_din <- ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 36) 
+    freq_chla <- input$da_freq_chla #ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 36) 
+    freq_din <- 36 #ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 36) 
     
     obs_file <- create_data_assim_inputs(freq_chla = freq_chla,
                                          freq_din = freq_din,
@@ -1697,8 +1717,8 @@ shinyServer(function(input, output, session) {
     
     req(!is.na(da_freq$rmse))
     
-    freq_chla <- ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 0) 
-    freq_din <- ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 0) 
+    freq_chla <- input$da_freq_chla #ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 0) 
+    freq_din <- 0 #ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 0) 
     
     idx <- input$da_freq_rmse_rows_selected
     if(is.null(idx)) {
@@ -2598,7 +2618,7 @@ shinyServer(function(input, output, session) {
         if(is.null(input[[qid[i]]])) out_chk <- c(out_chk, answers[qid[i], 2])
       } else if(qid[i] == "q6") {
         if(is.null(input[[qid[i]]])) out_chk <- c(out_chk, answers[qid[i], 2])
-      } else if(grepl("q3", qid[i])) {
+      } else if(grepl("q3", qid[i]) & !grepl("q30", qid[i]) & !grepl("q31", qid[i]) & !grepl("q32", qid[i]) & !grepl("q33", qid[i]) & !grepl("q34", qid[i]) & !grepl("q35", qid[i]) & !grepl("q36", qid[i]) & !grepl("q37", qid[i]) & !grepl("q38", qid[i]) & !grepl("q39", qid[i])) {
         if(!("Site Selection: Objective 1 - Q.3" %in% out_chk)) {
           if(is.na(answers["q3", 1])) out_chk <- c(out_chk, answers[qid[i], 2])
         }

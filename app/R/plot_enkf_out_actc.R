@@ -83,15 +83,15 @@ plot_enkf_out_actc <- function(obs_plot, start_date, plot_type, est_out, var, ad
   p <- p +
     scale_color_manual(values = c("Chlorophyll-a" = cols[1], "Nitrate" = cols[7], "Max uptake" = cols[4],
                                   "Member" = l.cols[8], "median" = "black", "95%" = p.cols[5], "75%" = p.cols[6], "Obs" = p.cols[4],
-                                  "Assimilated" = cols[4])) +
-    scale_fill_manual(values = c("95%" = p.cols[3], "75%" = p.cols[4]))
+                                  "Assimilated" = cols[4]), name = "") +
+    scale_fill_manual(values = c("95%" = p.cols[3], "75%" = p.cols[4]), name = "")
   
   if(!is.null(h_line)) {
     p <- p + 
-      geom_hline(yintercept = h_line, linetype = "dashed") #+
+      geom_hline(yintercept = h_line, linetype = "dashed") +
       # geom_vline(xintercept = df2$Date[1], col = "darkgray", linetype = "dashed") +
       # geom_vline(xintercept = df2$Date[6], col = "darkgray", linetype = "dashed") +
-      # annotate("text", x = df2$Date[3], y = 70, label = "  Date forecast issued   ") +
+      annotate("text", x = df2$Date[2], y = 22, label = "Water quality threshold") 
       # annotate("text", x = df2$Date[8], y = 70, label = "  Date forecast assessed")
     
   }
