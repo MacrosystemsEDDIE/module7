@@ -403,6 +403,41 @@ shinyServer(function(input, output, session) {
     
   })
   
+  #* Toggle for dataframe answers
+  observeEvent(input$ans_btn, {
+    # if(input$ans_btn %% 2 != 1 |){
+    #   hide(id = "ans_vars")
+    # }else{
+    show(id = "ans_vars")
+    # }
+    # toggle("ans_vars")
+  })
+  
+  observeEvent(input$ans_btn, {
+    if(length(input$rank_list_2) == 0) {
+      res <- "Drag answers into State box!"
+    } else if(all(input$rank_list_2 %in% state_vars)) {
+      res <- "State variables are correct!"
+    } else {
+      res <- "Incorrect answer in State box"
+    }
+    
+    if(length(input$rank_list_3) == 0) {
+      res2 <- "Drag answers into Parameter box!"
+    } else if(all(input$rank_list_3 %in% process_vars)) {
+      res2 <- "Parameter variables are correct!"
+    } else {
+      res2 <- "Incorrect answer in Parameter box"
+    }
+    
+    output$state_ans <- renderText({
+      res
+    })
+    output$proc_ans <- renderText({
+      res2
+    })
+  })
+  
   
   #** Save air and water temp ----
   selected2 <- reactiveValues(sel = NULL)
@@ -462,7 +497,7 @@ shinyServer(function(input, output, session) {
       need(!is.null(lm_wt$m),
            message = "Please click 'Add linear regression'.")
     )
-    formula <- "$$ wtemp = %s \times airtemp + %s   ;   r^2 = %s $$"
+    formula <- "$$ wtemp = %s \u00D7 airtemp + %s   ;   r^2 = %s $$"
     text <- sprintf(formula, lm_wt$m, lm_wt$b, lm_wt$r2)
     withMathJax(
       tags$p(text)
@@ -583,9 +618,9 @@ shinyServer(function(input, output, session) {
            message = "Please click 'Add linear regression'.")
     )
     if(lm_upar$b < 0) {
-      formula <- "$$ uPAR = %s \times SWR %s   ;   r^2 = %s $$"
+      formula <- "$$ uPAR = %s \u00D7 SWR %s   ;   r^2 = %s $$"
     } else {
-      formula <- "$$ uPAR = %s \times SWR + %s   ;   r^2 = %s $$"
+      formula <- "$$ uPAR = %s \u00D7 SWR + %s   ;   r^2 = %s $$"
     }
     text <- sprintf(formula, lm_upar$m, lm_upar$b, lm_upar$r2)
     withMathJax(
@@ -1592,10 +1627,47 @@ shinyServer(function(input, output, session) {
     paste0("Chlorophyll-a RMSE = ", obs_uc$rmse, " μg/L") 
   })
   
+  #** Table with RMSE & DA freq ---
+  obs_uc_rmse <- reactiveValues(dt = obs_uc_df)
+  output$obs_uc_rmse <- renderDT(obs_uc_rmse$dt, selection = "single",
+                                  options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
+                                                 columnDefs = list(list(width = '10%', targets = "_all"))
+                                  ), colnames = c("Chl-a obs uncertainty", "RMSE"),
+                                  server = FALSE, escape = FALSE)
+  
+  #** Save RMSE & Frequencies in a table ----
+  observeEvent(input$save_rmse, {
+    
+    req(!is.na(obs_uc$rmse))
+    
+    obs_uc_chla <- input$obs_uc_chla #ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 0) 
+    #freq_din <- 0 #ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 0) 
+    
+    idx <- input$obs_uc_rmse_rows_selected
+    if(is.null(idx)) {
+      idx <- which(is.na(obs_uc_rmse$dt[, 1]))[1]
+    }
+    obs_uc_rmse$dt$chla[idx] <- obs_uc_chla
+    #da_freq_rmse$dt$nitrate[idx] <- freq_din
+    obs_uc_rmse$dt$rmse[idx] <- obs_uc$rmse
+  })
+  
   #** Reset forecast when slider is moved
   observeEvent(input$obs_uc_chla, {
     obs_uc$out <- NULL
   })
+  
+  #** Disable Save button when no RMSE available ----
+  observe({
+    if(is.na(obs_uc$rmse)) {
+      shinyjs::disable("save_rmse")
+    } else {
+      shinyjs::enable("save_rmse")
+      
+    }
+  })
+  
+  
   
   #** Catch for distribution plot ----
   observeEvent(input$plot_type_obs_uc, {
@@ -1709,7 +1781,7 @@ shinyServer(function(input, output, session) {
   output$da_freq_rmse <- renderDT(da_freq_rmse$dt, selection = "single",
                               options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
                                              columnDefs = list(list(width = '10%', targets = "_all"))
-                              ), colnames = c("Chla freq", "Nitrate freq", "RMSE"),
+                              ), colnames = c("Chl-a freq", "RMSE"),
                               server = FALSE, escape = FALSE)
   
   #** Save RMSE & Frequencies in a table ----
@@ -2413,7 +2485,7 @@ shinyServer(function(input, output, session) {
   
   observe({
     toggleState(id = "prevBtn1", condition = rv1$prev > 0)
-    if(rv1$nxt > 7 & rv4a$nxt > 13) {
+    if(rv1$nxt > 7 & rv4a$nxt > 12) {
       shinyjs::disable("nextBtn1")
     } else {
       shinyjs::enable("nextBtn1")
@@ -2447,7 +2519,7 @@ shinyServer(function(input, output, session) {
       idx2 <- which(tab_names$tab_id == curr_obj)
       new_nam <- tab_names$name[idx2 + 1]
     }
-    if(curr_tab1 == "mtab7" & rv4a$nxt > 13) {
+    if(curr_tab1 == "mtab7" & rv4a$nxt > 12) {
       updateActionButton(session, inputId = "nextBtn1", label = paste("Next >"))
     } else {
       updateActionButton(session, inputId = "nextBtn1", label = paste(new_nam, ">"))
@@ -2463,7 +2535,7 @@ shinyServer(function(input, output, session) {
     if (curr_tab1 == "mtab4") {
       curr_obj <- input$tabseries1
       idx2 <- which(tab_names$tab_id == curr_obj)
-      if(curr_obj == "stab1") idx2 <- idx2 - 1 # Move off Activity A label
+      if(curr_obj == "stab1") idx2 <- idx2 - 1 # Move off Site selection label
       new_nam <- tab_names$name[idx2 - 1]
     }
     if (curr_tab1 == "mtab5") {
@@ -2475,13 +2547,13 @@ shinyServer(function(input, output, session) {
     if (curr_tab1 == "mtab6") {
       curr_obj <- input$tabseries3
       idx2 <- which(tab_names$tab_id == curr_obj)
-      if(curr_obj == "stab7") idx2 <- idx2 - 1 # Move off Activity C label
+      if(curr_obj == "stab7") idx2 <- idx2 - 1 # Move off Activity B label
       new_nam <- tab_names$name[idx2 - 1]
     }
     if(curr_tab1 == "mtab7") {
       curr_obj <- input$tabseries4
       idx2 <- which(tab_names$tab_id == curr_obj)
-      if(curr_obj == "stab12") idx2 <- idx2 - 1 # Move off Activity C label
+      if(curr_obj == "stab11") idx2 <- idx2 - 1 # Move off Activity C label
       new_nam <- tab_names$name[idx2 - 1]
     }
     if(curr_tab1 == "mtab1") {
@@ -2515,7 +2587,7 @@ shinyServer(function(input, output, session) {
         updateTabsetPanel(session, "tabseries2",
                           selected = paste0("stab", rv2a$nxt))
         
-      } else if (curr_tab1 == "mtab6" & rv3a$nxt < 12) {
+      } else if (curr_tab1 == "mtab6" & rv3a$nxt < 11) {
         curr_obj <- input$tabseries3
         updateTabsetPanel(session, "tabseries3",
                           selected = paste0("stab", rv3a$nxt))
@@ -2531,7 +2603,7 @@ shinyServer(function(input, output, session) {
         updateTabsetPanel(session, "tabseries3",
                           selected = "stab7")
         updateTabsetPanel(session, "tabseries4",
-                          selected = "stab12")
+                          selected = "stab11")
         updateTabsetPanel(session, "maintab",
                           selected = paste0("mtab", rv1$nxt))
       }
@@ -2559,7 +2631,7 @@ shinyServer(function(input, output, session) {
       curr_obj <- input$tabseries3
       updateTabsetPanel(session, "tabseries3",
                         selected = paste0("stab", rv3a$prev))
-    } else if (curr_tab1 == "mtab7" & rv4a$prev > 11) {
+    } else if (curr_tab1 == "mtab7" & rv4a$prev > 10) {
       curr_obj <- input$tabseries4
       updateTabsetPanel(session, "tabseries4",
                         selected = paste0("stab", rv4a$prev))
@@ -2569,7 +2641,7 @@ shinyServer(function(input, output, session) {
       updateTabsetPanel(session, "tabseries2",
                         selected = "stab6")
       updateTabsetPanel(session, "tabseries3",
-                        selected = "stab11")
+                        selected = "stab10")
       updateTabsetPanel(session, "maintab",
                         selected = paste0("mtab", rv1$prev))
     }

@@ -56,8 +56,8 @@ help_text <- read.csv("data/help_text.csv", row.names = 1)
 
 ab1 <- 4:9
 ab2 <- 13:16
-ab3 <- 19:21
-ab4 <- 24:25
+ab3 <- 18:20
+ab4 <- 23:24
 
 l1 <- length(ab1)
 l2 <- length(ab2)
@@ -134,7 +134,14 @@ rownames(data_frequency_latency) <- data_frequency_latency[, 1]
 # RMSE dataframe for da_freq
 da_freq_df <- data.frame(
   "chla" = rep(NA, 5),
-  "nitrate" = rep(NA, 5),
+  #"nitrate" = rep(NA, 5),
+  "rmse" = rep(NA, 5)
+)
+
+# RMSE dataframe for obs_uc
+obs_uc_df <- data.frame(
+  "chla" = rep(NA, 5),
+  #"nitrate" = rep(NA, 5),
   "rmse" = rep(NA, 5)
 )
 
@@ -158,7 +165,7 @@ neon_vars <- read.csv("data/neon_variables.csv")
 
 # Statistics
 stats <- list("Minimum" = "Min.", "1st Quartile" = "1st Qu.", "Median" = "Median", "Mean" = "Mean", "3rd Quartile" = "3rd Qu.", "Maximum" = "Max.", "Standard Deviation" = "sd")
-mod_choices <- c("Negative", "No change", "Positive")
+mod_choices <- c("Decrease (negative)", "Stay the same (no effect)", "Increase (positive)")
 # Sorting variables
 state_vars <- c("Phytoplankton", "Nitrogen")
 process_vars <- c("Mortality", "Uptake")

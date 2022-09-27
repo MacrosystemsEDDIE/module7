@@ -235,7 +235,7 @@ ui <- function(req) {
                                     align = "center"),
                                  h5("Click the arrows to navigate through the slides", align = "center"),
                                  wellPanel(
-                                   slickROutput("slides", width = "650px", height = "450px")
+                                   slickROutput("slides", width = "550px", height = "400px")
                                  )
                           )
                         )
@@ -448,8 +448,7 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(7, offset = 1,
                                                                    h3("Questions"),
-                                                                   h4(quest[qid[3], 1]),
-                                                                   p("If the information for your lake is not on the NEON website then you can input NA (Not Available) into the text box.")
+                                                                   h4(quest[qid[3], 1],tags$b("If the information for your lake is not on the NEON website then you can input NA (Not Available) into the text box."))
                                                             )
                                                           ),
                                                           fluidRow(
@@ -566,7 +565,7 @@ border-color: #FFF;
                                                                      options = list(
                                                                        placeholder = 'Please select a variable',
                                                                        onInitialize = I('function() { this.setValue(""); }'))),
-                                                      p("While for Q.7, you can select any two variables and investigate if there is any relationship. e.g. air temperature and surface water temperature")
+                                                      #p("While for Q.7, you can select any two variables and investigate if there is any relationship. e.g. air temperature and surface water temperature")
                                                ),
                                                #** Plot of data ----
                                                column(6,
@@ -593,8 +592,8 @@ border-color: #FFF;
                                                                                   width = "90%"),
                                                                    textAreaInput2(inputId = qid[16], label = quest[qid[16], ],
                                                                                   width = "90%"),
-                                                                   textAreaInput2(inputId = qid[17], label = quest[qid[17], ],
-                                                                                  width = "90%"),
+                                                                   # textAreaInput2(inputId = qid[17], label = quest[qid[17], ],
+                                                                   #                width = "90%"),
                                                                    br()
                                                             )
                                                           )
@@ -632,7 +631,7 @@ border-color: #FFF;
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
                                                                 h3(tab_names["stab4", 2]),
-                                                                p(id = "txt_j", module_text["obj_03", ])
+                                                                p(id = "txt_j", module_text["obj_04", ])
                                                       )
                                                )
                                              ),
@@ -647,7 +646,7 @@ border-color: #FFF;
                                                       p(id = "txt_j", module_text["model3", ]),
                                                       p(id = "txt_j", module_text["mod_desc", ]),
                                                       p(id = "txt_j", module_text["phyto_chla", ]),
-                                                      p("Click through the images to see how we can go from a conceptual food web model to a mathematical representation of the interaction of Nitrogen (N) and Phytoplankton (P).", id = "txt_j")
+                                                      p(tags$i("Click through the images to see how we can go from a conceptual food web model to a mathematical representation of the interaction of Nutrient (N) and Phytoplankton (P)."), id = "txt_j")
                                                ),
                                                column(8,
                                                       br(), br(), br(),
@@ -665,10 +664,10 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   h5(tags$b(quest[qid[18], 1])),
+                                                                   h5(tags$b(quest[qid[17], 1])),
+                                                                   radioButtons(qid[18], quest[qid[18], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    radioButtons(qid[19], quest[qid[19], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    radioButtons(qid[20], quest[qid[20], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   radioButtons(qid[21], quest[qid[21], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    br()
                                                             )
                                                           )
@@ -689,7 +688,7 @@ border-color: #FFF;
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(8, offset = 1,
-                                                                   h5(tags$b(quest[qid[22], 1])),
+                                                                   h5(tags$b(quest[qid[21], 1])),
                                                                    bucket_list(
                                                                      header = "",
                                                                      group_name = "bucket_list_group",
@@ -711,9 +710,9 @@ border-color: #FFF;
                                                                      )
                                                                    ),
                                                                    br(),
-                                                                   h5(tags$b(quest[qid[23], 1])),
+                                                                   h5(tags$b(quest[qid[22], 1])),
+                                                                   radioButtons(qid[23], quest[qid[23], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    radioButtons(qid[24], quest[qid[24], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   radioButtons(qid[25], quest[qid[25], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    br()
                                                             ),
                                                             column(2,
@@ -829,7 +828,7 @@ border-color: #FFF;
                                                column(4,
                                                       h3("Initial Condition(s) Uncertainty"),
                                                       p(module_text["init_uncert", ]),
-                                                      p("Here, we are concerned with the initial condition of chlorophyll-a. Even though we have measurements of chlorophyll-a from our lake, we know that chlorophyll-a varies throughout the day so this measurement might not capture exactly the chlorophyll-a in our lake at this time.")
+                                                      p("Here, we are focused on the initial condition of chlorophyll-a. Even though we have measurements of chlorophyll-a from our lake, we know that chlorophyll-a varies rapidly throughout the day and also over the surface of the lake, so one measurement might not capture perfectly the exact chlorophyll-a in our lake at this time.")
                                                ),
                                                column(8,
                                                       h5("Click the arrows to navigate through the slides", align = "center"),
@@ -881,10 +880,10 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[25], label = quest[qid[25], ], width = "90%"),
                                                                    textAreaInput2(inputId = qid[26], label = quest[qid[26], ], width = "90%"),
                                                                    textAreaInput2(inputId = qid[27], label = quest[qid[27], ], width = "90%"),
                                                                    textAreaInput2(inputId = qid[28], label = quest[qid[28], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[29], label = quest[qid[29], ], width = "90%"),
                                                                    br()
                                                             )
                                                           )
@@ -928,23 +927,23 @@ border-color: #FFF;
                           ),
                         ),
                         tabsetPanel(id = "tabseries3",
-                                    #* Activity B - Overview ====
+                                    # #* Activity B - Overview ====
+                                    # tabPanel(title = tab_names["stab7", 2], value = "stab7",
+                                    #          fluidRow(
+                                    #            column(12,
+                                    #                   wellPanel(style = paste0("background: ", obj_bg),
+                                    #                             h3("Overview"),
+                                    #                             p(id = "txt_j", module_text["act_B_overview", ])
+                                    #                   )
+                                    #            )
+                                    #          )
+                                    # ),
+                                    #* Objective 7 - Assimilate data ====
                                     tabPanel(title = tab_names["stab7", 2], value = "stab7",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3("Overview"),
-                                                                p(id = "txt_j", module_text["act_B_overview", ])
-                                                      )
-                                               )
-                                             )
-                                    ),
-                                    #* Objective 7 - Assimilate data ====
-                                    tabPanel(title = tab_names["stab8", 2], value = "stab8",
-                                             fluidRow(
-                                               column(12,
-                                                      wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab8", 2]),
+                                                                h3(tab_names["stab7", 2]),
                                                                 p(id = "txt_j", module_text["obj_07", ])
                                                       )
                                                )
@@ -952,7 +951,7 @@ border-color: #FFF;
                                              fluidRow(
                                                column(4,
                                                       h3("Ensemble Kalman filter"),
-                                                      p("Data assimilation can be done using a variety of methods. Today, we'll be using an approach called the 'ensemble Kalman filter'."),
+                                                      p("Data assimilation can be done using a variety of methods. Today, we'll be using an approach called the ",tags$b("ensemble Kalman filter.")),
                                                       p(module_text["enkf_filter2", ], id = "txt_j"),
                                                       p(module_text["enkf_filter3", ], id = "txt_j")
                                                ),
@@ -982,31 +981,13 @@ border-color: #FFF;
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(4, offset = 1,
-                                                      h4("Today"),
-                                                      p("We will use your converted forecasts of water temperature and underwater PAR, as well as observations of chlorophyll-a and nitrate from your selected lake, to generate four 35-day forecasts of chlorophyll-a."),
-                                                      br(),
-                                                      p("We will use an ensemble Kalman filter to conduct data assimilation.")
-                                               ),
-                                               column(5, offset = 1,
-                                                      h4("Types of forecasts:"),
-                                                      tags$ol(
-                                                        tags$li(id = "txt_j", tags$b("No assimilation:"), module_text["obj7_no_assim", ]),
-                                                        tags$li(id = "txt_j", tags$b("Chl-a assimilation:"), module_text["obj7_chla_assim", ]),
-                                                        tags$li(id = "txt_j", tags$b("Nitrate assimilation:"), module_text["obj7_nitrate_assim", ]),
-                                                        tags$li(id = "txt_j", tags$b("Chl-a and nitrate assimilation:"), module_text["obj7_chla_nitrate_assim", ])
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             fluidRow(
                                                column(10, offset = 1,
                                                       box(id = "box4", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[30], label = quest[qid[30], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[29], label = quest[qid[29], ], width = "90%"),
                                                             )
                                                           )
                                                       )
@@ -1054,8 +1035,8 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[30], label = quest[qid[30], ], width = "90%"),
                                                                    textAreaInput2(inputId = qid[31], label = quest[qid[31], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[32], label = quest[qid[32], ], width = "90%"),
                                                                    br()
                                                             )
                                                           )
@@ -1113,8 +1094,8 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[32], label = quest[qid[32], ], width = "90%"),
                                                                    textAreaInput2(inputId = qid[33], label = quest[qid[33], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[34], label = quest[qid[34], ], width = "90%"),
                                                                    br()
                                                                    )
                                                             )
@@ -1282,7 +1263,7 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[39], label = quest[qid[39], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[34], label = quest[qid[34], ], width = "90%"),
                                                             )
                                                           )
                                                       )
@@ -1293,16 +1274,16 @@ border-color: #FFF;
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("Now we will exlore how observation uncertainty affects data assimilation.")
+                                                      p("Now we will explore how observation uncertainty affects data assimilation.")
                                                )
                                              )
                                     ),
                                     #* Objective 8 - Explore observation uncertainty ====
-                                    tabPanel(title = tab_names["stab9", 2], value = "stab9",
+                                    tabPanel(title = tab_names["stab8", 2], value = "stab8",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab9", 2]),
+                                                                h3(tab_names["stab8", 2]),
                                                                 p(id = "txt_j", module_text["obj_08", ])
                                                       )
                                                )
@@ -1331,7 +1312,7 @@ border-color: #FFF;
                                                       h3("Sensor"),
                                                       p(data_collection_methods[7, 3], id = "txt_j"),
                                                       p(data_collection_methods[7, 4], id = "txt_j"),
-                                                      h3("Lab Measurement"),
+                                                      h3("Lab Water Sample Measurement"),
                                                       p(data_collection_methods[8, 3], id = "txt_j"),
                                                       p(data_collection_methods[8, 4], id = "txt_j")
                                                ),
@@ -1370,8 +1351,8 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[40], label = quest[qid[40], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[41], label = quest[qid[41], ], width = "90%")
+                                                                   textAreaInput2(inputId = qid[35], label = quest[qid[35], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[36], label = quest[qid[36], ], width = "90%")
                                                             )
                                                           )
                                                       )
@@ -1395,7 +1376,12 @@ border-color: #FFF;
                                                       h4("RMSE of forecast"),
                                                       wellPanel(
                                                         textOutput("rmse_obs_uc")
-                                                      )
+                                                      ),
+                                                      actionButton("save_rmse", "Save RMSE", icon = icon("save")),
+                                                      br(),
+                                                      DTOutput("obs_uc_rmse"),
+                                                      br(),
+                                                      p(tags$b("Note:"), " You can also select a row in the table BEFORE clicking 'Save RMSE' to overwrite a row in the table.")
                                                ),
                                                column(8,
                                                       wellPanel(
@@ -1416,7 +1402,7 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[42], label = quest[qid[42], ], width = "90%")
+                                                                   textAreaInput2(inputId = qid[37], label = quest[qid[37], ], width = "90%")
                                                             )
                                                           )
                                                       )
@@ -1432,11 +1418,11 @@ border-color: #FFF;
                                              )
                                     ),
                                     #* Objective 9 - Explore data frequency ====
-                                    tabPanel(title = tab_names["stab10", 2], value = "stab10",
+                                    tabPanel(title = tab_names["stab9", 2], value = "stab9",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab10", 2]),
+                                                                h3(tab_names["stab9", 2]),
                                                                 p(id = "txt_j", module_text["obj_09", ])
                                                       )
                                                )
@@ -1464,7 +1450,7 @@ border-color: #FFF;
                                                       h3("Sensor"),
                                                       p(data_frequency_latency["Chl-a sensor", 2], id = "txt_j"),
                                                       p(data_frequency_latency["Chl-a sensor", 3], id = "txt_j"),
-                                                      h3("Lab Measurement"),
+                                                      h3("Lab Water Sample Measurement"),
                                                       p(data_frequency_latency["Laboratory analysis of water sample for chl-a", 2], id = "txt_j"),
                                                       p(data_frequency_latency["Laboratory analysis of water sample for chl-a", 3], id = "txt_j")
                                                ),
@@ -1510,8 +1496,8 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[43], label = quest[qid[43], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[44], label = quest[qid[44], ], width = "90%")
+                                                                   textAreaInput2(inputId = qid[38], label = quest[qid[38], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[39], label = quest[qid[39], ], width = "90%")
                                                                    )
                                                             )
                                                           )
@@ -1560,9 +1546,9 @@ border-color: #FFF;
                                                                    fluidRow(
                                                                      column(10, offset = 1,
                                                                             h3("Questions"),
-                                                                            textAreaInput2(inputId = qid[45], label = quest[qid[45], ], width = "90%"),
-                                                                            textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%"),
-                                                                            textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
+                                                                            textAreaInput2(inputId = qid[40], label = quest[qid[40], ], width = "90%"),
+                                                                            textAreaInput2(inputId = qid[41], label = quest[qid[41], ], width = "90%"),
+                                                                            textAreaInput2(inputId = qid[42], label = quest[qid[42], ], width = "90%")
                                                                      )
                                                                    )
                                                                )
@@ -1576,21 +1562,38 @@ border-color: #FFF;
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("Synthesize your understanding of data assimilation in ecological forecasting to design an environmental monitoring program that will be used to generate ecological forecasts.")
+                                                      p("Synthesize your understanding of data assimilation in ecological forecasting to assimilate data into forecasts used for water resource management.")
                                                       )
                                                )
                                              ),
                                     # * Activity B - Summary ====
-                                    tabPanel(title = tab_names["stab11", 2], value = "stab11",
+                                    tabPanel(title = tab_names["stab10", 2], value = "stab10",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab11", 2]),
+                                                                h3(tab_names["stab10", 2]),
                                                                 p(id = "txt_j", module_text["act_B_summ", ]),
                                                                 p("Remember, the Shiny app will disconnect if you leave it idle for 10 minutes, so make sure to download your '.eddie' file at the bottom of the page to checkpoint your progress.")
                                                       )
                                                )
-                                             )
+                                             ),
+                                             #** Questions ----
+                                             hr(),
+                                             fluidRow(
+                                               column(10, offset = 1,
+                                                      box(id = "box4", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[43], label = quest[qid[43], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[44], label = quest[qid[44], ], width = "90%"),
+                                                            )
+                                                          )
+                                                      )
+                                               )
+                                             ),
+                                             hr()
                                     )
                         )
                ),
@@ -1608,11 +1611,11 @@ border-color: #FFF;
                         ),
                         tabsetPanel(id = "tabseries4",
                                     #* Objective 10 - Management Scenario ====
-                                    tabPanel(title = tab_names["stab12", 2], value = "stab12",
+                                    tabPanel(title = tab_names["stab11", 2], value = "stab11",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab12", 2]),
+                                                                h3(tab_names["stab11", 2]),
                                                                 p(id = "txt_j", "Now that you have explored the effect of observation uncertainty and data collection frequency on data assimilation, you will apply your knowledge to a lake management scenario.")
                                                       )
                                                )
@@ -1624,7 +1627,7 @@ border-color: #FFF;
                                                       p("Green Reservoir, one of several drinking water supply reservoirs for a city of about 100,000 people, suffers from algal blooms which sometimes release toxins that could threaten the health of water consumers. Forecasts of chl-a allow Green Reservoir managers to plan ahead to source water from other reservoirs and/or pre-emptively issue drinking water warnings."),
                                                       p("The water authority that manages Green Reservoir has developed a forecast system that assimilates monthly chlorophyll-a observations which are collected manually at the beginning of each month by water authority personnel. But managers are interested in exploring whether they can increase the accuracy of their forecasts by investing in a high-frequency chlorophyll-a sensor."),
                                                       p("The water authority of Green Reservoir has budgeted $15,000 for new forecast sensors. After doing some market research, the forecast development team at the water authority has identified two options for chl-a sensors: "),
-                                                      p("Sensor A costs $14,000, including the cost of the technology needed to wirelessly stream data from this sensor to computers that will run the forecast model as well as personnel to install and maintain the sensor."),
+                                                      p("Sensor A costs $15,000, including the cost of the technology needed to wirelessly stream data from this sensor to computers that will run the forecast model as well as personnel to install and maintain the sensor."),
                                                       p("Sensor B costs $20,000, including the cost of the technology and personnel. Sensor B is more expensive because it is able to make more precise observations (less observation error) and is somewhat more reliable than Sensor A (less likely to experience sensor malfunction)."),
                                                       ),
                                                column(6,
@@ -1649,7 +1652,7 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[48], label = quest[qid[48], ], width = "90%")
+                                                                   textAreaInput2(inputId = qid[45], label = quest[qid[45], ], width = "90%")
                                                             )
                                                             )
                                                           )
@@ -1675,7 +1678,7 @@ border-color: #FFF;
                                                                              fluidRow(
                                                                                column(10, offset = 1,
                                                                                       h3("Questions"),
-                                                                                      textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%")
+                                                                                      textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%")
                                                                                )
                                                                              )
                                                                          ),
@@ -1703,7 +1706,7 @@ border-color: #FFF;
                                                                              fluidRow(
                                                                                column(10, offset = 1,
                                                                                       h3("Questions"),
-                                                                                      textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%")
+                                                                                      textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
                                                                                )
                                                                              )
                                                                          ),
@@ -1730,7 +1733,7 @@ border-color: #FFF;
                                                                              fluidRow(
                                                                                column(10, offset = 1,
                                                                                       h3("Questions"),
-                                                                                      textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%")
+                                                                                      textAreaInput2(inputId = qid[48], label = quest[qid[48], ], width = "90%")
                                                                                )
                                                                              )
                                                                          ),
@@ -1752,10 +1755,10 @@ border-color: #FFF;
                                                             fluidRow(
                                                               column(10, offset = 1,
                                                                      h3("Questions"),
-                                                                     textAreaInput2(inputId = qid[52], label = quest[qid[52], ], width = "90%"),
-                                                                     textAreaInput2(inputId = qid[53], label = quest[qid[53], ], width = "90%"),
-                                                                     textAreaInput2(inputId = qid[54], label = quest[qid[54], ], width = "90%"),
-                                                                     textAreaInput2(inputId = qid[55], label = quest[qid[55], ], width = "90%")
+                                                                     textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%"),
+                                                                     textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%"),
+                                                                     textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%"),
+                                                                     textAreaInput2(inputId = qid[52], label = quest[qid[52], ], width = "90%")
                                                               )
                                                             )
                                                         )
@@ -1780,7 +1783,7 @@ border-color: #FFF;
                                                                                             fluidRow(
                                                                                               column(10, offset = 1,
                                                                                                      h3("Questions"),
-                                                                                                     textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%")
+                                                                                                     textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%")
                                                                                               )
                                                                                             )
                                                                                         ),
@@ -1808,7 +1811,7 @@ border-color: #FFF;
                                                                                             fluidRow(
                                                                                               column(10, offset = 1,
                                                                                                      h3("Questions"),
-                                                                                                     textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%")
+                                                                                                     textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
                                                                                               )
                                                                                             )
                                                                                         ),
@@ -1835,7 +1838,7 @@ border-color: #FFF;
                                                                                             fluidRow(
                                                                                               column(10, offset = 1,
                                                                                                      h3("Questions"),
-                                                                                                     textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%")
+                                                                                                     textAreaInput2(inputId = qid[48], label = quest[qid[48], ], width = "90%")
                                                                                               )
                                                                                             )
                                                                                         ),
@@ -1857,10 +1860,10 @@ border-color: #FFF;
                                                                            fluidRow(
                                                                              column(10, offset = 1,
                                                                                     h3("Questions"),
-                                                                                    textAreaInput2(inputId = "qXX2", label = "Q.XX How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor A (cheaper sensor)?", width = "90%"),
-                                                                                    textAreaInput2(inputId = "qXX2", label = "Q.XX How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor B (expensive sensor)?", width = "90%"),
-                                                                                    textAreaInput2(inputId = "qXX2", label = "Q.XX How did the management decision made using a forecast with Sensor A (cheaper sensor) compare to the decision made using a forecast with Sensor B (expensive sensor)?", width = "90%"),
-                                                                                    textAreaInput2(inputId = "qXX2", label = "Q.XX Now that you can see forecasts generated with each sensor as well as all the data collected during the forecast period, would you change your recommendation to the water authority about which sensor to use? Why or why not?", width = "90%")
+                                                                                    textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%"),
+                                                                                    textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%"),
+                                                                                    textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%"),
+                                                                                    textAreaInput2(inputId = qid[52], label = quest[qid[52], ], width = "90%")
                                                                              )
                                                                            )
                                                                        )
@@ -2050,11 +2053,11 @@ border-color: #FFF;
                                              # hr()
                                              ),
                                     #* Activity C - Summary ====
-                                    tabPanel(title = tab_names["stab13", 2], value = "stab13",
+                                    tabPanel(title = tab_names["stab12", 2], value = "stab12",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab13", 2])
+                                                                h3(tab_names["stab12", 2])
                                                       )
                                                )
                                              ),
