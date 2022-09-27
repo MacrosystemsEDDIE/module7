@@ -180,10 +180,14 @@ ui <- function(req) {
                    column(6,
                           #* Module text ====
                           h2("Using Data to Improve Ecological Forecasts"),
+                          h3("Focal question"),
+                          h4(tags$b(tags$i("How can we use data to improve ecological forecasts?"))),
                           h3("Summary"),
-                          p("Algal blooms are increasing in frequency and severity across many freshwater lakes and can substantially impact water quality. One tool that can be useful in helping water resource managers to mitigate the effect of these blooms is an ecological forecast, which generates predictions about how likely a bloom is to occur. Forecasts can give managers time to take preemptive actions to prevent blooms, such as applying algaecide, or to make plans to reduce the bloom's impact on human health, such as closing recreational beaches. Useful forecasts need to be accurate enough for managers to rely on for decision-making and also must include a representation of forecast uncertainty, so managers can incorporate the probability of an algal bloom event into their management strategy. Recent improvements in sensor technology and an increase in the number of sensors deployed in freshwater lakes have resulted in an increase of available data to help develop forecasting systems for water resource management."),
-                          p(id = "txt_j", module_text["this_module", ]),
-                          p(id = "txt_j", module_text["goal", ]),
+                          p("To be useful for management, ecological forecasts need to be both accurate enough for managers to be able to rely on them for decision-making",tags$i("and"), " include a representation of forecast uncertainty, so managers can properly interpret the probability of future events. To improve forecast accuracy, we can update forecasts with observational data once they become available, a process known as", tags$b("data assimilation"),". Recent improvements in environmental sensor technology and an increase in the number of sensors deployed in ecosystems have resulted in an increase in the availability of data for assimilation to help develop and improve forecasts for natural resource management."),
+                          p("One important test case in which data assimilation may greatly improve the use of ecological forecasts for management is algal blooms in lakes. Algal blooms are increasing in frequency and severity across many freshwater lakes and can substantially impact water quality. Forecasts of the likelihood of future algal blooms may be useful tools in helping water resource managers to mitigate the effect of these blooms. Forecasts can give managers time to take preemptive actions to prevent blooms, such as applying algaecide, or to make plans to reduce the bloom's impact on human health, such as closing recreational beaches."),
+                          p("In this module, we will address the following question: ",tags$b(tags$i("How can we use data to improve a forecast of lake algal biomass?"))),
+                          p("We will address this question by building an ecological model to predict chlorophyll-a (a metric of algal biomass and primary productivity), generating ecological forecasts, and using data science approaches to integrate the most recently collected data into a forecast, a process known as data assimilation. Assimilating the most recent observations into a forecast model allows the forecaster to update the initial conditions, or the starting conditions, of the model, with the goal of improving forecast accuracy. For example, if our task is to generate a forecast of chlorophyll-a concentrations in a lake for tomorrow, it is likely that our forecast will be more accurate if we use today’s measurement of chlorophyll-a as the initial condition for our model, rather than last week’s measurement."),
+                          p("We will explore how assimilating different types of data (e.g., chlorophyll-a, nutrient concentrations, water temperature) at different temporal frequencies (e.g., daily, weekly) affects forecast output. Finally, we will assimilate different types of data into forecasts and examine how data assimilation affects water resource management decisions."),
                           h3("Learning Outcomes"),
                           tags$line(),
                           tags$ul(
@@ -212,19 +216,19 @@ ui <- function(req) {
                           column(4,
                                  h3("Presentation"),
                                  p("The presentation accompanying this module reviews the forecast cycle, introduces the process of using ecological data to improve forecasts (data assimilation), and explains how the amount of uncertainty in observations and model predictions as well as the frequency of observations affect data assimilation."),
-                                 p("What is data assimilation?"),
+                                 p(tags$b("What is data assimilation?")),
                                  tags$ul(
                                    tags$li(module_text["data_assimilation", ])
                                  ),
-                                 p("How does the amount of uncertainty in model predictions and data affect the process of data assimilation?"),
+                                 p(tags$b("How does the amount of uncertainty in model predictions and data affect the process of data assimilation?")),
                                  tags$ul(
                                    tags$li(module_text["da_uncert", ])
                                  ),
-                                 p("How does the frequency of observations affect data assimilation?"),
+                                 p(tags$b("How does the frequency of observations affect data assimilation?")),
                                  tags$ul(
                                    tags$li(module_text["da_freq", ])
                                  ),
-                                 p("Click through the slides to recap some of the main points from the lecture.")
+                                 p(tags$i("Click through the slides to recap some of the main points from the lecture."))
                           ),
                           column(8, offset = 0, align = "center",
                                  h3("Key Slides",
