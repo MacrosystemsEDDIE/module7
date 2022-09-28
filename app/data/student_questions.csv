@@ -25,7 +25,7 @@ q9a,Increases in water temperature,Activity A: Objective 4
 q9b,Increases in underwater light,Activity A: Objective 4
 q10,"How sensitive is your forecast to the initial condition of chlorophyll-a? Specifically, if you start the model at low or high values of chlorophyll-a concentration, how does this affect forecast output?",Activity A: Objective 6
 q11,"How sensitive is your forecast to initial condition uncertainty? Specifically, if you start the model using a normal distribution of initial conditions with a small versus a large standard deviation, how does this affect forecast output?",Activity A: Objective 6
-q12,"Based on your answer to questions 11 and 12, how do you think your forecast would be affected by assimilating the most recently observed data into the model to inform the value of the initial condition of chlorophyll-a?",Activity A: Objective 6
+q12,"Based on your answer to questions 10 and 11, how do you think your forecast would be affected by assimilating the most recently observed data into the model to inform the value of the initial condition of chlorophyll-a?",Activity A: Objective 6
 q13,"Other than initial condition uncertainty, what is another source of uncertainty influencing your forecast? (Hint: think back to Objective 5 - Prepare inputs.)",Activity A: Objective 6
 q14,"Make a hypothesis by choosing the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation.""",Activity B: Objective 7
 q15,Describe the predicted vs. observed plot for your forecast with no data assimilation. How accurate do you think the forecast is?,Activity B: Objective 7
@@ -43,7 +43,7 @@ q26,"Generate a forecast with daily data assimilation for chl-a, and record the 
 q27,Compare the RMSEs of forecasts when data are assimilated every day vs. when data are only assimilated every 10 days. How do they compare? What does this comparison indicate about the effect of data assimilation frequency on forecast output?,Activity B: Objective 9
 q28,What are some characteristics of environmental data streams that would make data easier or harder to assimilate into forecasts? Explain your reasoning.,Activity B: Summary
 q29,What are some characteristics of environmental data streams that would lead to the greatest improvement in forecast accuracy when those data are assimilated? Explain your reasoning.,Activity B: Summary
-q30,Briefly explain your decision.,Activity C: Objective 10
+q30,Briefly explain your decision to purchase either Sensor A (cheap sensor) or Sensor B (expensive sensor).,Activity C: Objective 10
 q31,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
 q32,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
 q33,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10

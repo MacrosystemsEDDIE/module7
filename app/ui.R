@@ -269,7 +269,7 @@ ui <- function(req) {
                                  p(module_text["student_activities", ]),
                                  box(width = 12, status = "warning",
                                      solidHeader = TRUE,
-                                     p(tags$b("WARNING:"), " The Shiny app will disconnect from the server if it is left idle for 15 minutes. If this happens you will lose all your inputs into the app. It is recommended to download the user input at the end of the class, but you can also download throughout the class."),
+                                     p(tags$b("WARNING:"), " The Shiny app will disconnect from the server if it is left idle for 10 minutes. If this happens you will lose all your inputs into the app. It is recommended to download the user input at the end of the class, but you can also download throughout the class."),
                                  ),
                                  p("Alternatively, you can download the questions as a Word (.docx) file  and record your answers there. If you opt for this option, you can hide the green question boxes by unchecking the box below."),
                                  checkboxInput("show_q1", "Show questions", value = TRUE),
