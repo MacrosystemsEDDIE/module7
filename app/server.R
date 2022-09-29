@@ -734,7 +734,7 @@ shinyServer(function(input, output, session) {
   
   #** Slickr Initial conditions UC slides ----
   output$ic_uc_slides <- renderSlickR({
-    slickR(ic_uc_slides) + settings(dots = TRUE, autoplay = TRUE, autoplaySpeed = 7000)
+    slickR(ic_uc_slides) + settings(dots = TRUE)
   })
   
   #** Initial Condition Uncertainty ----

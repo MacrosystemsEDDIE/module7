@@ -523,7 +523,11 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   h5(tags$b(quest["q4", 1])),                                                                   
+                                                                   h5(tags$b(quest["q4", 1])), 
+                                                                   box(width = 10, status = "warning",
+                                                                       solidHeader = TRUE,
+                                                                       p(tags$b("WARNING:"), " Careful! If you delete variables from the data table by deleting text in the left column, the server will disconnect and you will lose any responses entered since the last time you saved your progress!"),
+                                                                   ),
                                                                    DTOutput("q4_tab"),
                                                                    bsTooltip("q4_tab", title = "Double click the cell to edit", placement = "top", trigger = "hover"),
                                                                    br(),
