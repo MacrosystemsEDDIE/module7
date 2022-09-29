@@ -897,9 +897,6 @@ border-color: #FFF;
                                                                     step = 1, animate = TRUE),
                                                         radioButtons("plot_type1", "Plot type", c("Line", "Distribution"),
                                                                      inline = TRUE)
-                                                      ),
-                                                      wellPanel(
-                                                        plotlyOutput("nitrate_fc1")
                                                       )
                                                )
                                              ),
@@ -1522,7 +1519,7 @@ border-color: #FFF;
                                                       wellPanel(
                                                         textOutput("rmse_da_freq")
                                                       ),
-                                                      actionButton("save_rmse", "Save RMSE", icon = icon("save")),
+                                                      actionButton("save_rmse2", "Save RMSE", icon = icon("save")),
                                                       br(),
                                                       DTOutput("da_freq_rmse"),
                                                       br(),
@@ -1665,7 +1662,7 @@ border-color: #FFF;
                                              ),
                                              #** Expensive sensor ----
                                              hr(),
-                                             conditionalPanel("input.data_collec1 == 'Sensor B'", #chose expensive sensor
+                                             conditionalPanel("input.data_collec1 != ''", #chose expensive sensor
                                                fluidRow(
                                                  column(4,
                                                         h3("Run forecast with no sensor"),
@@ -1764,112 +1761,112 @@ border-color: #FFF;
                                                         )
                                                  )
                                                )
-                                             ),
+                                             )#,
                                              
                                              
-                                             #** Cheap sensor ----
-                                  
-                                             conditionalPanel("input.data_collec1 == 'Sensor A'",
-                                                              #run forecast with no sensor
-                                                              fluidRow(
-                                                                column(4,
-                                                                       h3("Run forecast with no sensor"),
-                                                                       p("For comparison, click the button below to generate the forecast that managers are using now, without a sensor. In this case, the most recent observation occurred on Oct. 2, 2020, when water authority personnel traveled to Green Reservoir and collected a manual chlorophyll-a sample."),
-                                                                       p("Managers of Green Reservoir know that concentrations of over 25 ug/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 25 ug/L as a trigger for issuing a drinking water warning to the public."),
-                                                                       actionButton("run_fc_dec3b", "Run forecast"),
-                                                                       conditionalPanel("input.run_fc_dec3b > 0",
-                                                                                        box(id = "box4", width = 12, status = "primary",
-                                                                                            solidHeader = TRUE,
-                                                                                            fluidRow(
-                                                                                              column(10, offset = 1,
-                                                                                                     h3("Questions"),
-                                                                                                     textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%")
-                                                                                              )
-                                                                                            )
-                                                                                        ),
-                                                                       ),
-                                                                       p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
-                                                                       checkboxInput("add_obs_actc3b", "Add observations")
-                                                                ),
-                                                                column(8,
-                                                                       wellPanel(
-                                                                         plotlyOutput("fc_dec3b")
-                                                                       )
-                                                                )
-                                                    
-                                                              ),
-                                                              #run forecast with chosen sensor (cheap)
-                                                              hr(),
-                                                              fluidRow(
-                                                                column(4,
-                                                                       h3("Run forecast with Sensor A (cheaper sensor)"),
-                                                                       p("Click the button below to see a daily forecast for the next 30 days generated using data from the cheaper sensor."),
-                                                                       actionButton("run_fc_dec2b", "Run forecast"),
-                                                                       conditionalPanel("input.run_fc_dec2b > 0",
-                                                                                        box(id = "box4", width = 12, status = "primary",
-                                                                                            solidHeader = TRUE,
-                                                                                            fluidRow(
-                                                                                              column(10, offset = 1,
-                                                                                                     h3("Questions"),
-                                                                                                     textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
-                                                                                              )
-                                                                                            )
-                                                                                        ),
-                                                                       ),
-                                                                       p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
-                                                                       checkboxInput("add_obs_actc2b", "Add observations")
-                                                                ),
-                                                                column(8,
-                                                                       wellPanel(
-                                                                         plotlyOutput("fc_dec2b")
-                                                                       )
-                                                                )
-                                                                
-                                                              ),
-                                                              #run forecast with non-chosen sensor (expensive)
-                                                              hr(),
-                                                              fluidRow(
-                                                                column(4,
-                                                                       h3("Run forecast with Sensor B (expensive sensor)"),
-                                                                       actionButton("run_fc_dec1b", "Run forecast"),
-                                                                       conditionalPanel("input.run_fc_dec1b > 0",
-                                                                                        box(id = "box4", width = 12, status = "primary",
-                                                                                            solidHeader = TRUE,
-                                                                                            fluidRow(
-                                                                                              column(10, offset = 1,
-                                                                                                     h3("Questions"),
-                                                                                                     textAreaInput2(inputId = qid[48], label = quest[qid[48], ], width = "90%")
-                                                                                              )
-                                                                                            )
-                                                                                        ),
-                                                                       ),
-                                                                       p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
-                                                                       checkboxInput("add_obs_actc1b", "Add observations")
-                                                                ),
-                                                                column(8,
-                                                                       wellPanel(
-                                                                         plotlyOutput("fc_dec1b")
-                                                                       )
-                                                                )
-                                                              ),
-                                                              #** Questions ----
-                                                              fluidRow(
-                                                                column(10, offset = 1,
-                                                                       box(id = "box4", width = 12, status = "primary",
-                                                                           solidHeader = TRUE,
-                                                                           fluidRow(
-                                                                             column(10, offset = 1,
-                                                                                    h3("Questions"),
-                                                                                    textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%"),
-                                                                                    textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%"),
-                                                                                    textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%"),
-                                                                                    textAreaInput2(inputId = qid[52], label = quest[qid[52], ], width = "90%")
-                                                                             )
-                                                                           )
-                                                                       )
-                                                                )
-                                                              ),
-                                             )
+                                             # #** Cheap sensor ----
+                                             # 
+                                             # conditionalPanel("input.data_collec1 == 'Sensor A'",
+                                             #                  #run forecast with no sensor
+                                             #                  fluidRow(
+                                             #                    column(4,
+                                             #                           h3("Run forecast with no sensor"),
+                                             #                           p("For comparison, click the button below to generate the forecast that managers are using now, without a sensor. In this case, the most recent observation occurred on Oct. 2, 2020, when water authority personnel traveled to Green Reservoir and collected a manual chlorophyll-a sample."),
+                                             #                           p("Managers of Green Reservoir know that concentrations of over 25 ug/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 25 ug/L as a trigger for issuing a drinking water warning to the public."),
+                                             #                           actionButton("run_fc_dec3b", "Run forecast"),
+                                             #                           conditionalPanel("input.run_fc_dec3b > 0",
+                                             #                                            box(id = "box4", width = 12, status = "primary",
+                                             #                                                solidHeader = TRUE,
+                                             #                                                fluidRow(
+                                             #                                                  column(10, offset = 1,
+                                             #                                                         h3("Questions"),
+                                             #                                                         textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%")
+                                             #                                                  )
+                                             #                                                )
+                                             #                                            ),
+                                             #                           ),
+                                             #                           p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
+                                             #                           checkboxInput("add_obs_actc3b", "Add observations")
+                                             #                    ),
+                                             #                    column(8,
+                                             #                           wellPanel(
+                                             #                             plotlyOutput("fc_dec3b")
+                                             #                           )
+                                             #                    )
+                                             #        
+                                             #                  ),
+                                             #                  #run forecast with chosen sensor (cheap)
+                                             #                  hr(),
+                                             #                  fluidRow(
+                                             #                    column(4,
+                                             #                           h3("Run forecast with Sensor A (cheaper sensor)"),
+                                             #                           p("Click the button below to see a daily forecast for the next 30 days generated using data from the cheaper sensor."),
+                                             #                           actionButton("run_fc_dec2b", "Run forecast"),
+                                             #                           conditionalPanel("input.run_fc_dec2b > 0",
+                                             #                                            box(id = "box4", width = 12, status = "primary",
+                                             #                                                solidHeader = TRUE,
+                                             #                                                fluidRow(
+                                             #                                                  column(10, offset = 1,
+                                             #                                                         h3("Questions"),
+                                             #                                                         textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
+                                             #                                                  )
+                                             #                                                )
+                                             #                                            ),
+                                             #                           ),
+                                             #                           p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
+                                             #                           checkboxInput("add_obs_actc2b", "Add observations")
+                                             #                    ),
+                                             #                    column(8,
+                                             #                           wellPanel(
+                                             #                             plotlyOutput("fc_dec2b")
+                                             #                           )
+                                             #                    )
+                                             #                    
+                                             #                  ),
+                                             #                  #run forecast with non-chosen sensor (expensive)
+                                             #                  hr(),
+                                             #                  fluidRow(
+                                             #                    column(4,
+                                             #                           h3("Run forecast with Sensor B (expensive sensor)"),
+                                             #                           actionButton("run_fc_dec1b", "Run forecast"),
+                                             #                           conditionalPanel("input.run_fc_dec1b > 0",
+                                             #                                            box(id = "box4", width = 12, status = "primary",
+                                             #                                                solidHeader = TRUE,
+                                             #                                                fluidRow(
+                                             #                                                  column(10, offset = 1,
+                                             #                                                         h3("Questions"),
+                                             #                                                         textAreaInput2(inputId = qid[48], label = quest[qid[48], ], width = "90%")
+                                             #                                                  )
+                                             #                                                )
+                                             #                                            ),
+                                             #                           ),
+                                             #                           p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
+                                             #                           checkboxInput("add_obs_actc1b", "Add observations")
+                                             #                    ),
+                                             #                    column(8,
+                                             #                           wellPanel(
+                                             #                             plotlyOutput("fc_dec1b")
+                                             #                           )
+                                             #                    )
+                                             #                  ),
+                                             #                  #** Questions ----
+                                             #                  fluidRow(
+                                             #                    column(10, offset = 1,
+                                             #                           box(id = "box4", width = 12, status = "primary",
+                                             #                               solidHeader = TRUE,
+                                             #                               fluidRow(
+                                             #                                 column(10, offset = 1,
+                                             #                                        h3("Questions"),
+                                             #                                        textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%"),
+                                             #                                        textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%"),
+                                             #                                        textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%"),
+                                             #                                        textAreaInput2(inputId = qid[52], label = quest[qid[52], ], width = "90%")
+                                             #                                 )
+                                             #                               )
+                                             #                           )
+                                             #                    )
+                                             #                  ),
+                                             # )
                                              # hr(),
                                              # fluidRow(
                                              #   column(6,
@@ -2115,7 +2112,7 @@ border-color: #FFF;
                    br(),
                    tags$style(type="text/css", paste0("#download_answers {background-color:#579277;color: white; padding:15px; font-size:18px;}")),
                    hover_download_button(outputId = "download_answers",
-                                         label = "Download user input",
+                                         label = "Save progress",
                                          class = "butt1",
                                          button_animation = "glow"),
                    br(), br()

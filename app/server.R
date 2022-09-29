@@ -1785,7 +1785,7 @@ shinyServer(function(input, output, session) {
                               server = FALSE, escape = FALSE)
   
   #** Save RMSE & Frequencies in a table ----
-  observeEvent(input$save_rmse, {
+  observeEvent(input$save_rmse2, {
     
     req(!is.na(da_freq$rmse))
     
@@ -1797,7 +1797,7 @@ shinyServer(function(input, output, session) {
       idx <- which(is.na(da_freq_rmse$dt[, 1]))[1]
     }
     da_freq_rmse$dt$chla[idx] <- freq_chla
-    da_freq_rmse$dt$nitrate[idx] <- freq_din
+    #da_freq_rmse$dt$nitrate[idx] <- freq_din
     da_freq_rmse$dt$rmse[idx] <- da_freq$rmse
   })
   
@@ -1809,9 +1809,9 @@ shinyServer(function(input, output, session) {
   #** Disable Save button when no RMSE available ----
   observe({
     if(is.na(da_freq$rmse)) {
-      shinyjs::disable("save_rmse")
+      shinyjs::disable("save_rmse2")
     } else {
-      shinyjs::enable("save_rmse")
+      shinyjs::enable("save_rmse2")
       
     }
   })
@@ -2848,8 +2848,8 @@ shinyServer(function(input, output, session) {
     #updateTextAreaInput(session, "q8", value = up_answers$a8) #need to figure out how to do rank list
     updateRadioButtons(session, "q9a", selected = up_answers$a9a)
     updateRadioButtons(session, "q9b", selected = up_answers$a9b)
-    updateTextAreaInput(session, "q10", selected = up_answers$a10)
-    updateTextAreaInput(session, "q11", selected = up_answers$a11)
+    updateTextAreaInput(session, "q10", value = up_answers$a10)
+    updateTextAreaInput(session, "q11", value = up_answers$a11)
     updateTextAreaInput(session, "q12", value = up_answers$a12)
     updateTextAreaInput(session, "q13", value = up_answers$a13)
     updateTextAreaInput(session, "q14", value = up_answers$a14)
@@ -2877,6 +2877,8 @@ shinyServer(function(input, output, session) {
     updateTextAreaInput(session, "q36", value = up_answers$a36)
     updateTextAreaInput(session, "q37", value = up_answers$a37)
     
+    # Update reactive values
+    q4_ans$dt <- up_answers$a4
     
     # for(i in 1:nrow(up_answers$answers)) {
     #   if(qid[i] == "q7") {
