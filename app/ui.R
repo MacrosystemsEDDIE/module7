@@ -771,30 +771,32 @@ border-color: #FFF;
                                                       wellPanel(
                                                         plotlyOutput("at_wt")
                                                       ),
-                                                      p("You can add a linear regression to the whole data or a subset by selecting data points using the 'Box Select' or 'Lasso Select' tool. This may be required if you have many points around 0 or you want to exclude obvious outliers."),
+                                                      p("Because we are using real NEON data, we will need to run",tags$b(" data quality assurance and quality control (QAQC)")," procedures on our data before using the data as inputs to our model. Please click the button below to remove data that are incorrect due to sensor error."),
+                                                      actionButton("run_qaqc1", "Run QAQC"),
+                                                      conditionalPanel("input.run_qaqc1 > 0",
+                                                      p("Now, you can add a linear regression to the QAQCed dataset."),
                                                       actionButton("add_lm2", "Add linear regression"),
-                                                      p("Clear selected points and regression line"),
-                                                      actionButton("clear_sel2", "Clear plot"),
                                                       br(),
                                                       wellPanel(
                                                         p(tags$b("Linear regression equation:")),
                                                         uiOutput('lm2_eqn')
-                                                      )
+                                                      ))
                                                ),
                                                column(6,
                                                       h3("Shortwave radiation vs underwater PAR"),
                                                       wellPanel(
                                                         plotlyOutput("sw_upar")
                                                       ),
-                                                      p("You can add a linear regression to the whole data or a subset by selecting data points using the 'Box Select' or 'Lasso Select' tool. This may be required if you have many points around 0 or you want to exclude obvious outliers."),
-                                                      actionButton("add_lm3", "Add linear regression"),
-                                                      p("Clear selected points and regression line"),
-                                                      actionButton("clear_sel3", "Clear plot"),
-                                                      br(),
-                                                      wellPanel(
-                                                        p(tags$b("Linear regression equation:")),
-                                                        uiOutput('lm3_eqn')
-                                                      )
+                                                      p("Because we are using real NEON data, we will need to run",tags$b(" data quality assurance and quality control (QAQC)")," procedures on our data before using the data as inputs to our model. Please click the button below to remove data that are below the threshold at which the sensor can reliably quantify underwater light."),
+                                                      actionButton("run_qaqc2", "Run QAQC"),
+                                                      conditionalPanel("input.run_qaqc2 > 0",
+                                                                       p("Now, you can add a linear regression to the QAQCed dataset."),
+                                                                       actionButton("add_lm3", "Add linear regression"),
+                                                                       br(),
+                                                                       wellPanel(
+                                                                         p(tags$b("Linear regression equation:")),
+                                                                         uiOutput('lm3_eqn')
+                                                                       ))
                                                ),
                                              ),
                                              fluidRow(
@@ -849,10 +851,18 @@ border-color: #FFF;
                                                       p("Use the input below to set the value of the initial condition for chlorophyll-a."),
                                                       numericInput("ic_val", "Initial condition value:", min = 0.5,
                                                                    value = 7, max = 20, step = 0.5),
-                                                      p("Use the slider below to adjust the standard deviation and then generate a normal distribution around the observation"),
-                                                      sliderInput("ic_uc", "Standard deviation", min = 0, max = 5, value = 0.5, 
-                                                                  step = 0.5),
-                                                      actionButton("gen_ic", "Generate distribution")
+                                                      actionButton("gen_ic1", "Generate distribution"),
+                                                      hr(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[25], label = quest[qid[25], ], width = "90%"),
+                                                                   br()
+                                                            )
+                                                          )
+                                                      )
                                                ),
                                                # column(4,
                                                #        h4("Recent Observations"),
@@ -863,7 +873,42 @@ border-color: #FFF;
                                                column(4, offset = 2,
                                                       h4("Distribution of Initial Conditions"),
                                                       wellPanel(
-                                                        plotOutput("ic_uc_plot")
+                                                        plotOutput("ic_uc_plot1")
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(4,
+                                                      h4("Forecasting with Initial Condition Uncertainty"),
+                                                      p("To account for initial condition uncertainty we can generate a distribution around this value and then run our model with slightly different initial conditions to account for this uncertainty."),
+                                                      p("Use the slider below to adjust the standard deviation and then generate a normal distribution around the observation"),
+                                                      sliderInput("ic_uc", "Standard deviation", min = 0, max = 5, value = 0.5, 
+                                                                  step = 0.5),
+                                                      actionButton("gen_ic2", "Generate distribution"),
+                                                      hr(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   textAreaInput2(inputId = qid[26], label = quest[qid[26], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[27], label = quest[qid[27], ], width = "90%"),
+                                                                   br()
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               # column(4,
+                                               #        h4("Recent Observations"),
+                                               #        wellPanel(
+                                               #          plotlyOutput("ic_obs_plot")
+                                               #        )
+                                               # ),
+                                               column(4, offset = 2,
+                                                      h4("Distribution of Initial Conditions"),
+                                                      wellPanel(
+                                                        plotOutput("ic_uc_plot2")
                                                       )
                                                )
                                              ),
@@ -884,9 +929,6 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[25], label = quest[qid[25], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[26], label = quest[qid[26], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[27], label = quest[qid[27], ], width = "90%"),
                                                                    textAreaInput2(inputId = qid[28], label = quest[qid[28], ], width = "90%"),
                                                                    br()
                                                             )

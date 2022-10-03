@@ -466,11 +466,12 @@ shinyServer(function(input, output, session) {
   lm_wt <- reactiveValues(sub = NULL, m = NULL, b = NULL, r2 = NULL, sigma = NULL)
   
   observeEvent(input$add_lm2, {
-    if(is.null(selected2$sel)) {
-      df <- wtemp_airtemp()$data
-    } else {
-      df <- selected2$sel[, 2:4]
-    }
+    # if(is.null(selected2$sel)) {
+    #   df <- wtemp_airtemp()$data
+    # } else {
+    #   df <- selected2$sel[, 2:4]
+    # }
+    df <- wtemp_airtemp()$qaqc
     fit <- lm(df[, 3] ~ df[, 2])
     coeffs <- fit$coefficients
     lm_wt$sub <- df
@@ -516,10 +517,12 @@ shinyServer(function(input, output, session) {
     )
     colnames(df)[-1] <- c("X", "Y")
     sel <- tryCatch(df[(selected2$sel$pointNumber+1),,drop=FALSE] , error=function(e){NULL})
-    return(list(data = df, sel = sel))
+    qaqc <- df[df$Y != 5.2300000,]
+    return(list(data = df, qaqc = qaqc, sel = sel))
   })
   
   # Air temp vs Water temp plot ----
+  
   output$at_wt <- renderPlotly({
     validate(
       need(input$table01_rows_selected != "",
@@ -543,6 +546,36 @@ shinyServer(function(input, output, session) {
     }
     return(ggplotly(p, dynamicTicks = TRUE, source = "B"))
   })
+  
+  observeEvent(input$run_qaqc1, {
+    
+               output$at_wt <- renderPlotly({
+                 validate(
+                   need(input$table01_rows_selected != "",
+                        message = "Please select a site in Objective 1.")
+                 )
+                 obj <- wtemp_airtemp()$sel
+                 
+                 p <- ggplot() +
+                   geom_point(data = wtemp_airtemp()$data, aes_string(names(wtemp_airtemp()$data)[2], names(wtemp_airtemp()$data)[3]), color = "gray") +
+                   geom_point(data = wtemp_airtemp()$qaqc, aes_string(names(wtemp_airtemp()$data)[2], names(wtemp_airtemp()$data)[3]), color = "black") +
+                   ylab("Surface water temperature (\u00B0C)") +
+                   xlab("Air temperature (\u00B0C)") +
+                   theme_minimal(base_size = 12)
+                 
+                 if(nrow(obj) != 0) {
+                   p <- p +
+                     geom_point(data = obj, aes_string(names(obj)[2], names(obj)[3]), color = cols[2])
+                 }
+                 if(!is.null(lm_wt$m)) {
+                   p <- p +
+                     geom_abline(slope = lm_wt$m, intercept = lm_wt$b, color = cols[2], linetype = "dashed")
+                 }
+                 return(ggplotly(p, dynamicTicks = TRUE, source = "B"))
+               })
+               })
+  
+  
   
   #** Save SWR and uPAR ----
   selected3 <- reactiveValues(sel = NULL)
@@ -579,17 +612,19 @@ shinyServer(function(input, output, session) {
     )
     colnames(df)[-1] <- c("X", "Y")
     sel <- tryCatch(df[(selected3$sel$pointNumber+1),,drop=FALSE] , error=function(e){NULL})
-    return(list(data = df, sel = sel))
+    qaqc <- df[df$Y >= 10,]
+    return(list(data = df, qaqc = qaqc, sel = sel))
   })
   
   lm_upar <- reactiveValues(sub = NULL, m = NULL, b = NULL, r2 = NULL, sigma = NULL)
   
   observeEvent(input$add_lm3, {
-    if(is.null(selected3$sel)) {
-      df <- swr_upar()$data
-    } else {
-      df <- selected3$sel[, 2:4]
-    }
+    # if(is.null(selected3$sel)) {
+    #   df <- swr_upar()$data
+    # } else {
+    #   df <- selected3$sel[, 2:4]
+    # }
+    df <- swr_upar()$qaqc
     fit <- lm(df[, 3] ~ df[, 2])
     coeffs <- fit$coefficients
     lm_upar$sub <- df
@@ -654,6 +689,36 @@ shinyServer(function(input, output, session) {
     
     return(ggplotly(p, dynamicTicks = TRUE, source = "C"))
     
+  })
+  
+  observeEvent(input$run_qaqc2, {
+    output$sw_upar <- renderPlotly({
+      validate(
+        need(input$table01_rows_selected != "",
+             message = "Please select a site in Objective 1.")
+      )
+      
+      obj <- swr_upar()$sel
+      
+      p <- ggplot() +
+        geom_point(data = swr_upar()$data, aes_string(names(swr_upar()$data)[2], names(swr_upar()$data)[3]), color = "gray") +
+        geom_point(data = swr_upar()$qaqc, aes_string(names(swr_upar()$data)[2], names(swr_upar()$data)[3]), color = "black") +
+        ylab("Underwater PAR (micromolesPerSquareMeterPerSecond)") +
+        xlab("Shortwave radiation (wattsPerSquareMeter)") +
+        theme_minimal(base_size = 12)
+      
+      if(nrow(obj) != 0) {
+        p <- p +
+          geom_point(data = obj, aes_string(names(obj)[2], names(obj)[3]), color = cols[2])
+      }
+      if(!is.null(lm_upar$m)) {
+        p <- p +
+          geom_abline(slope = lm_upar$m, intercept = lm_upar$b, color = cols[2], linetype = "dashed")
+      }
+      
+      return(ggplotly(p, dynamicTicks = TRUE, source = "C"))
+      
+    })
   })
   
   #** Convert NOAA forecast data ----
@@ -740,9 +805,9 @@ shinyServer(function(input, output, session) {
   #** Initial Condition Uncertainty ----
   ic_dist <- reactiveValues(df = NULL)
   
-  #** Generate IC distribution ----
+  #** Generate IC distribution w/ changing initial condition values ----
   ic_plot <- reactiveValues(plot = NULL)
-  observeEvent(input$gen_ic, {
+  observeEvent(input$gen_ic1, {
     req(input$table01_rows_selected != "")
     req(!is.null(lake_data$df))
     mn_chla <- lake_data$df$chla[lake_data$df$Date == start_date]
@@ -766,7 +831,7 @@ shinyServer(function(input, output, session) {
     xlims <- c(input$ic_val - (3 * input$ic_uc), input$ic_val + (3 * input$ic_uc))
     ylims <- c(0, max(df$y) + 1)
     
-    ic_plot$plot <- ggplot(df, aes(x,y)) + 
+    ic_plot$plot1 <- ggplot(df, aes(x,y)) + 
       geom_ribbon(aes(ymin = 0, ymax = y, fill = quant)) + 
       geom_vline(xintercept = input$ic_val, linetype = "dashed") + 
       scale_fill_brewer(guide = "none", palette = "OrRd") +
@@ -776,24 +841,77 @@ shinyServer(function(input, output, session) {
       theme_bw(base_size = 18)
   })
   
+  
+  
   #** Plot - IC distribution ----
-  output$ic_uc_plot <- renderPlot({
+  output$ic_uc_plot1 <- renderPlot({
     validate(
       need(input$table01_rows_selected != "",
            message = "Please select a site in Objective 1.")
     )
     validate(
-      need(!is.null(ic_plot$plot), "Click 'Generate distribution")
+      need(!is.null(ic_plot$plot1), "Click 'Generate distribution'")
     )
-    ic_plot$plot
+    ic_plot$plot1
   })
   
   # Reset plot
   observeEvent(input$ic_val, {
-    ic_plot$plot <- NULL
+    ic_plot$plot1 <- NULL
   })
+  
+  #** Generate IC distribution w/ changing initial condition uncertainty ----
+  observeEvent(input$gen_ic2, {
+    req(input$table01_rows_selected != "")
+    req(!is.null(lake_data$df))
+    mn_chla <- lake_data$df$chla[lake_data$df$Date == start_date]
+    dat <- data.frame(value = rnorm(1000, input$ic_val, input$ic_uc))
+    dat$value[dat$value < 0.1] <- 0.1 # If below the min, set to a non-zero value
+    ic_dist$df <- dat
+    
+    df <- data.frame(x = lake_data$df$chla[lake_data$df$Date == start_date],
+                     label = "Observed")
+    
+    dens <- density(ic_dist$df$value)
+    df <- data.frame(x = dens$x, y = dens$y)
+    probs <- c(0, 0.025, 0.125, 0.875, 0.975, 1)
+    quantiles <- quantile(ic_dist$df$value, prob = probs)
+    df$quant <- findInterval(df$x, quantiles)
+    df$quant[df$quant == 4] <- 2
+    df$quant[df$quant == 5] <- 1
+    df$quant[df$quant == 6] <- 0
+    df$quant <- factor(df$quant)
+    
+    xlims <- c(input$ic_val - (3 * input$ic_uc), input$ic_val + (3 * input$ic_uc))
+    ylims <- c(0, max(df$y) + 1)
+    
+    ic_plot$plot2 <- ggplot(df, aes(x,y)) + 
+      geom_ribbon(aes(ymin = 0, ymax = y, fill = quant)) + 
+      geom_vline(xintercept = input$ic_val, linetype = "dashed") + 
+      scale_fill_brewer(guide = "none", palette = "OrRd") +
+      xlab("Chlorophyll-a (μg/L)") +
+      ylab("Density") +
+      coord_cartesian(xlim = xlims, ylim = ylims) +
+      theme_bw(base_size = 18)
+  })
+  
+  
+  
+  #** Plot - IC distribution ----
+  output$ic_uc_plot2 <- renderPlot({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(ic_plot$plot2), "Click 'Generate distribution'")
+    )
+    ic_plot$plot2
+  })
+  
+  # Reset plot
   observeEvent(input$ic_uc, {
-    ic_plot$plot <- NULL
+    ic_plot$plot2 <- NULL
   })
   
   
