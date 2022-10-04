@@ -403,6 +403,38 @@ shinyServer(function(input, output, session) {
     
   })
   
+  #Check answers to Q7
+  
+  observeEvent(input$ans_btn2, {
+    if(input$q7a == "Increase (positive relationship)") {
+      res <- "Q.7a is correct!"
+    } else {
+      res <- "Incorrect answer for Q.7a"
+    }
+    
+    if(input$q7b == "Increase (positive relationship)") {
+      res2 <- "Q.7b is correct!"
+    } else {
+      res2 <- "Incorrect answer for Q.7b"
+    }
+    
+    if(input$q7c == "Increase (positive relationship)") {
+      res3 <- "Q.7c is correct!"
+    } else {
+      res3 <- "Incorrect answer for Q.7c"
+    }
+    
+    output$q7a_ans <- renderText({
+      res
+    })
+    output$q7b_ans <- renderText({
+      res2
+    })
+    output$q7c_ans <- renderText({
+      res3
+    })
+  })
+  
   #* Toggle for dataframe answers for matching states and params
   observeEvent(input$ans_btn, {
     # if(input$ans_btn %% 2 != 1 |){
@@ -437,6 +469,39 @@ shinyServer(function(input, output, session) {
       res2
     })
   })
+  
+  # Q9 table
+  q9_ans <- reactiveValues() # %>% formatStyle(c(1:3), border = '1px solid #ddd'))
+  q9_ans$df <- data.frame(`Variable relationship` = c("Primary productivity (chl-a) vs. water temperature", "Primary productivity (chl-a) vs. light (underwater PAR)", "Primary productivity (chl-a) vs. nutrients (nitrate sensor)"),
+                          `Q.6 Answers` = rep(NA, 3), 
+                          `Q.7 Answers` = rep(NA, 3) 
+  )
+  
+  observeEvent(input$submitButtonQ6, {
+    Q6_ans <- c(input$q6b, input$q6c, input$q6d)
+    q9_ans$df[,2] <- Q6_ans
+  })
+  
+  observeEvent(input$submitButtonQ7, {
+    Q7_ans <- c(input$q7a, input$q7b, input$q7c)
+    q9_ans$df[,3] <- Q7_ans
+  })
+  
+  output$q9_tab <- DT::renderDT(
+    q9_ans$df, #%>% formatStyle(c(1:dim(q6_ans$dt)[2]), border = '1px solid #ddd'),
+    selection = "none", class = "cell-border stripe",
+    options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t"),
+    server = FALSE, escape = FALSE, rownames = FALSE, colnames=c("Variable relationship","Q.6 Answers","Q.7 Answers"), editable = FALSE
+  )
+  # q9_proxy <- dataTableProxy("q9_tab")
+  # observeEvent(input$q9_tab_cell_edit, {
+  #   info = input$q9_tab_cell_edit
+  #   i = info$row
+  #   j = info$col
+  #   v = info$value
+  #   q9_ans$dt[i, j] <<- DT::coerceValue(v, q9_ans$dt[i, j])
+  #   # replaceData(q6_proxy, q6_ans$dt, resetPaging = FALSE)  # important
+  # })
   
   
   #** Save air and water temp ----

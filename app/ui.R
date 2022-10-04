@@ -598,6 +598,12 @@ border-color: #FFF;
                                                                                   width = "90%"),
                                                                    # textAreaInput2(inputId = qid[17], label = quest[qid[17], ],
                                                                    #                width = "90%"),
+                                                                   br(),
+                                                                   actionButton("submitButtonQ6", "Submit Q.6 answers"),
+                                                                   br(),
+                                                                   conditionalPanel("input.submitButtonQ6 > 0",
+                                                                                    p(tags$i("Thanks for submitting your answers! They've been used to populate a table for a question later on in Activity A.")),
+                                                                                    br()),
                                                                    br()
                                                             )
                                                           )
@@ -662,17 +668,32 @@ border-color: #FFF;
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(10, align = "left",
+                                               column(12, align = "left",
                                                       box(id = "box6", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
-                                                            column(10, offset = 1,
+                                                            column(8, offset = 1,
                                                                    h3("Questions"),
                                                                    h5(tags$b(quest[qid[17], 1])),
                                                                    radioButtons(qid[18], quest[qid[18], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    radioButtons(qid[19], quest[qid[19], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
                                                                    radioButtons(qid[20], quest[qid[20], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   br(),
+                                                                   actionButton("submitButtonQ7", "Submit Q.7 answers"),
+                                                                   br(),
+                                                                   conditionalPanel("input.submitButtonQ7 > 0",
+                                                                                    p(tags$i("Thanks for submitting your answers! They've been used to populate a table for a question later on in Activity A.")),
+                                                                                    br()),
                                                                    br()
+                                                            ),
+                                                            column(2,
+                                                                   wellPanel(
+                                                                     useShinyjs(),  # Set up shinyjs
+                                                                     actionButton("ans_btn2", "Check answers"),
+                                                                     textOutput("q7a_ans"),
+                                                                     textOutput("q7b_ans"),
+                                                                     textOutput("q7c_ans")
+                                                                   )
                                                             )
                                                           )
                                                       )
@@ -714,9 +735,10 @@ border-color: #FFF;
                                                                      )
                                                                    ),
                                                                    br(),
-                                                                   h5(tags$b(quest[qid[22], 1])),
-                                                                   radioButtons(qid[23], quest[qid[23], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   radioButtons(qid[24], quest[qid[24], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
+                                                                   textAreaInput2(inputId = qid[22], label = quest[qid[22], ], width = "90%"),
+                                                                   br(),
+                                                                   DTOutput("q9_tab"),
+                                                                   br(),
                                                                    br()
                                                             ),
                                                             column(2,

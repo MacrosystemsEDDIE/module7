@@ -105,11 +105,17 @@ quest$location <- NULL
 colnames(answers)[1] <- "Answer"
 answers[, 1] <- ""
 
-#Table for Q4
+#Table for Q4 and Q9
 q4_table <- data.frame(
   Frequency = rep(NA, 6),
   row.names = c("Air temperature", "Surface water temperature", "Shortwave radiation", "Underwater PAR", "Nitrogen", "Chlorophyll-a")
 )
+
+# q9_table <- data.frame(
+#   Q.6.answers = rep(NA, 3),
+#   Q.7.answers = rep(NA, 3),
+#   row.names = c("Primary productivity vs. water temperature", "Primary productivity vs. light", "Primary productivity vs. nutrients")
+# )
 
 # Slides
 recap_slides <- list.files("www/Mod7_key_slides", full.names = TRUE)
@@ -165,7 +171,7 @@ neon_vars <- read.csv("data/neon_variables.csv")
 
 # Statistics
 stats <- list("Minimum" = "Min.", "1st Quartile" = "1st Qu.", "Median" = "Median", "Mean" = "Mean", "3rd Quartile" = "3rd Qu.", "Maximum" = "Max.", "Standard Deviation" = "sd")
-mod_choices <- c("Decrease (negative)", "Stay the same (no effect)", "Increase (positive)")
+mod_choices <- c("Decrease (negative relationship)", "Stay the same (no effect)", "Increase (positive relationship)")
 # Sorting variables
 state_vars <- c("Phytoplankton", "Nitrogen")
 process_vars <- c("Mortality", "Uptake")

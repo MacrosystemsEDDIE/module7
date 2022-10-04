@@ -13,14 +13,14 @@ q5,Why might some types of data be collected more frequently than others? Try to
 q6,Describe the effect of each of the following variables on chlorophyll-a. Chlorophyll-a is used as a proxy measurement for algal biomass (phytoplankton concentration) and primary productivity in aquatic environments.,Site Selection: Objective 3
 q6a,Air temperature,Site Selection: Objective 3
 q6b,Surface water temperature,Site Selection: Objective 3
-q6c,Nitrogen,Site Selection: Objective 3
-q6d,Underwater PAR,Site Selection: Objective 3
-q7,"What is the relationship between each of these driver variables and productivity? For example, if the driver variable increases, will it cause productivity to increase (positive relationship), decrease (negative relationship), or have no effect (stay the same).",Activity A: Objective 4
+q6c,Underwater PAR,Site Selection: Objective 3
+q6d,Nitrate sensor,Site Selection: Objective 3
+q7,"In our ecological model of primary productivity, what is the relationship between each of these driver variables and productivity? For example, if the driver variable increases, will it cause productivity to increase (positive relationship), decrease (negative relationship), or have no effect (stay the same). Hint: Use the slides at the top of the page to help you if you are not sure of the answer.",Activity A: Objective 4
 q7a,Surface water temperature,Activity A: Objective 4
 q7b,Incoming light,Activity A: Objective 4
 q7c,Available nutrients,Activity A: Objective 4
 q8,Classify the following as either a state variable or a driver variable by dragging it into the corresponding bin.,Activity A: Objective 4
-q9,We are using chlorophyll-a as a proxy of aquatic primary productivity. Select how you envision increases in each driver variable to affect chlorophyll-a concentrations:,Activity A: Objective 4
+q9,"We are using chlorophyll-a data as a proxy of aquatic primary productivity for our ecological model. Are there any differences between the variable relationships you observed in Q.6 and the way that relationships between those same variables are represented in the ecological model (Q.7)? Refer to the table below to compare your answers to Q.6 and Q.7. Hint: For example, if the ecological model structure assumes that higher water temperatures cause higher primary productivity, we would expect to observe a positive correlation between water temperature and chlorophyll-a in our NEON lake data. ",Activity A: Objective 4
 q9a,Increases in water temperature,Activity A: Objective 4
 q9b,Increases in underwater light,Activity A: Objective 4
 q10,"How sensitive is your forecast to the initial condition of chlorophyll-a? Specifically, if you start the model at low or high values of chlorophyll-a concentration, how does this affect forecast output?",Activity A: Objective 6
