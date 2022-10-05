@@ -939,6 +939,10 @@ border-color: #FFF;
                                                column(4,
                                                       h3("Forecast!"),
                                                       p("Now we will generate forecasts with different initial conditions for each of our models."),
+                                                      box(width = 10, status = "warning",
+                                                          solidHeader = TRUE,
+                                                          p("Note that ",tags$b("every time you generate a forecast,")," even if you do not change the value of the initial condition or initial condition uncertainty, ",tags$b("the forecast will look slightly different")," because it is generated using random draws from the initial conditions distribution.")
+                                                      ),
                                                       br(),
                                                       actionButton("run_fc1", label = div("Run Forecast", icon("running"))),
                                                       br(),
@@ -1051,8 +1055,9 @@ border-color: #FFF;
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[29], label = quest[qid[29], ], width = "90%"),
+                                                                   h3("Question"),
+                                                                   radioButtons(qid[29], quest[qid[29], 1], choices = assim_choices, inline = TRUE, selected = character(0)),
+                                                                   br(),
                                                             )
                                                           )
                                                       )
@@ -1327,8 +1332,9 @@ border-color: #FFF;
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[34], label = quest[qid[34], ], width = "90%"),
+                                                                   h3("Question"),
+                                                                   radioButtons(qid[34], quest[qid[34], 1], choices = assim_choices, inline = TRUE, selected = character(0)),
+                                                                   br()
                                                             )
                                                           )
                                                       )
@@ -1692,7 +1698,7 @@ border-color: #FFF;
                                                       p("Green Reservoir, one of several drinking water supply reservoirs for a city of about 100,000 people, suffers from algal blooms which sometimes release toxins that could threaten the health of water consumers. Forecasts of chl-a allow Green Reservoir managers to plan ahead to source water from other reservoirs and/or pre-emptively issue drinking water warnings."),
                                                       p("The water authority that manages Green Reservoir has developed a forecast system that assimilates monthly chlorophyll-a observations which are collected manually at the beginning of each month by water authority personnel. But managers are interested in exploring whether they can increase the accuracy of their forecasts by investing in a high-frequency chlorophyll-a sensor."),
                                                       p("The water authority of Green Reservoir has budgeted $15,000 for new forecast sensors. After doing some market research, the forecast development team at the water authority has identified two options for chl-a sensors: "),
-                                                      p("Sensor A costs $15,000, including the cost of the technology needed to wirelessly stream data from this sensor to computers that will run the forecast model as well as personnel to install and maintain the sensor."),
+                                                      p("Sensor A costs $15,000, including the cost of the technology needed to wirelessly transmit data from this sensor to computers that will run the forecast model as well as personnel to install and maintain the sensor."),
                                                       p("Sensor B costs $20,000, including the cost of the technology and personnel. Sensor B is more expensive because it is able to make more precise observations (less observation error) and is somewhat more reliable than Sensor A (less likely to experience sensor malfunction)."),
                                                       ),
                                                column(6,

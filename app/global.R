@@ -172,6 +172,7 @@ neon_vars <- read.csv("data/neon_variables.csv")
 # Statistics
 stats <- list("Minimum" = "Min.", "1st Quartile" = "1st Qu.", "Median" = "Median", "Mean" = "Mean", "3rd Quartile" = "3rd Qu.", "Maximum" = "Max.", "Standard Deviation" = "sd")
 mod_choices <- c("Decrease (negative relationship)", "Stay the same (no effect)", "Increase (positive relationship)")
+assim_choices <- c("increase","decrease","stay the same")
 # Sorting variables
 state_vars <- c("Phytoplankton", "Nitrogen")
 process_vars <- c("Mortality", "Uptake")

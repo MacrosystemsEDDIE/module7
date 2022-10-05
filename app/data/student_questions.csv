@@ -32,7 +32,7 @@ q15,Describe the predicted vs. observed plot for your forecast with no data assi
 q16,Record the RMSE of your forecast with no data assimilation.,Activity B: Objective 7
 q17,Describe the predicted vs. observed plot for your forecast with chlorophyll-a data assimilation. How accurate do you think the forecast is?,Activity B: Objective 7
 q18,Record the RMSE of your forecast with chlorophyll-a data assimilation.,Activity B: Objective 7
-q19,"Using RMSE from the table above, choose the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation."" Remember, a lower RMSE value indicates a more accurate forecast. Does the word you chose match your stated expectation from Question 15?",Activity B: Objective 7
+q19,"Using RMSE from the table above, choose the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation."" Remember, a lower RMSE value indicates a more accurate forecast.",Activity B: Objective 7
 q20,"Using the table above, briefly characterize the relative amount of observation uncertainty associated with chl-a sensors and chl-a lab measurements.",Activity B: Objective 8
 q21,Make a hypothesis: how do you think a high level of observation uncertainty might affect the process of data assimilation into forecasts and forecast output?,Activity B: Objective 8
 q22,Describe the effect of changes in observation uncertainty on your forecast output. Does this match your stated expectation from the previous question?,Activity B: Objective 8
@@ -41,8 +41,8 @@ q24,"Make a hypothesis: how do you think the frequency of data assimilation migh
 q25,"Generate a forecast with chl-a data assimilation every 10 days, and record the RMSE of the forecast.",Activity B: Objective 9
 q26,"Generate a forecast with daily data assimilation for chl-a, and record the RMSE of the forecast.",Activity B: Objective 9
 q27,Compare the RMSEs of forecasts when data are assimilated every day vs. when data are only assimilated every 10 days. How do they compare? What does this comparison indicate about the effect of data assimilation frequency on forecast output?,Activity B: Objective 9
-q28,What are some characteristics of environmental data streams that would make data easier or harder to assimilate into forecasts? Explain your reasoning.,Activity B: Summary
-q29,What are some characteristics of environmental data streams that would lead to the greatest improvement in forecast accuracy when those data are assimilated? Explain your reasoning.,Activity B: Summary
+q28,What are some characteristics of environmental data that would make data easier or harder to assimilate into forecasts? Explain your reasoning.,Activity B: Summary
+q29,What are some characteristics of environmental data that would lead to the greatest improvement in forecast accuracy when those data are assimilated? Explain your reasoning.,Activity B: Summary
 q30,Briefly explain your decision to purchase either Sensor A (cheap sensor) or Sensor B (expensive sensor).,Activity C: Objective 10
 q31,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
 q32,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
