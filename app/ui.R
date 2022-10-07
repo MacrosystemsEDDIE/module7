@@ -662,7 +662,7 @@ border-color: #FFF;
                                                       br(), br(), br(),
                                                       h5("Click on the arrows to navigate through the slides", align = "center"),
                                                       wellPanel(
-                                                        slickROutput("slck_model", width = "600px", height = "450px")
+                                                        slickROutput("slck_model", width = "550px", height = "400px")
                                                       )
                                                )
                                              ),
