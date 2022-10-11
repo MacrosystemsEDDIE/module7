@@ -27,7 +27,8 @@ p.cols <- RColorBrewer::brewer.pal(12, "Paired")
 #      col = COL, pch = 16, cex = 3, xaxt = 'n', yaxt = 'n', xlab = '', ylab = '')
 
 # Create scale for plots
-da_method_fill_scale <- scale_fill_manual(values = c("No DA" = l.cols[1], "Chl-a" = l.cols[2], "Nitrate" = l.cols[3], "Both" = l.cols[4]))
+da_method_fill_scale <- scale_fill_manual(values = c("No DA" = l.cols[1], "Chl-a DA" = l.cols[2]), name = "")
+#da_method_fill_scale <- scale_fill_manual(values = c("No DA" = l.cols[1], "Chl-a" = l.cols[2], "Nitrate" = l.cols[3], "Both" = l.cols[4]))
 
 # Plot saving
 png_dpi <- 120
@@ -55,8 +56,8 @@ help_text <- read.csv("data/help_text.csv", row.names = 1)
 
 ab1 <- 4:9
 ab2 <- 13:16
-ab3 <- 19:21
-ab4 <- 24:25
+ab3 <- 18:20
+ab4 <- 23:24
 
 l1 <- length(ab1)
 l2 <- length(ab2)
@@ -93,9 +94,9 @@ quest$Question[(ab4[l4]+1):nrow(quest)] <- paste0("Q.", (((ab4[l4]+1):(nrow(ques
 # Number location
 idx1 <- grep("Q.10", quest$Question)
 quest$location[1:(idx1-1)] <- paste0(quest$location[1:(idx1-1)], " - ", substr(quest$Question[1:(idx1-1)], 1, 3))
-quest$location[(idx1+1):(idx1+2)] <- paste0(quest$location[(idx1+1):(idx1+2)], " - ", substr(quest$Question[(idx1+1):(idx1+2)], 1, 3))
+#quest$location[(idx1+1):(idx1+2)] <- paste0(quest$location[(idx1+1):(idx1+2)], " - ", substr(quest$Question[(idx1+1):(idx1+2)], 1, 4))
 quest$location[idx1] <- paste0(quest$location[idx1], " - ", substr(quest$Question[idx1], 1, 4))
-quest$location[(idx1+3):nrow(quest)] <- paste0(quest$location[(idx1+3):nrow(quest)], " - ", substr(quest$Question[(idx1+3):nrow(quest)], 1, 4))
+quest$location[(idx1+1):nrow(quest)] <- paste0(quest$location[(idx1+1):nrow(quest)], " - ", substr(quest$Question[(idx1+1):nrow(quest)], 1, 4))
 # quest$location[idx:(ab1[l1])] <- paste0(quest$location[idx:ab1[l1]],letters[1:length(idx:ab1[l1])], ". ", )
 # quest$location[(ab1[l1]+1):(ab2[1]-1)] <- paste0(quest$location[(ab1[l1]+1):(ab2[1]-1)], " - Q.", ((ab1[l1]+1):(ab2[1]-1) - l1))
 # Create dataframe for answers
@@ -103,6 +104,18 @@ answers <- quest
 quest$location <- NULL
 colnames(answers)[1] <- "Answer"
 answers[, 1] <- ""
+
+#Table for Q4 and Q9
+q4_table <- data.frame(
+  Frequency = rep(NA, 6),
+  row.names = c("Air temperature", "Surface water temperature", "Shortwave radiation", "Underwater PAR", "Nitrogen", "Chlorophyll-a")
+)
+
+# q9_table <- data.frame(
+#   Q.6.answers = rep(NA, 3),
+#   Q.7.answers = rep(NA, 3),
+#   row.names = c("Primary productivity vs. water temperature", "Primary productivity vs. light", "Primary productivity vs. nutrients")
+# )
 
 # Slides
 recap_slides <- list.files("www/Mod7_key_slides", full.names = TRUE)
@@ -127,7 +140,14 @@ rownames(data_frequency_latency) <- data_frequency_latency[, 1]
 # RMSE dataframe for da_freq
 da_freq_df <- data.frame(
   "chla" = rep(NA, 5),
-  "nitrate" = rep(NA, 5),
+  #"nitrate" = rep(NA, 5),
+  "rmse" = rep(NA, 5)
+)
+
+# RMSE dataframe for obs_uc
+obs_uc_df <- data.frame(
+  "chla" = rep(NA, 5),
+  #"nitrate" = rep(NA, 5),
   "rmse" = rep(NA, 5)
 )
 
@@ -151,7 +171,8 @@ neon_vars <- read.csv("data/neon_variables.csv")
 
 # Statistics
 stats <- list("Minimum" = "Min.", "1st Quartile" = "1st Qu.", "Median" = "Median", "Mean" = "Mean", "3rd Quartile" = "3rd Qu.", "Maximum" = "Max.", "Standard Deviation" = "sd")
-mod_choices <- c("Negative", "No change", "Positive")
+mod_choices <- c("Decrease (negative relationship)", "Stay the same (no effect)", "Increase (positive relationship)")
+assim_choices <- c("increase","decrease","stay the same")
 # Sorting variables
 state_vars <- c("Phytoplankton", "Nitrogen")
 process_vars <- c("Mortality", "Uptake")
@@ -183,7 +204,7 @@ png_theme <- theme(legend.position = "bottom",
 fc_date <- "2020-09-25"
 
 # Assimilation methods
-assim_methods <- c("No data assimilation", "Chl-a assimilation", "Nitrate assimilation", "Chla and nitrate assimilation")
+assim_methods <- c("increase", "decrease", "stay the same")
 view_vars <- data.frame(lname = c("Chlorophyll-a", "Nitrate", "Max uptake"),
                         sname = c("chla", "nitrate", "maxUptake"))
 

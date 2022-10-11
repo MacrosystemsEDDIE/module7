@@ -315,6 +315,26 @@ shinyServer(function(input, output, session) {
     return(ggplotly(p, dynamicTicks = TRUE, source = "A"))
   })
 
+  # Q4 table
+  q4_ans <- reactiveValues(dt = q4_table) # %>% formatStyle(c(1:3), border = '1px solid #ddd'))
+  
+  output$q4_tab <- DT::renderDT(
+    q4_ans$dt, #%>% formatStyle(c(1:dim(q6_ans$dt)[2]), border = '1px solid #ddd'),
+    selection = "none", class = "cell-border stripe",
+    options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t"),
+    server = FALSE, escape = FALSE, rownames= c("Air temperature", "Surface water temperature", "Shortwave radiation", "Underwater PAR", "Nitrogen", "Chlorophyll-a"), colnames=c("Data collection frequency"), editable = TRUE
+  )
+  
+  q4_proxy <- dataTableProxy("q4_tab")
+  observeEvent(input$q4_tab_cell_edit, {
+    info = input$q4_tab_cell_edit
+    i = info$row
+    j = info$col
+    v = info$value
+    q4_ans$dt[i, j] <<- DT::coerceValue(v, q4_ans$dt[i, j])
+    # replaceData(q6_proxy, q6_ans$dt, resetPaging = FALSE)  # important
+  })
+  
   # Slickr model output
   output$slck_model <- renderSlickR({
     slickR(model_slides)
@@ -383,6 +403,106 @@ shinyServer(function(input, output, session) {
     
   })
   
+  #Check answers to Q7
+  
+  observeEvent(input$ans_btn2, {
+    if(input$q7a == "Increase (positive relationship)") {
+      res <- "Q.7a is correct!"
+    } else {
+      res <- "Incorrect answer for Q.7a"
+    }
+    
+    if(input$q7b == "Increase (positive relationship)") {
+      res2 <- "Q.7b is correct!"
+    } else {
+      res2 <- "Incorrect answer for Q.7b"
+    }
+    
+    if(input$q7c == "Increase (positive relationship)") {
+      res3 <- "Q.7c is correct!"
+    } else {
+      res3 <- "Incorrect answer for Q.7c"
+    }
+    
+    output$q7a_ans <- renderText({
+      res
+    })
+    output$q7b_ans <- renderText({
+      res2
+    })
+    output$q7c_ans <- renderText({
+      res3
+    })
+  })
+  
+  #* Toggle for dataframe answers for matching states and params
+  observeEvent(input$ans_btn, {
+    # if(input$ans_btn %% 2 != 1 |){
+    #   hide(id = "ans_vars")
+    # }else{
+    show(id = "ans_vars")
+    # }
+    # toggle("ans_vars")
+  })
+  
+  observeEvent(input$ans_btn, {
+    if(length(input$rank_list_2) == 0) {
+      res <- "Drag answers into State box!"
+    } else if(all(input$rank_list_2 %in% state_vars)) {
+      res <- "State variables are correct!"
+    } else {
+      res <- "Incorrect answer in State box"
+    }
+    
+    if(length(input$rank_list_3) == 0) {
+      res2 <- "Drag answers into Parameter box!"
+    } else if(all(input$rank_list_3 %in% process_vars)) {
+      res2 <- "Parameter variables are correct!"
+    } else {
+      res2 <- "Incorrect answer in Parameter box"
+    }
+    
+    output$state_ans <- renderText({
+      res
+    })
+    output$proc_ans <- renderText({
+      res2
+    })
+  })
+  
+  # Q9 table
+  q9_ans <- reactiveValues() # %>% formatStyle(c(1:3), border = '1px solid #ddd'))
+  q9_ans$df <- data.frame(`Variable relationship` = c("Primary productivity (chl-a) vs. water temperature", "Primary productivity (chl-a) vs. light (underwater PAR)", "Primary productivity (chl-a) vs. nutrients (nitrate sensor)"),
+                          `Q.6 Answers` = rep(NA, 3), 
+                          `Q.7 Answers` = rep(NA, 3) 
+  )
+  
+  observeEvent(input$submitButtonQ6, {
+    Q6_ans <- c(input$q6b, input$q6c, input$q6d)
+    q9_ans$df[,2] <- Q6_ans
+  })
+  
+  observeEvent(input$submitButtonQ7, {
+    Q7_ans <- c(input$q7a, input$q7b, input$q7c)
+    q9_ans$df[,3] <- Q7_ans
+  })
+  
+  output$q9_tab <- DT::renderDT(
+    q9_ans$df, #%>% formatStyle(c(1:dim(q6_ans$dt)[2]), border = '1px solid #ddd'),
+    selection = "none", class = "cell-border stripe",
+    options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t"),
+    server = FALSE, escape = FALSE, rownames = FALSE, colnames=c("Variable relationship","Q.6 Answers","Q.7 Answers"), editable = FALSE
+  )
+  # q9_proxy <- dataTableProxy("q9_tab")
+  # observeEvent(input$q9_tab_cell_edit, {
+  #   info = input$q9_tab_cell_edit
+  #   i = info$row
+  #   j = info$col
+  #   v = info$value
+  #   q9_ans$dt[i, j] <<- DT::coerceValue(v, q9_ans$dt[i, j])
+  #   # replaceData(q6_proxy, q6_ans$dt, resetPaging = FALSE)  # important
+  # })
+  
   
   #** Save air and water temp ----
   selected2 <- reactiveValues(sel = NULL)
@@ -411,11 +531,12 @@ shinyServer(function(input, output, session) {
   lm_wt <- reactiveValues(sub = NULL, m = NULL, b = NULL, r2 = NULL, sigma = NULL)
   
   observeEvent(input$add_lm2, {
-    if(is.null(selected2$sel)) {
-      df <- wtemp_airtemp()$data
-    } else {
-      df <- selected2$sel[, 2:4]
-    }
+    # if(is.null(selected2$sel)) {
+    #   df <- wtemp_airtemp()$data
+    # } else {
+    #   df <- selected2$sel[, 2:4]
+    # }
+    df <- wtemp_airtemp()$qaqc
     fit <- lm(df[, 3] ~ df[, 2])
     coeffs <- fit$coefficients
     lm_wt$sub <- df
@@ -442,7 +563,7 @@ shinyServer(function(input, output, session) {
       need(!is.null(lm_wt$m),
            message = "Please click 'Add linear regression'.")
     )
-    formula <- "$$ wtemp = %s \times airtemp + %s   ;   r^2 = %s $$"
+    formula <- "$$ wtemp = %s \u00D7 airtemp + %s   ;   r^2 = %s $$"
     text <- sprintf(formula, lm_wt$m, lm_wt$b, lm_wt$r2)
     withMathJax(
       tags$p(text)
@@ -461,10 +582,12 @@ shinyServer(function(input, output, session) {
     )
     colnames(df)[-1] <- c("X", "Y")
     sel <- tryCatch(df[(selected2$sel$pointNumber+1),,drop=FALSE] , error=function(e){NULL})
-    return(list(data = df, sel = sel))
+    qaqc <- df[df$Y != 5.2300000,]
+    return(list(data = df, qaqc = qaqc, sel = sel))
   })
   
   # Air temp vs Water temp plot ----
+  
   output$at_wt <- renderPlotly({
     validate(
       need(input$table01_rows_selected != "",
@@ -488,6 +611,36 @@ shinyServer(function(input, output, session) {
     }
     return(ggplotly(p, dynamicTicks = TRUE, source = "B"))
   })
+  
+  observeEvent(input$run_qaqc1, {
+    
+               output$at_wt <- renderPlotly({
+                 validate(
+                   need(input$table01_rows_selected != "",
+                        message = "Please select a site in Objective 1.")
+                 )
+                 obj <- wtemp_airtemp()$sel
+                 
+                 p <- ggplot() +
+                   geom_point(data = wtemp_airtemp()$data, aes_string(names(wtemp_airtemp()$data)[2], names(wtemp_airtemp()$data)[3]), color = "gray") +
+                   geom_point(data = wtemp_airtemp()$qaqc, aes_string(names(wtemp_airtemp()$data)[2], names(wtemp_airtemp()$data)[3]), color = "black") +
+                   ylab("Surface water temperature (\u00B0C)") +
+                   xlab("Air temperature (\u00B0C)") +
+                   theme_minimal(base_size = 12)
+                 
+                 if(nrow(obj) != 0) {
+                   p <- p +
+                     geom_point(data = obj, aes_string(names(obj)[2], names(obj)[3]), color = cols[2])
+                 }
+                 if(!is.null(lm_wt$m)) {
+                   p <- p +
+                     geom_abline(slope = lm_wt$m, intercept = lm_wt$b, color = cols[2], linetype = "dashed")
+                 }
+                 return(ggplotly(p, dynamicTicks = TRUE, source = "B"))
+               })
+               })
+  
+  
   
   #** Save SWR and uPAR ----
   selected3 <- reactiveValues(sel = NULL)
@@ -524,17 +677,19 @@ shinyServer(function(input, output, session) {
     )
     colnames(df)[-1] <- c("X", "Y")
     sel <- tryCatch(df[(selected3$sel$pointNumber+1),,drop=FALSE] , error=function(e){NULL})
-    return(list(data = df, sel = sel))
+    qaqc <- df[df$Y >= 10,]
+    return(list(data = df, qaqc = qaqc, sel = sel))
   })
   
   lm_upar <- reactiveValues(sub = NULL, m = NULL, b = NULL, r2 = NULL, sigma = NULL)
   
   observeEvent(input$add_lm3, {
-    if(is.null(selected3$sel)) {
-      df <- swr_upar()$data
-    } else {
-      df <- selected3$sel[, 2:4]
-    }
+    # if(is.null(selected3$sel)) {
+    #   df <- swr_upar()$data
+    # } else {
+    #   df <- selected3$sel[, 2:4]
+    # }
+    df <- swr_upar()$qaqc
     fit <- lm(df[, 3] ~ df[, 2])
     coeffs <- fit$coefficients
     lm_upar$sub <- df
@@ -563,9 +718,9 @@ shinyServer(function(input, output, session) {
            message = "Please click 'Add linear regression'.")
     )
     if(lm_upar$b < 0) {
-      formula <- "$$ uPAR = %s \times SWR %s   ;   r^2 = %s $$"
+      formula <- "$$ uPAR = %s \u00D7 SWR %s   ;   r^2 = %s $$"
     } else {
-      formula <- "$$ uPAR = %s \times SWR + %s   ;   r^2 = %s $$"
+      formula <- "$$ uPAR = %s \u00D7 SWR + %s   ;   r^2 = %s $$"
     }
     text <- sprintf(formula, lm_upar$m, lm_upar$b, lm_upar$r2)
     withMathJax(
@@ -599,6 +754,36 @@ shinyServer(function(input, output, session) {
     
     return(ggplotly(p, dynamicTicks = TRUE, source = "C"))
     
+  })
+  
+  observeEvent(input$run_qaqc2, {
+    output$sw_upar <- renderPlotly({
+      validate(
+        need(input$table01_rows_selected != "",
+             message = "Please select a site in Objective 1.")
+      )
+      
+      obj <- swr_upar()$sel
+      
+      p <- ggplot() +
+        geom_point(data = swr_upar()$data, aes_string(names(swr_upar()$data)[2], names(swr_upar()$data)[3]), color = "gray") +
+        geom_point(data = swr_upar()$qaqc, aes_string(names(swr_upar()$data)[2], names(swr_upar()$data)[3]), color = "black") +
+        ylab("Underwater PAR (micromolesPerSquareMeterPerSecond)") +
+        xlab("Shortwave radiation (wattsPerSquareMeter)") +
+        theme_minimal(base_size = 12)
+      
+      if(nrow(obj) != 0) {
+        p <- p +
+          geom_point(data = obj, aes_string(names(obj)[2], names(obj)[3]), color = cols[2])
+      }
+      if(!is.null(lm_upar$m)) {
+        p <- p +
+          geom_abline(slope = lm_upar$m, intercept = lm_upar$b, color = cols[2], linetype = "dashed")
+      }
+      
+      return(ggplotly(p, dynamicTicks = TRUE, source = "C"))
+      
+    })
   })
   
   #** Convert NOAA forecast data ----
@@ -679,15 +864,15 @@ shinyServer(function(input, output, session) {
   
   #** Slickr Initial conditions UC slides ----
   output$ic_uc_slides <- renderSlickR({
-    slickR(ic_uc_slides) + settings(dots = TRUE, autoplay = TRUE, autoplaySpeed = 7000)
+    slickR(ic_uc_slides) + settings(dots = TRUE)
   })
   
   #** Initial Condition Uncertainty ----
   ic_dist <- reactiveValues(df = NULL)
   
-  #** Generate IC distribution ----
+  #** Generate IC distribution w/ changing initial condition values ----
   ic_plot <- reactiveValues(plot = NULL)
-  observeEvent(input$gen_ic, {
+  observeEvent(input$gen_ic1, {
     req(input$table01_rows_selected != "")
     req(!is.null(lake_data$df))
     mn_chla <- lake_data$df$chla[lake_data$df$Date == start_date]
@@ -711,7 +896,7 @@ shinyServer(function(input, output, session) {
     xlims <- c(input$ic_val - (3 * input$ic_uc), input$ic_val + (3 * input$ic_uc))
     ylims <- c(0, max(df$y) + 1)
     
-    ic_plot$plot <- ggplot(df, aes(x,y)) + 
+    ic_plot$plot1 <- ggplot(df, aes(x,y)) + 
       geom_ribbon(aes(ymin = 0, ymax = y, fill = quant)) + 
       geom_vline(xintercept = input$ic_val, linetype = "dashed") + 
       scale_fill_brewer(guide = "none", palette = "OrRd") +
@@ -721,24 +906,77 @@ shinyServer(function(input, output, session) {
       theme_bw(base_size = 18)
   })
   
+  
+  
   #** Plot - IC distribution ----
-  output$ic_uc_plot <- renderPlot({
+  output$ic_uc_plot1 <- renderPlot({
     validate(
       need(input$table01_rows_selected != "",
            message = "Please select a site in Objective 1.")
     )
     validate(
-      need(!is.null(ic_plot$plot), "Click 'Generate distribution")
+      need(!is.null(ic_plot$plot1), "Click 'Generate distribution'")
     )
-    ic_plot$plot
+    ic_plot$plot1
   })
   
   # Reset plot
   observeEvent(input$ic_val, {
-    ic_plot$plot <- NULL
+    ic_plot$plot1 <- NULL
   })
+  
+  #** Generate IC distribution w/ changing initial condition uncertainty ----
+  observeEvent(input$gen_ic2, {
+    req(input$table01_rows_selected != "")
+    req(!is.null(lake_data$df))
+    mn_chla <- lake_data$df$chla[lake_data$df$Date == start_date]
+    dat <- data.frame(value = rnorm(1000, input$ic_val, input$ic_uc))
+    dat$value[dat$value < 0.1] <- 0.1 # If below the min, set to a non-zero value
+    ic_dist$df <- dat
+    
+    df <- data.frame(x = lake_data$df$chla[lake_data$df$Date == start_date],
+                     label = "Observed")
+    
+    dens <- density(ic_dist$df$value)
+    df <- data.frame(x = dens$x, y = dens$y)
+    probs <- c(0, 0.025, 0.125, 0.875, 0.975, 1)
+    quantiles <- quantile(ic_dist$df$value, prob = probs)
+    df$quant <- findInterval(df$x, quantiles)
+    df$quant[df$quant == 4] <- 2
+    df$quant[df$quant == 5] <- 1
+    df$quant[df$quant == 6] <- 0
+    df$quant <- factor(df$quant)
+    
+    xlims <- c(input$ic_val - (3 * input$ic_uc), input$ic_val + (3 * input$ic_uc))
+    ylims <- c(0, max(df$y) + 1)
+    
+    ic_plot$plot2 <- ggplot(df, aes(x,y)) + 
+      geom_ribbon(aes(ymin = 0, ymax = y, fill = quant)) + 
+      geom_vline(xintercept = input$ic_val, linetype = "dashed") + 
+      scale_fill_brewer(guide = "none", palette = "OrRd") +
+      xlab("Chlorophyll-a (μg/L)") +
+      ylab("Density") +
+      coord_cartesian(xlim = xlims, ylim = ylims) +
+      theme_bw(base_size = 18)
+  })
+  
+  
+  
+  #** Plot - IC distribution ----
+  output$ic_uc_plot2 <- renderPlot({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(ic_plot$plot2), "Click 'Generate distribution'")
+    )
+    ic_plot$plot2
+  })
+  
+  # Reset plot
   observeEvent(input$ic_uc, {
-    ic_plot$plot <- NULL
+    ic_plot$plot2 <- NULL
   })
   
   
@@ -868,18 +1106,18 @@ shinyServer(function(input, output, session) {
       updateSliderInput(session, inputId = "run_fc1_nday", value = 35)
       shinyjs::disable("run_fc1_nday")
     } else {
-      shinyjs::enable("run_fc1_nday")
+      shinyjs::enable("nday_no_da")
     }
   })
 
   # Objective 7 ----
   #** Submit Hypothesis Rank ----
   observeEvent(input$submit_hyp, {
-    
+
     shinyalert::shinyalert(title = "Hypothesis Submitted!",
                            "Now continue below and generate the forecasts and we will see how it matches with your hypothesis.")
   })
-  
+
   #* Run Forecast with NO DA ----
   est_out_no_da <- reactiveValues(out = NULL)
   observeEvent(input$run_fc_no_da, {
@@ -1398,21 +1636,42 @@ shinyServer(function(input, output, session) {
   })
   
   #** Compare all forecasts ----
-  da_method <- reactiveValues(dt = data.frame(RMSE = rep(NA, 4)), plot = NULL)
+  da_method <- reactiveValues(dt = data.frame(RMSE = rep(NA, 2)), plot = NULL)
   
   observeEvent(input$compare_da, {
     
     req(input$table01_rows_selected != "")
     
-    var <- view_vars$sname[view_vars$lname == input$view_var_da_method]
+    if(input$run_fc_no_da == 0){
+      validate(
+             shinyalert::shinyalert(title = "Click 'Run forecast' for the forecast with no data assimilation.")
+      )
+    }
+    if(input$assess_fc_no_da == 0){
+      validate(
+        shinyalert::shinyalert(title = "Click 'Assess forecast' for the forecast with no data assimilation.")
+      )
+    }
+    if(input$run_fc_chla_assim == 0){
+      validate(
+        shinyalert::shinyalert(title = "Click 'Run forecast' for the forecast with data assimilation.")
+      )
+    }
+    if(input$assess_fc_chla_assim == 0){
+      validate(
+        shinyalert::shinyalert(title = "Click 'Assess forecast' for the forecast with data assimilation.")
+      )
+    }
+  
+    var <- "chla"
     da_method$plot <- plot_four_forecasts(no_da = est_out_no_da$out, chla = est_out_chla_assim$out,
-                                          nitrate = est_out_nitrate_assim$out, both = est_out_both_assim$out, 
+                                          #nitrate = est_out_nitrate_assim$out, both = est_out_both_assim$out, 
                                           var = var, obs_plot = obs_plot, add_obs = TRUE)
     
     da_method$dt$RMSE[1] <- fc_no_da$rmse
     da_method$dt$RMSE[2] <- fc_chla_assim$rmse
-    da_method$dt$RMSE[3] <- fc_nitrate_assim$rmse
-    da_method$dt$RMSE[4] <- fc_both_assim$rmse
+    # da_method$dt$RMSE[3] <- fc_nitrate_assim$rmse
+    # da_method$dt$RMSE[4] <- fc_both_assim$rmse
   })
   
   #** Table of RMSE ----
@@ -1420,7 +1679,7 @@ shinyServer(function(input, output, session) {
                            options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
                                           columnDefs = list(list(width = '100%', targets = "_all")), scrollX = TRUE
                            ), colnames = c("RMSE"),
-                           rownames = c("No DA", "Chl-a", "Nitrate", "Both"),
+                           rownames = c("No DA", "Chl-a"),
                            server = FALSE, escape = FALSE)
   
   #** Plot of all DA methods ----
@@ -1461,9 +1720,9 @@ shinyServer(function(input, output, session) {
   hyp1 <- reactiveValues(dt = NULL)
   observe({
     hyp1$dt <- data.frame(Hypothesis = input$rank_hyp_2)
-    
+
   })
-  
+
   output$hyp1 <- renderDT({
     validate(
       need(length(input$rank_hyp_4) == 4,
@@ -1475,7 +1734,7 @@ shinyServer(function(input, output, session) {
                                          columnDefs = list(list(width = '20%', targets = "_all")), scrollX = TRUE
                           ), colnames = c("Hypothesis"),
                           server = FALSE, escape = FALSE)
-  
+
   # Objective 8 - Explore observation uncertainty ----
   #** Slickr Chla slides ----
   output$chla_slides <- renderSlickR({
@@ -1501,8 +1760,8 @@ shinyServer(function(input, output, session) {
                  detail = "This may take a while. This window will disappear
                      when it is finished running the forecasts.", value = 0.1)
     
-    freq_chla <- ifelse("Chlorophyll-a" %in% input$obs_uc_da, 7, 36) 
-    freq_din <- ifelse("Nitrate" %in% input$obs_uc_da, 7, 36) 
+    freq_chla <- 7#ifelse("Chlorophyll-a" %in% input$obs_uc_da, 7, 36) 
+    freq_din <- 36#ifelse("Nitrate" %in% input$obs_uc_da, 7, 36) 
     
     obs_file <- create_data_assim_inputs(freq_chla = freq_chla,
                                          freq_din = freq_din,
@@ -1515,7 +1774,7 @@ shinyServer(function(input, output, session) {
                      start_date = start_date)
     
     chla_cv <-  ((input$obs_uc_chla / mean(obs_plot$hist$chla, na.rm = TRUE)))
-    nitrate_cv <- ((input$obs_uc_nitrate / 2)) # mean(obs_plot$hist$nitrate, na.rm = TRUE)))
+    nitrate_cv <- 0.25#((input$obs_uc_nitrate / 2)) # mean(obs_plot$hist$nitrate, na.rm = TRUE)))
     
     progress$set(value = 0.3)
     est_out <- EnKF(n_en = 100, 
@@ -1572,10 +1831,47 @@ shinyServer(function(input, output, session) {
     paste0("Chlorophyll-a RMSE = ", obs_uc$rmse, " μg/L") 
   })
   
+  #** Table with RMSE & DA freq ---
+  obs_uc_rmse <- reactiveValues(dt = obs_uc_df)
+  output$obs_uc_rmse <- renderDT(obs_uc_rmse$dt, selection = "single",
+                                  options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
+                                                 columnDefs = list(list(width = '10%', targets = "_all"))
+                                  ), colnames = c("Chl-a obs uncertainty", "RMSE"),
+                                  server = FALSE, escape = FALSE)
+  
+  #** Save RMSE & Frequencies in a table ----
+  observeEvent(input$save_rmse, {
+    
+    req(!is.na(obs_uc$rmse))
+    
+    obs_uc_chla <- input$obs_uc_chla #ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 0) 
+    #freq_din <- 0 #ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 0) 
+    
+    idx <- input$obs_uc_rmse_rows_selected
+    if(is.null(idx)) {
+      idx <- which(is.na(obs_uc_rmse$dt[, 1]))[1]
+    }
+    obs_uc_rmse$dt$chla[idx] <- obs_uc_chla
+    #da_freq_rmse$dt$nitrate[idx] <- freq_din
+    obs_uc_rmse$dt$rmse[idx] <- obs_uc$rmse
+  })
+  
   #** Reset forecast when slider is moved
   observeEvent(input$obs_uc_chla, {
     obs_uc$out <- NULL
   })
+  
+  #** Disable Save button when no RMSE available ----
+  observe({
+    if(is.na(obs_uc$rmse)) {
+      shinyjs::disable("save_rmse")
+    } else {
+      shinyjs::enable("save_rmse")
+      
+    }
+  })
+  
+  
   
   #** Catch for distribution plot ----
   observeEvent(input$plot_type_obs_uc, {
@@ -1612,8 +1908,8 @@ shinyServer(function(input, output, session) {
                  detail = "This may take a while. This window will disappear
                      when it is finished running the forecasts.", value = 0.1)
     
-    freq_chla <- ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 36) 
-    freq_din <- ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 36) 
+    freq_chla <- input$da_freq_chla #ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 36) 
+    freq_din <- 36 #ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 36) 
     
     obs_file <- create_data_assim_inputs(freq_chla = freq_chla,
                                          freq_din = freq_din,
@@ -1689,23 +1985,23 @@ shinyServer(function(input, output, session) {
   output$da_freq_rmse <- renderDT(da_freq_rmse$dt, selection = "single",
                               options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t", autoWidth = TRUE,
                                              columnDefs = list(list(width = '10%', targets = "_all"))
-                              ), colnames = c("Chla freq", "Nitrate freq", "RMSE"),
+                              ), colnames = c("Chl-a freq", "RMSE"),
                               server = FALSE, escape = FALSE)
   
   #** Save RMSE & Frequencies in a table ----
-  observeEvent(input$save_rmse, {
+  observeEvent(input$save_rmse2, {
     
     req(!is.na(da_freq$rmse))
     
-    freq_chla <- ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 0) 
-    freq_din <- ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 0) 
+    freq_chla <- input$da_freq_chla #ifelse("Chlorophyll-a" %in% input$da_freq_da, input$da_freq_chla, 0) 
+    freq_din <- 0 #ifelse("Nitrate" %in% input$da_freq_da, input$da_freq_nitrate, 0) 
     
     idx <- input$da_freq_rmse_rows_selected
     if(is.null(idx)) {
       idx <- which(is.na(da_freq_rmse$dt[, 1]))[1]
     }
     da_freq_rmse$dt$chla[idx] <- freq_chla
-    da_freq_rmse$dt$nitrate[idx] <- freq_din
+    #da_freq_rmse$dt$nitrate[idx] <- freq_din
     da_freq_rmse$dt$rmse[idx] <- da_freq$rmse
   })
   
@@ -1717,9 +2013,9 @@ shinyServer(function(input, output, session) {
   #** Disable Save button when no RMSE available ----
   observe({
     if(is.na(da_freq$rmse)) {
-      shinyjs::disable("save_rmse")
+      shinyjs::disable("save_rmse2")
     } else {
-      shinyjs::enable("save_rmse")
+      shinyjs::enable("save_rmse2")
       
     }
   })
@@ -2393,7 +2689,7 @@ shinyServer(function(input, output, session) {
   
   observe({
     toggleState(id = "prevBtn1", condition = rv1$prev > 0)
-    if(rv1$nxt > 7 & rv4a$nxt > 13) {
+    if(rv1$nxt > 7 & rv4a$nxt > 12) {
       shinyjs::disable("nextBtn1")
     } else {
       shinyjs::enable("nextBtn1")
@@ -2427,7 +2723,7 @@ shinyServer(function(input, output, session) {
       idx2 <- which(tab_names$tab_id == curr_obj)
       new_nam <- tab_names$name[idx2 + 1]
     }
-    if(curr_tab1 == "mtab7" & rv4a$nxt > 13) {
+    if(curr_tab1 == "mtab7" & rv4a$nxt > 12) {
       updateActionButton(session, inputId = "nextBtn1", label = paste("Next >"))
     } else {
       updateActionButton(session, inputId = "nextBtn1", label = paste(new_nam, ">"))
@@ -2443,7 +2739,7 @@ shinyServer(function(input, output, session) {
     if (curr_tab1 == "mtab4") {
       curr_obj <- input$tabseries1
       idx2 <- which(tab_names$tab_id == curr_obj)
-      if(curr_obj == "stab1") idx2 <- idx2 - 1 # Move off Activity A label
+      if(curr_obj == "stab1") idx2 <- idx2 - 1 # Move off Site selection label
       new_nam <- tab_names$name[idx2 - 1]
     }
     if (curr_tab1 == "mtab5") {
@@ -2455,13 +2751,13 @@ shinyServer(function(input, output, session) {
     if (curr_tab1 == "mtab6") {
       curr_obj <- input$tabseries3
       idx2 <- which(tab_names$tab_id == curr_obj)
-      if(curr_obj == "stab7") idx2 <- idx2 - 1 # Move off Activity C label
+      if(curr_obj == "stab7") idx2 <- idx2 - 1 # Move off Activity B label
       new_nam <- tab_names$name[idx2 - 1]
     }
     if(curr_tab1 == "mtab7") {
       curr_obj <- input$tabseries4
       idx2 <- which(tab_names$tab_id == curr_obj)
-      if(curr_obj == "stab12") idx2 <- idx2 - 1 # Move off Activity C label
+      if(curr_obj == "stab11") idx2 <- idx2 - 1 # Move off Activity C label
       new_nam <- tab_names$name[idx2 - 1]
     }
     if(curr_tab1 == "mtab1") {
@@ -2495,7 +2791,7 @@ shinyServer(function(input, output, session) {
         updateTabsetPanel(session, "tabseries2",
                           selected = paste0("stab", rv2a$nxt))
         
-      } else if (curr_tab1 == "mtab6" & rv3a$nxt < 12) {
+      } else if (curr_tab1 == "mtab6" & rv3a$nxt < 11) {
         curr_obj <- input$tabseries3
         updateTabsetPanel(session, "tabseries3",
                           selected = paste0("stab", rv3a$nxt))
@@ -2511,7 +2807,7 @@ shinyServer(function(input, output, session) {
         updateTabsetPanel(session, "tabseries3",
                           selected = "stab7")
         updateTabsetPanel(session, "tabseries4",
-                          selected = "stab12")
+                          selected = "stab11")
         updateTabsetPanel(session, "maintab",
                           selected = paste0("mtab", rv1$nxt))
       }
@@ -2539,7 +2835,7 @@ shinyServer(function(input, output, session) {
       curr_obj <- input$tabseries3
       updateTabsetPanel(session, "tabseries3",
                         selected = paste0("stab", rv3a$prev))
-    } else if (curr_tab1 == "mtab7" & rv4a$prev > 11) {
+    } else if (curr_tab1 == "mtab7" & rv4a$prev > 10) {
       curr_obj <- input$tabseries4
       updateTabsetPanel(session, "tabseries4",
                         selected = paste0("stab", rv4a$prev))
@@ -2549,7 +2845,7 @@ shinyServer(function(input, output, session) {
       updateTabsetPanel(session, "tabseries2",
                         selected = "stab6")
       updateTabsetPanel(session, "tabseries3",
-                        selected = "stab11")
+                        selected = "stab10")
       updateTabsetPanel(session, "maintab",
                         selected = paste0("mtab", rv1$prev))
     }
@@ -2565,51 +2861,133 @@ shinyServer(function(input, output, session) {
   })
   
   #** Answers checklist ----
+  
   ans_list <- reactiveValues()
   observe({
-    for(i in 1:nrow(answers)) {
-      if(length(input[[qid[i]]]) != 0) {
-        answers[qid[i], 1] <<- input[[qid[i]]]
-      }
-    }
-    
     ans_list <<- list(
       name = input$name,
       id_number = input$id_number,
-      answers = answers,
-      site_row = input$table01_rows_selected
+      a1 = input$q1,
+      a2 = input$q2,
+      a3a = input$q3a,
+      a3b = input$q3b,
+      a3c = input$q3c,
+      a3d = input$q3d,
+      a3e = input$q3e,
+      a3f = input$q3f,
+      a4 = q4_ans$dt,
+      a5 = input$q5,
+      a6a = input$q6a,
+      a6b = input$q6b,
+      a6c = input$q6c,
+      a6d = input$q6d,
+      a7a = input$q7a,
+      a7b = input$q7b,
+      a7c = input$q7c,
+      a8_states = input$rank_list_2,
+      a8_pars = input$rank_list_3,
+      a9 = input$q9,
+      a9_tab = q9_ans$df,
+      a10 = input$q10,
+      a11 = input$q11,
+      a12 = input$q12,
+      a13 = input$q13,
+      a14 = input$q14,
+      a15 = input$q15,
+      a16 = input$q16,
+      a17 = input$q17,
+      a18 = input$q18,
+      a19 = input$q19,
+      a20 = input$q20,
+      a21 = input$q21,
+      a22 = input$q22,
+      a23 = input$q23,
+      a24 = input$q24,
+      a25 = input$q25,
+      a26 = input$q26,
+      a27 = input$q27,
+      a28 = input$q28,
+      a29 = input$q29,
+      a30 = input$q30,
+      a31 = input$q31,
+      a32 = input$q32,
+      a33 = input$q33,
+      a34 = input$q34,
+      a35 = input$q35,
+      a36 = input$q36,
+      a37 = input$q37
+      # param_df = par_save$value,
+      # site_row = input$table01_rows_selected,
+      # mod_input = input$mod_sens,
+      # wt_m = lmfit2$m,
+      # wt_b = lmfit2$b,
+      # wt_r2 = lmfit2$r2,
+      # upar_m = lmfit3$m,
+      # upar_b = lmfit3$b,
+      # upar_r2 = lmfit3$r2
     )
   })
+  
+  # ans_list <- reactiveValues()
+  # observe({
+  #   for(i in 1:nrow(answers)) {
+  #     if(length(input[[qid[i]]]) != 0) {
+  #       answers[qid[i], 1] <<- input[[qid[i]]]
+  #     }
+  #   }
+  #   
+  #   ans_list <<- list(
+  #     name = input$name,
+  #     id_number = input$id_number,
+  #     answers = answers,
+  #     site_row = input$table01_rows_selected
+  #   )
+  # })
   
   # Checklist for user inputs
   chk_list <- reactive({
     out_chk <- c(
-      if(input$name == "") "Introduction: Name",
-      if(input$id_number == "") "Introduction: ID number"
+      if(input$name == "") {"Introduction: Name"},
+      if(input$id_number == "") "Introduction: ID number",
+      if(input$q1 == "") "Introduction: Q. 1",
+      if(input$q2 == "") "Introduction: Q. 2",
+      if(input$q3a == "" | input$q3b == "" | input$q3c == "" |input$q3d == "" |input$q3e == "" |input$q3f == "") "Site Selection: Objective 1 - Q.3",
+      if(any(is.na(q4_ans$dt[, 1]))) "Site Selection: Objective 2 - Q.4",
+      if(input$q5 == "") "Site Selection: Objective 2 - Q.5",
+      if(input$q6a == "" | input$q6b == "" | input$q6c == "" | input$q6d == "") "Site Selection: Objective 3 - Q.6",
+      if(is.null(input$q7a) | is.null(input$q7b) | is.null(input$q7c)) "Activity A: Objective 4 - Q.7",
+      if(length(input$rank_list_2) == 0 | length(input$rank_list_3) == 0) "Activity A: Objective 4 - Q.8",
+      if(input$q9 == "") "Activity A: Objective 4 - Q.9",
+      if(input$q10 == "") "Activity A: Objective 6 - Q.10",
+      if(input$q11 == "") "Activity A: Objective 6 - Q.11",
+      if(input$q12 == "") "Activity A: Objective 6 - Q.12",
+      if(input$q13 == "") "Activity A: Objective 6 - Q.13",
+      if(is.null(input$q14)) "Activity B: Objective 7 - Q.14",
+      if(input$q15 == "") "Activity B: Objective 7 - Q.15",
+      if(input$q16 == "") "Activity B: Objective 7 - Q.16",
+      if(input$q17 == "") "Activity B: Objective 7 - Q.17",
+      if(input$q18 == "") "Activity B: Objective 7 - Q.18",
+      if(is.null(input$q19)) "Activity B: Objective 7 - Q.19",
+      if(input$q20 == "") "Activity B: Objective 8 - Q.20",
+      if(input$q21 == "") "Activity B: Objective 8 - Q.21",
+      if(input$q22 == "") "Activity B: Objective 8 - Q.22",
+      if(input$q23 == "") "Activity B: Objective 9 - Q.23",
+      if(input$q24 == "") "Activity B: Objective 9 - Q.24",
+      if(input$q25 == "") "Activity B: Objective 9 - Q.25",
+      if(input$q26 == "") "Activity B: Objective 9 - Q.26",
+      if(input$q27 == "") "Activity B: Objective 9 - Q.27",
+      if(input$q28 == "") "Activity B: Summary - Q.28",
+      if(input$q29 == "") "Activity B: Summary - Q.29",
+      if(input$q30 == "") "Activity C: Objective 10 - Q.30",
+      if(input$q31 == "") "Activity C: Objective 10 - Q.31",
+      if(input$q32 == "") "Activity C: Objective 10 - Q.32",
+      if(input$q33 == "") "Activity C: Objective 10 - Q.33",
+      if(input$q34 == "") "Activity C: Objective 10 - Q.34",
+      if(input$q35 == "") "Activity C: Objective 10 - Q.35",
+      if(input$q36 == "") "Activity C: Objective 10 - Q.36",
+      if(input$q37 == "") "Activity C: Objective 10 - Q.37"
     )
     
-    for(i in 1:nrow(answers)) {
-      
-      
-      
-      if(qid[i] == "q10") {
-        if(is.null(input[[qid[i]]])) out_chk <- c(out_chk, answers[qid[i], 2])
-      } else if(qid[i] == "q8") {
-        if(is.null(input[[qid[i]]])) out_chk <- c(out_chk, answers[qid[i], 2])
-      } else if(qid[i] == "q6") {
-        if(is.null(input[[qid[i]]])) out_chk <- c(out_chk, answers[qid[i], 2])
-      } else if(grepl("q3", qid[i])) {
-        if(!("Site Selection: Objective 1 - Q.3" %in% out_chk)) {
-          if(is.na(answers["q3", 1])) out_chk <- c(out_chk, answers[qid[i], 2])
-        }
-      } else {
-        if(is.null(input[[qid[i]]])) {
-          out_chk <- c(out_chk, answers[qid[i], 2])
-        } else if(input[[qid[i]]] == "") {
-          out_chk <- c(out_chk, answers[qid[i], 2])
-        }
-      }
-    }
     
     if(length(out_chk) == 0) {
       out_chk <- "Finished! All answers have been input into the app."
@@ -2655,14 +3033,64 @@ shinyServer(function(input, output, session) {
     up_answers <<- readRDS(input$upload_answers$datapath)
     updateTextAreaInput(session, "name", value = up_answers$name)
     updateTextAreaInput(session, "id_number", value = up_answers$id_number)
+    updateTextAreaInput(session, "q1", value = up_answers$a1)
+    updateTextAreaInput(session, "q2", value = up_answers$a2)
+    updateTextAreaInput(session, "q3a", value = up_answers$a3a)
+    updateTextAreaInput(session, "q3b", value = up_answers$a3b)
+    updateTextAreaInput(session, "q3c", value = up_answers$a3c)
+    updateTextAreaInput(session, "q3d", value = up_answers$a3d)
+    updateTextAreaInput(session, "q3e", value = up_answers$a3e)
+    updateTextAreaInput(session, "q3f", value = up_answers$a3f)
+    updateTextAreaInput(session, "q5", value = up_answers$a5)
+    updateTextAreaInput(session, "q6a", value = up_answers$a6a)
+    updateTextAreaInput(session, "q6b", value = up_answers$a6b)
+    updateTextAreaInput(session, "q6c", value = up_answers$a6c)
+    updateTextAreaInput(session, "q6d", value = up_answers$a6d)
+    updateRadioButtons(session, "q7a", selected = up_answers$a7a)
+    updateRadioButtons(session, "q7b", selected = up_answers$a7b)
+    updateRadioButtons(session, "q7c", selected = up_answers$a7c)
+    #updateTextAreaInput(session, "q8", value = up_answers$a8) #need to figure out how to do rank list
+    updateTextAreaInput(session, "q9", value = up_answers$a9)
+    updateTextAreaInput(session, "q10", value = up_answers$a10)
+    updateTextAreaInput(session, "q11", value = up_answers$a11)
+    updateTextAreaInput(session, "q12", value = up_answers$a12)
+    updateTextAreaInput(session, "q13", value = up_answers$a13)
+    updateRadioButtons(session, "q14", selected = up_answers$a14)
+    updateTextAreaInput(session, "q15", value = up_answers$a15)
+    updateTextAreaInput(session, "q16", value = up_answers$a16)
+    updateTextAreaInput(session, "q17", value = up_answers$a17)
+    updateTextAreaInput(session, "q18", value = up_answers$a18)
+    updateRadioButtons(session, "q19", selected = up_answers$a19)
+    updateTextAreaInput(session, "q20", value = up_answers$a20)
+    updateTextAreaInput(session, "q21", value = up_answers$a21)
+    updateTextAreaInput(session, "q22", value = up_answers$a22)
+    updateTextAreaInput(session, "q23", value = up_answers$a23)
+    updateTextAreaInput(session, "q24", value = up_answers$a24)
+    updateTextAreaInput(session, "q25", value = up_answers$a25)
+    updateTextAreaInput(session, "q26", value = up_answers$a26)
+    updateTextAreaInput(session, "q27", value = up_answers$a27)
+    updateTextAreaInput(session, "q28", value = up_answers$a28)
+    updateTextAreaInput(session, "q29", value = up_answers$a29)
+    updateTextAreaInput(session, "q30", value = up_answers$a30)
+    updateTextAreaInput(session, "q31", value = up_answers$a31)
+    updateTextAreaInput(session, "q32", value = up_answers$a32)
+    updateTextAreaInput(session, "q33", value = up_answers$a33)
+    updateTextAreaInput(session, "q34", value = up_answers$a34)
+    updateTextAreaInput(session, "q35", value = up_answers$a35)
+    updateTextAreaInput(session, "q36", value = up_answers$a36)
+    updateTextAreaInput(session, "q37", value = up_answers$a37)
     
-    for(i in 1:nrow(up_answers$answers)) {
-      if(qid[i] == "q7") {
-        updateRadioButtons(session, qid[i], selected = up_answers$answers[qid[i], 1])
-      } else if(!(qid[i] %in% c("q3", "q7"))) {
-        updateTextAreaInput(session, qid[i], value = up_answers$answers[qid[i], 1])
-      }
-    }
+    # Update reactive values
+    q4_ans$dt <- up_answers$a4
+    q9_ans$df <- up_answers$a9_tab
+    
+    # for(i in 1:nrow(up_answers$answers)) {
+    #   if(qid[i] == "q7") {
+    #     updateRadioButtons(session, qid[i], selected = up_answers$answers[qid[i], 1])
+    #   } else if(!(qid[i] %in% c("q3", "q7"))) {
+    #     updateTextAreaInput(session, qid[i], value = up_answers$answers[qid[i], 1])
+    #   }
+    # }
     
     showModal(
       modalDialog(
@@ -2685,6 +3113,17 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  # Repopulate data collection frequency table
+  observe({
+    req(input$maintab == "mtab4" & exists("up_answers") & input$tabseries1 == "stab2")
+    updateNumericInput(session, "q4_at_freq", value = up_answers$a4_at_freq)
+    updateNumericInput(session, "q4_wt_freq", value = up_answers$a4_wt_freq)
+    updateNumericInput(session, "q4_swr_freq", value = up_answers$a4_swr_freq)
+    updateNumericInput(session, "q4_par_freq", value = up_answers$a4_par_freq)
+    updateNumericInput(session, "q4_n_freq", value = up_answers$a4_n_freq)
+    updateNumericInput(session, "q4_chl_freq", value = up_answers$a4_chl_freq)
+  })
+  
   #** Render Report ----
   report <- reactiveValues(filepath = NULL) #This creates a short-term storage location for a filepath
   report2 <- reactiveValues(filepath = NULL) #This creates a short-term storage location for a filepath
@@ -2702,8 +3141,80 @@ shinyServer(function(input, output, session) {
     # Set up parameters to pass to Rmd document
     params <- list(name = input$name,
                    id_number = input$id_number,
-                   answers = answers,
-                   pheno_file = pheno_file$img
+                   a1 = input$q1,
+                   a2 = input$q2,
+                   a3a = input$q3a,
+                   a3b = input$q3b,
+                   a3c = input$q3c,
+                   a3d = input$q3d,
+                   a3e = input$q3e,
+                   a3f = input$q3f,
+                   a4_at_freq = q4_ans$dt[1,1],
+                   a4_wt_freq = q4_ans$dt[2,1],
+                   a4_swr_freq = q4_ans$dt[3,1],
+                   a4_par_freq = q4_ans$dt[4,1],
+                   a4_n_freq = q4_ans$dt[5,1],
+                   a4_chl_freq = q4_ans$dt[6,1],
+                   a5 = input$q5,
+                   a6a = input$q6a,
+                   a6b = input$q6b,
+                   a6c = input$q6c,
+                   a6d = input$q6d,
+                   a7a = input$q7a,
+                   a7b = input$q7b,
+                   a7c = input$q7c,
+                   a8_states = input$rank_list_2,
+                   a8_pars = input$rank_list_3,
+                   a9 = input$q9,
+                   a10 = input$q10,
+                   a11 = input$q11,
+                   a12 = input$q12,
+                   a13 = input$q13,
+                   a14 = input$q14,
+                   a15 = input$q15,
+                   a16 = input$q16,
+                   a17 = input$q17,
+                   a18 = input$q18,
+                   a19 = input$q19,
+                   a20 = input$q20,
+                   a21 = input$q21,
+                   a22 = input$q22,
+                   a23 = input$q23,
+                   a24 = input$q24,
+                   a25 = input$q25,
+                   a26 = input$q26,
+                   a27 = input$q27,
+                   a28 = input$q28,
+                   a29 = input$q29,
+                   a30 = input$q30,
+                   a31 = input$q31,
+                   a32 = input$q32,
+                   a33 = input$q33,
+                   a34 = input$q34,
+                   a35 = input$q35,
+                   a36 = input$q36,
+                   a37 = input$q37,
+                   da_method_plot = "www/compare_da.png",
+                   no_da_rmse = da_method$dt$RMSE[1],
+                   chla_assim_rmse = da_method$dt$RMSE[2],
+                   obs_uc_rmse = obs_uc_rmse$dt,
+                   da_freq_rmse = da_freq_rmse$dt
+                   # save_pars = par_file,
+                   # pheno_file = pheno_file$img,
+                   # site_html = "data/site.html",
+                   # mod_2019_png = "www/mod_run_2019.png",
+                   # noaa_plot = "www/noaa_fc.png",
+                   # comm_plot = "www/comm_fc_plot.png",
+                   # assess_plot = "www/assess_fc.png",
+                   # update_plot = "www/fc_update.png",
+                   # next_fc_plot = "www/new_fc.png",
+                   # wt_m = lmfit2$m,
+                   # wt_b = lmfit2$b,
+                   # wt_r2 = lmfit2$r2,
+                   # upar_m = lmfit3$m,
+                   # upar_b = lmfit3$b,
+                   # upar_r2 = lmfit3$r2,
+                   # mod_summ = summ_file
     )
     print(params)
     
@@ -2717,6 +3228,108 @@ shinyServer(function(input, output, session) {
                       envir = new.env(parent = globalenv()))
     progress$set(value = 1)
     report$filepath <- tmp_file #Assigning in the temp file where the .docx is located to the reactive file created above
+  })
+  
+  observeEvent(input$generate2, {
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = "Gathering data and building report.",
+                 detail = "This may take a while. This window will disappear
+                     when the report is ready.", value = 0)
+    
+    
+    # Set up parameters to pass to Rmd document
+    params <- list(name = input$name,
+                   id_number = input$id_number,
+                   a1 = input$q1,
+                   a2 = input$q2,
+                   a3a = input$q3a,
+                   a3b = input$q3b,
+                   a3c = input$q3c,
+                   a3d = input$q3d,
+                   a3e = input$q3e,
+                   a3f = input$q3f,
+                   a4_at_freq = q4_ans$dt[1,1],
+                   a4_wt_freq = q4_ans$dt[2,1],
+                   a4_swr_freq = q4_ans$dt[3,1],
+                   a4_par_freq = q4_ans$dt[4,1],
+                   a4_n_freq = q4_ans$dt[5,1],
+                   a4_chl_freq = q4_ans$dt[6,1],
+                   a5 = input$q5,
+                   a6a = input$q6a,
+                   a6b = input$q6b,
+                   a6c = input$q6c,
+                   a6d = input$q6d,
+                   a7a = input$q7a,
+                   a7b = input$q7b,
+                   a7c = input$q7c,
+                   a8_states = input$rank_list_2,
+                   a8_pars = input$rank_list_3,
+                   a9 = input$q9,
+                   a10 = input$q10,
+                   a11 = input$q11,
+                   a12 = input$q12,
+                   a13 = input$q13,
+                   a14 = input$q14,
+                   a15 = input$q15,
+                   a16 = input$q16,
+                   a17 = input$q17,
+                   a18 = input$q18,
+                   a19 = input$q19,
+                   a20 = input$q20,
+                   a21 = input$q21,
+                   a22 = input$q22,
+                   a23 = input$q23,
+                   a24 = input$q24,
+                   a25 = input$q25,
+                   a26 = input$q26,
+                   a27 = input$q27,
+                   a28 = input$q28,
+                   a29 = input$q29,
+                   a30 = input$q30,
+                   a31 = input$q31,
+                   a32 = input$q32,
+                   a33 = input$q33,
+                   a34 = input$q34,
+                   a35 = input$q35,
+                   a36 = input$q36,
+                   a37 = input$q37,
+                   da_method_plot = "www/compare_da.png",
+                   no_da_rmse = da_method$dt$RMSE[1],
+                   chla_assim_rmse = da_method$dt$RMSE[2],
+                   obs_uc_rmse = obs_uc_rmse$dt,
+                   da_freq_rmse = da_freq_rmse$dt
+                   # save_pars = par_file,
+                   # pheno_file = pheno_file$img,
+                   # site_html = "data/site.html",
+                   # mod_2019_png = "www/mod_run_2019.png",
+                   # noaa_plot = "www/noaa_fc.png",
+                   # comm_plot = "www/comm_fc_plot.png",
+                   # assess_plot = "www/assess_fc.png",
+                   # update_plot = "www/fc_update.png",
+                   # next_fc_plot = "www/new_fc.png",
+                   # wt_m = lmfit2$m,
+                   # wt_b = lmfit2$b,
+                   # wt_r2 = lmfit2$r2,
+                   # upar_m = lmfit3$m,
+                   # upar_b = lmfit3$b,
+                   # upar_r2 = lmfit3$r2,
+                   # mod_summ = summ_file
+    )
+    print(params)
+    
+    
+    tmp_file <- paste0(tempfile(), ".docx") #Creating the temp where the .pdf is going to be stored
+    
+    rmarkdown::render("report.Rmd",
+                      output_format = "all",
+                      output_file = tmp_file,
+                      params = params,
+                      envir = new.env(parent = globalenv()))
+    progress$set(value = 1)
+    report2$filepath <- tmp_file #Assigning in the temp file where the .docx is located to the reactive file created above
   })
   
   # Hide download button until report is generated
@@ -2756,7 +3369,7 @@ shinyServer(function(input, output, session) {
     # This function returns a string which tells the client
     # browser what name to use when saving the file.
     filename = function() {
-      paste0("report_", input$id_number, ".docx") %>%
+      paste0("module7_report_", input$id_number, ".docx") %>%
         gsub(" ", "_", .)
     },
     

@@ -6,8 +6,65 @@ output:
 params:
   name: ""
   id_number: ""
-  answers: ""
+  a1: ""
+  a2: ""
+  a3a: ""
+  a3b: ""
+  a3c: ""
+  a3d: ""
+  a3e: ""
+  a3f: ""
+  a4_at_freq: ""
+  a4_wt_freq: ""
+  a4_swr_freq: ""
+  a4_par_freq: ""
+  a4_n_freq: ""
+  a4_chl_freq: ""
+  a5: ""
+  a6a: ""
+  a6b: ""
+  a6c: ""
+  a6d: ""
+  a7a: ""
+  a7b: ""
+  a7c: ""
+  a8_states: ""
+  a8_pars: ""
+  a9: ""
+  a10: ""
+  a11: ""
+  a12: ""
+  a13: ""
+  a14: ""
+  a15: ""
+  a16: ""
+  a17: ""
+  a18: ""
+  a19: ""
+  a20: ""
+  a21: ""
+  a22: ""
+  a23: ""
+  a24: ""
+  a25: ""
+  a26: ""
+  a27: ""
+  a28: ""
+  a29: ""
+  a30: ""
+  a31: ""
+  a32: ""
+  a33: ""
+  a34: ""
+  a35: ""
+  a36: ""
+  a37: ""
   pheno_file: NULL
+  da_method_plot: ""
+  no_da_rmse: ""
+  chla_assim_rmse: ""
+  obs_uc_rmse: ""
+  da_freq_rmse: ""
 ---
 
 ```{r setup, include=FALSE}
@@ -26,8 +83,8 @@ quest <- read.csv("data/student_questions.csv", row.names = 1)
 # Number rows
 ab1 <- 4:9
 ab2 <- 13:16
-ab3 <- 19:21
-ab4 <- 24:25
+ab3 <- 18:20
+ab4 <- 23:24
 
 l1 <- length(ab1)
 l2 <- length(ab2)
@@ -54,55 +111,22 @@ qid <- row.names(quest)
 # # quest$location[idx:(idx2)] <- paste0(quest$location[idx:idx2],letters[1:length(idx:idx2)], ". ", )
 # quest$location[(idx2+1):nrow(quest)] <- paste0(quest$location[(idx2+1):nrow(quest)], " - Q.", ((idx2+1):nrow(quest) - 6))
 
-answers <- params$answers
-answers[is.na(answers[, 1]), 1] <- ""
+# answers <- params$answers
+# answers[is.na(answers[, 1]), 1] <- ""
 
-if(length(params$plot_list) == 1) {
-  plot_list <- list(airt_wtemp_ts = NA,
-                      lr_mod_ts = NA,
-                      param_dist_lr = NA,
-                      pers_mod = NA,
-                      mlr_mod_ts = NA,
-                      deter_fc = NA,
-                      proc_uc_fc = NA,
-                      param_dist_fc = NA,
-                      param_uc_fc = NA,
-                      ic_ts_dist = NA,
-                      ic_uc_fc = NA,
-                      airt_fc = NA,
-                      driver_uc_fc = NA,
-                      all_fc = NA,
-                      tot_uc_fc1 = NA,
-                      quant_uc_fc1 = NA,
-                      tot_uc_fc2 = NA,
-                      quant_uc_fc2 = NA,
-                      dec1 = NA,
-                      dec2 = NA)
-} else {
-  plot_list <- params$plot_list
-}
-
-# plot_list[[1]] <- "www/out_plots/airt_wtemp_ts.png"
-
-plt_chk <- lapply(plot_list, function(x) {
-  if(is.na(x)) {
-    return(FALSE)
-  } else {
-    file.exists(x)
-  }
-})
-incr <- 1
+compare_da_plot_chk <- file.exists(params$da_method_plot)
 
 # Read in tables
 # tab_lr <- read.csv("data/out_tables/tab_lr.csv")
 # tab_lr[is.na(tab_lr)] <- ""
 
-if(length(answers) == 1) {
-  answers <- quest
-  quest$location <- NULL
-  colnames(answers)[1] <- "Answer"
-  answers[, 1] <- ""
-}
+# if(length(answers) == 1) {
+#   answers <- quest
+#   quest$location <- NULL
+#   colnames(answers)[1] <- "Answer"
+#   answers[, 1] <- ""
+# }
+
 
 # Load in text
 module_text <- read.csv("data/module_text.csv", row.names = 1, header = FALSE)
@@ -149,21 +173,21 @@ knitr::include_graphics("www/mod7_conceptual_figure.png")
 
 **Forecasting** is a tool that can be used for understanding and predicting macrosystems dynamics. To anticipate and prepare for increased variability in populations, communities, and ecosystems, there is a pressing need to know the future state of ecological systems across space and time (Dietze et al. 2018). Ecological forecasting is an emerging approach which provides an estimate of the future state of an ecological system with uncertainty, allowing society to prepare for changes in important ecosystem services. Ecological forecasts are a powerful test of the scientific method because ecologists make a hypothesis of how an ecological system works; embed their hypothesis in a model; use the model to make a forecast of future conditions; and then when observations become available, assess the accuracy of their forecast, which indicates if their hypothesis is supported or needs to be updated. Forecasts that are effectively communicated to the public and managers will be most useful for aiding decision-making. Consequently, macrosystems ecologists are increasingly using ecological forecasts to predict how ecosystems are changing over space and time (Dietze and Lynch 2019).  
 \
-In this module, students will generate an ecological forecast for a NEON site and quantify the different sources of uncertainty within their forecast. This module will introduce students to the conceptof uncertainty within an ecological forecast; where uncertainty in a forecast comes from; how uncertainty can be quantified within a forecast; and how uncertainty can be managed.  \
+In this module, students will generate an ecological forecast for a NEON site and explore how to use ecological data to improve forecast accuracy. This module will introduce students to the concept of data assimilation within an ecological forecast; how data assimilation can be used to improve forecast accuracy; how the level of uncertainty and temporal frequency of observations affects forecast output; and how data assimilation can affect decision-making using ecological forecasts.  \
 
 ## `r tab_names["mtab1", 2]`:
 
 - Introduction to Ecological Forecasting: pre-readings and PowerPoint in class
-- Activity A: Build different models to simulate water temperature for their chosen NEON site.
-- Activity B: Generate multiple forecasts of water temperature with different sources of uncertainty and examine how uncertainty propagation differs.
-- Activity C: Quantify and partition the uncertainty for their forecasts with different models and make management decisions using an ecological forecast.
+- Activity A: Students build a model to simulate primary productivity for their chosen NEON site and generate a forecast.
+- Activity B: Students generate multiple forecasts while assimilating data at different temporal frequencies and with different amounts of observation uncertainty.
+- Activity C: Students then explore the effect of assimilating sensor data with different levels of observation uncertainty on forecast accuracy and make management decisions using an ecological forecast.
 \
 
-## Today's focal question: _Where does forecast uncertainty come from and how can it be quantified and reduced?_
+## Today's focal question: _How can we use data to improve ecological forecasts?_
 
-To address this question, we will introduce ecological forecasts and the iterative forecasting cycle. We will build a model that forecasts water temperature with uncertainty. We will then explore the different sources of uncertainty associated with our forecast predictions. In this module, we will use our model to examine where forecast uncertainty comes from and how it propagates through time due to driver data, model parameters, and initial conditions. We will then quantify the sources of uncertainty in forecasts and compare between models and then make a management decision using information from a forecast.
+We will address this question by building an ecological model to predict chlorophyll-a (a metric of algal biomass and primary productivity), generating ecological forecasts, and using data science approaches to integrate the most recently collected data into a forecast, a process known as data assimilation. Assimilating the most recent observations into a forecast model allows the forecaster to update the initial conditions, or the starting conditions, of the model, with the goal of improving forecast accuracy. For example, if our task is to generate a forecast of chlorophyll-a concentrations in a lake for tomorrow, it is likely that our forecast will be more accurate if we use today’s measurement of chlorophyll-a as the initial condition for our model, rather than last week’s measurement.
 
-We will be using ecological data collected by the National Ecological Observation Network (NEON) to tackle this question. NEON is a continental-scale observatory designed to collect publicly-available, long-term ecological data to monitor changing ecosystems across the U.S. Water temperature exerts a major influence on biological activity and growth, has an effect on water chemistry, can influence water quantity measurements, and governs the kinds of organisms that live in water bodies.
+We will explore how assimilating different types of data (e.g., chlorophyll-a, nutrient concentrations, water temperature) at different temporal frequencies (e.g., daily, weekly) affects forecast output. Finally, we will assimilate different types of data into forecasts and examine how data assimilation affects water resource management decisions.
 
 ## R Shiny App:
 
@@ -179,14 +203,16 @@ Webpages:
 
 Articles:
 
+- Silver, N. (2012) Chapter 6: How to drown in three feet of water.Pages 176-203 inThe Signal and the Noise: Why so many Predictions Fail – but some Don't. Penguin Books.
 - Dietze, M. and Lynch, H. 2019. Forecasting a bright future for ecology. _Frontiers in Ecology and the Environment_, _17_(1), 3. [https://doi.org/10.1002/fee.1994](https://doi.org/10.1002/fee.1994)
 - Dietze, M.C., et al. 2018. Iterative near-term ecological forecasting: Needs, opportunities, and challenges. Proceedings of the National Academy of Sciences, 115(7), 1424–1432. [https://doi.org/10.1073/pnas.1710231115](https://doi.org/10.1073/pnas.1710231115)
-- Jackson, L.J., Trebitz, A.S., &amp; Cottingham, K.L. 2000. An introduction to the practice of ecological modeling. BioScience, 50(8), 694. [https://doi.org/10.1641/0006-3568(2000)050[0694:aittpo]2.0.co;2](https://doi.org/10.1641/0006-3568(2000)050%5B0694:aittpo%5D2.0.co;2)
 
 Videos:
 
 - NEON&#39;s [Ecological Forecast: The Science of Predicting Ecosystems](https://www.youtube.com/watch?v=Lgi_e7N-C8E&amp;t=196s&amp;pbjreload=101)
 - Fundamentals of Ecological Forecasting Series: [Why Forecast?](https://www.youtube.com/watch?v=kq0DTcotpA0&amp;list=PLLWiknuNGd50Lc3rft4kFPc_oxAhiQ-6s&amp;index=1)
+- Fundamentals of Ecological Forecasting Series: [Forecast Analysis Cycle](https://www.youtube.com/watch?v=zBsqjmdLYfk&list=PLLWiknuNGd50Lc3rft4kFPc_oxAhiQ-6s&index=1)
+- Fundamentals of Ecological Forecasting Series: [Ensemble Kalman Filter](https://www.youtube.com/watch?v=UeFsEOGz_cc&list=PLLWiknuNGd50Lc3rft4kFPc_oxAhiQ-6s&index=1)
 
 The questions you must answer are embedded in the Shiny interface. You can answer the questions there and generate a report at the end or you can fill out the questions within this document.
 
@@ -196,11 +222,11 @@ Answer the following questions:
 
 1. `r quest[qid[1], 1]`  
 \
-**Answer:** `r answers[qid[1], 1]`\
+**Answer:** `r params$a1`\
 
 2. `r quest[qid[2], 1]`   
 \
-**Answer:** `r answers[qid[2], 1]`\
+**Answer:** `r params$a2`\
 
 
 Now navigate to the [Shiny interface](https://macrosystemseddie.shinyapps.io/module7) to answer the rest of the questions.
@@ -231,12 +257,12 @@ if (!pheno_chk) {cat("-->")}
 
 | | |
 | --- | --- |
-| `r quest[qid[4], 1]` | `r answers[qid[4], 1]` |
-| `r quest[qid[5], 1]` | `r answers[qid[5], 1]` |
-| `r quest[qid[6], 1]` | `r answers[qid[6], 1]` |
-| `r quest[qid[7], 1]` | `r answers[qid[7], 1]` |
-| `r quest[qid[8], 1]` | `r answers[qid[8], 1]` |
-| `r quest[qid[9], 1]` | `r answers[qid[9], 1]` |
+| `r quest[qid[4], 1]` | `r params$a3a` |
+| `r quest[qid[5], 1]` | `r params$a3b` |
+| `r quest[qid[6], 1]` | `r params$a3c` |
+| `r quest[qid[7], 1]` | `r params$a3d` |
+| `r quest[qid[8], 1]` | `r params$a3e` |
+| `r quest[qid[9], 1]` | `r params$a3f` |
 \
 
 ## `r tab_names["stab2", 2]`\
@@ -247,12 +273,23 @@ if (!pheno_chk) {cat("-->")}
 ***
 
 4. `r quest[qid[10], 1]`  
+
+*Table 2. Description of site variable collection frequency:*  
+
+| **Variable** | **Data collection frequency** | 
+| --- | --- |  
+| Air temperature | `r params$a4_at_freq` | 
+| Surface water temperature | `r params$a4_wt_freq` | 
+| Shortwave radiation | `r params$a4_swr_freq` | 
+| Underwater PAR | `r params$a4_par_freq` | 
+| Nitrogen | `r params$a4_n_freq` | 
+| Chlorophyll-a | `r params$a4_chl_freq` | 
+
 \
-**Answer:** `r answers[qid[10], 1]`\
 
 5. `r quest[qid[11], 1]`   
 \
-**Answer:** `r answers[qid[11], 1]`\
+**Answer:** `r params$a5`\
 
 ## `r tab_names["stab3", 2]`\
 
@@ -260,6 +297,29 @@ if (!pheno_chk) {cat("-->")}
 `r module_text["obj_03", ]`
 
 ***
+
+6. `r quest[qid[12], 1]`  
+\
+
+a. `r quest[qid[13], 1]`  
+\
+**Answer:** `r params$a6a`  
+\
+
+b. `r quest[qid[14], 1]`  
+\
+**Answer:** `r params$a6b`  
+\
+
+c. `r quest[qid[15], 1]`  
+\
+**Answer:** `r params$a6c`  
+\
+
+d. `r quest[qid[16], 1]`  
+\
+**Answer:** `r params$a6d`  
+\
 
 ```{r}
 
@@ -270,37 +330,6 @@ if (!pheno_chk) {cat("-->")}
 
 `r module_text["act_A", ]`
 
-
-
-6. `r quest[qid[12], 1]`  
-\
-
-a. `r quest[qid[13], 1]`  
-\
-**Answer:** `r answers[qid[13], 1]`  
-\
-
-b. `r quest[qid[14], 1]`  
-\
-**Answer:** `r answers[qid[14], 1]`  
-\
-
-c. `r quest[qid[15], 1]`  
-\
-**Answer:** `r answers[qid[15], 1]`  
-\
-
-d. `r quest[qid[16], 1]`  
-\
-**Answer:** `r answers[qid[16], 1]`  
-\
-
-7. `r quest[qid[17], 1]`  
-\
-**Answer:** `r answers[qid[17], 1]`  
-\
-
-
 ## `r tab_names["stab4", 2]`\
 
 ***
@@ -308,34 +337,48 @@ d. `r quest[qid[16], 1]`
 
 ***
 
-8. `r quest[qid[18], 1]`  
-a. `r quest[qid[19], 1]`  
+7. `r quest[qid[17], 1]`  
 \
-**Answer:** `r answers[qid[19], 1]`  
+a. `r quest[qid[18], 1]` 
 \
-b. `r quest[qid[20], 1]`  
+**Answer:** `r params$a7a`  
 \
-**Answer:** `r answers[qid[20], 1]`  
+b. `r quest[qid[19], 1]`  
 \
-c. `r quest[qid[21], 1]`  
+**Answer:** `r params$a7b`  
 \
-**Answer:** `r answers[qid[21], 1]`  
+c. `r quest[qid[20], 1]`  
+\
+**Answer:** `r params$a7c`  
+\
+
+8. `r quest[qid[21], 1]`  
+
+*Table 3. Sorted model states and parameters:*  
+
+| **State variables** | **Parameters** | 
+| --- | --- |  
+| `r params$a8_states` | `r params$a8_pars` | 
+
 \
 
 9. `r quest[qid[22], 1]`  
 \
-**Answer:** `r answers[qid[22], 1]`  
+**Answer:** `r params$a9`  
 \
 
-10. `r quest[qid[23], 1]`  
-a. `r quest[qid[24], 1]`  
+
+*Table 4. Relationships between primary productivity and environmental variables:*  
+
+| **Variable relationship** | **Q.6 Answers** | **Q.7 Answers** |   
+| --- | --- | --- |  
+| Primary productivity (chl-a) vs. water temperature | `r params$a6b` | `r params$a7a` |
+| Primary productivity (chl-a) vs. light (underwater PAR) | `r params$a6c` | `r params$a7b` |
+| Primary productivity (chl-a) vs. nutrients (nitrate sensor) | `r params$a6d` | `r params$a7c` |
+
+
 \
-**Answer:** `r answers[qid[24], 1]`  
-\
-b. `r quest[qid[25], 1]`  
-\
-**Answer:** `r answers[qid[25], 1]`  
-\
+
 
 ## `r tab_names["stab5", 2]`\
 
@@ -351,189 +394,218 @@ b. `r quest[qid[25], 1]`
 
 ***
 
+10. `r quest[qid[25], 1]`  
+\
+**Answer:** `r params$a10`  
+\
+
 11. `r quest[qid[26], 1]`  
 \
-**Answer:** `r answers[qid[26], 1]`  
+**Answer:** `r params$a11`  
 \
+
 12. `r quest[qid[27], 1]`  
 \
-**Answer:** `r answers[qid[27], 1]`  
+**Answer:** `r params$a12`  
 \
+
 13. `r quest[qid[28], 1]`  
 \
-**Answer:** `r answers[qid[28], 1]`  
-\
-14. `r quest[qid[29], 1]`  
-\
-**Answer:** `r answers[qid[29], 1]`  
+**Answer:** `r params$a13`  
 \
 
 
 # Activity B - Assimilate Data\
 
+***
+`r module_text["act_B", ]`
+
+***
 
 ## `r tab_names["stab7", 2]`\
-
-***
-`r module_text["act_B_overview", ]`
-***
-
-
-## `r tab_names["stab8", 2]`\
 
 ***
 `r module_text["obj_07", ]`
 
 ***
 
+14. `r quest[qid[29], 1]`  
+\
+**Answer:** `r params$a14`  
+\
+
 15. `r quest[qid[30], 1]`  
 \
-**Answer:** `r answers[qid[30], 1]`  
+**Answer:** `r params$a15`  
 \
+
 16. `r quest[qid[31], 1]`  
 \
-**Answer:** `r answers[qid[31], 1]`  
+**Answer:** `r params$a16`  
 \
 
 17. `r quest[qid[32], 1]`  
 \
-**Answer:** `r answers[qid[32], 1]`  
+**Answer:** `r params$a17`  
 \
 
 18. `r quest[qid[33], 1]`  
 \
-**Answer:** `r answers[qid[33], 1]`  
+**Answer:** `r params$a18`  
 \
 
+```{r results='asis', echo=FALSE}
+if (!compare_da_plot_chk) {cat("<!---")}
+```
+![](`r params$da_method_plot`)  
+*Figure 1: Comparison of forecast with and without data assimilation*   
+```{r results='asis', echo=FALSE}
+if (!compare_da_plot_chk) {cat("-->")}
+```
+\
+*Table 5. Effect of data assimilation on forecast accuracy.*  
+
+| **DA Method** | **Forecast RMSE** | 
+| --- | --- |  
+| No data assimilation | `r params$no_da_rmse` | 
+| Chlorophyll-a data assimilation | `r params$chla_assim_rmse` | 
+\
 19. `r quest[qid[34], 1]`  
 \
-**Answer:** `r answers[qid[34], 1]`  
+**Answer:** `r params$a19`  
 \
 
-20. `r quest[qid[35], 1]`  
-\
-**Answer:** `r answers[qid[35], 1]`  
-\
 
-21. `r quest[qid[36], 1]`  
-\
-**Answer:** `r answers[qid[36], 1]`  
-\
-
-22. `r quest[qid[37], 1]`  
-\
-**Answer:** `r answers[qid[37], 1]`  
-\
-
-23. `r quest[qid[38], 1]`  
-\
-**Answer:** `r answers[qid[38], 1]`  
-\
-
-24. `r quest[qid[39], 1]`  
-\
-**Answer:** `r answers[qid[39], 1]`  
-\
-
-## `r tab_names["stab9", 2]`\
+## `r tab_names["stab8", 2]`\
 
 ***
 `r module_text["obj_08", ]`
 
 ***
 
-25. `r quest[qid[40], 1]`  
+20. `r quest[qid[35], 1]`  
 \
-**Answer:** `r answers[qid[40], 1]`  
-\
-
-26. `r quest[qid[41], 1]`  
-\
-**Answer:** `r answers[qid[41], 1]`  
+**Answer:** `r params$a20`  
 \
 
-27. `r quest[qid[42], 1]`  
+21. `r quest[qid[36], 1]`  
 \
-**Answer:** `r answers[qid[42], 1]`  
+**Answer:** `r params$a21`  
+\
+*Table 6. Effect of observation uncertainty on forecast accuracy.*  
+
+| **Chl-a observation uncertainty** | **Forecast RMSE** | 
+| --- | --- |  
+| `r params$obs_uc_rmse[1,1]` | `r params$obs_uc_rmse[1,2]` | 
+| `r params$obs_uc_rmse[2,1]` | `r params$obs_uc_rmse[2,2]` | 
+| `r params$obs_uc_rmse[3,1]` | `r params$obs_uc_rmse[3,2]` | 
+| `r params$obs_uc_rmse[4,1]` | `r params$obs_uc_rmse[4,2]` | 
+| `r params$obs_uc_rmse[5,1]` | `r params$obs_uc_rmse[5,2]` | 
+\
+22. `r quest[qid[37], 1]`  
+\
+**Answer:** `r params$a22`  
 \
 
-## `r tab_names["stab10", 2]`\
+
+## `r tab_names["stab9", 2]`\
 
 ***
 `r module_text["obj_09", ]`
 
 ***
 
-28. `r quest[qid[43], 1]`  
+23. `r quest[qid[38], 1]`  
 \
-**Answer:** `r answers[qid[43], 1]`  
-\
-
-29. `r quest[qid[44], 1]`  
-\
-**Answer:** `r answers[qid[44], 1]`  
+**Answer:** `r params$a23`  
 \
 
-30. `r quest[qid[45], 1]`  
+24. `r quest[qid[39], 1]`  
 \
-**Answer:** `r answers[qid[45], 1]`  
+**Answer:** `r params$a24`  
+\
+*Table 7. Effect of data assimilation frequency on forecast accuracy.*  
+
+| **Chl-a observation uncertainty** | **Forecast RMSE** | 
+| --- | --- |  
+| `r params$da_freq_rmse[1,1]` | `r params$da_freq_rmse[1,2]` | 
+| `r params$da_freq_rmse[2,1]` | `r params$da_freq_rmse[2,2]` | 
+| `r params$da_freq_rmse[3,1]` | `r params$da_freq_rmse[3,2]` | 
+| `r params$da_freq_rmse[4,1]` | `r params$da_freq_rmse[4,2]` | 
+| `r params$da_freq_rmse[5,1]` | `r params$da_freq_rmse[5,2]` | 
+\
+25. `r quest[qid[40], 1]`  
+\
+**Answer:** `r params$a25`  
 \
 
-31. `r quest[qid[46], 1]`  
+26. `r quest[qid[41], 1]`  
 \
-**Answer:** `r answers[qid[46], 1]`  
-\
-
-32. `r quest[qid[47], 1]`  
-\
-**Answer:** `r answers[qid[47], 1]`  
+**Answer:** `r params$a26`  
 \
 
+27. `r quest[qid[42], 1]`  
+\
+**Answer:** `r params$a27`  
+\
 
-
-## `r tab_names["stab11", 2]`\
+## `r tab_names["stab10", 2]`\
 
 ***
 `r module_text["act_B_summ", ]`
 
 ***
 
+28. `r quest[qid[43], 1]`  
+\
+**Answer:** `r params$a28`  
+\
+
+29. `r quest[qid[44], 1]`  
+\
+**Answer:** `r params$a29`  
+\
+
+
 # Activity C: Management Scenario\
 
 `r module_text["act_C", ]`
 
-## `r tab_names["stab12", 2]`\
+## `r tab_names["stab11", 2]`\
 
 ***
 `r module_text["obj_10", ]`
 
 ***
+
+30. `r quest[qid[45], 1]`  
 \
-33. `r quest[qid[48], 1]`  
+**Answer:** `r params$a30`  
 \
-**Answer:** `r answers[qid[48], 1]`  
-\
+
+**Note:** Questions 31-33 are not included in the final report as the order of these questions and their answers will vary depending on which sensor you have selected to purchase.\
 
 34. `r quest[qid[49], 1]`  
 \
-**Answer:** `r answers[qid[49], 1]`  
+**Answer:** `r params$a34`  
 \
 
 35. `r quest[qid[50], 1]`  
 \
-**Answer:** `r answers[qid[50], 1]`  
+**Answer:** `r params$a35`  
 \
 
 36. `r quest[qid[51], 1]`  
 \
-**Answer:** `r answers[qid[51], 1]`  
+**Answer:** `r params$a36`  
 \
 
+37. `r quest[qid[52], 1]`  
+\
+**Answer:** `r params$a37`  
+\
 
-## Think, Pair, Share!\
-`r module_text["tps1", 1]`\
-
-
+## End of module - nice work!\
 
 `r module_text["acknowledgement", ]`
 `r app_update_txt`

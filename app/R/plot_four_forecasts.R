@@ -7,7 +7,7 @@
 #' @param obs_plot list of historical and future dataframes of observations
 #' @param add_obs Add future observations. Defaults to FALSE
 
-plot_four_forecasts <- function(no_da, chla, nitrate, both, var = "chla", obs_plot, add_obs = FALSE) {
+plot_four_forecasts <- function(no_da, chla, var = "chla", obs_plot, add_obs = FALSE) {
   
   if(var == "chla") {
     y_lab <- "Chlorophyll-a (μg/L)"
@@ -23,8 +23,8 @@ plot_four_forecasts <- function(no_da, chla, nitrate, both, var = "chla", obs_pl
     xlab("Date") +
     {if(!is.null(no_da[[var]]$dist)) geom_ribbon(data = no_da[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "No DA"), alpha = 0.2)} +
     {if(!is.null(chla[[var]]$dist)) geom_ribbon(data = chla[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Chl-a"), alpha = 0.2)} +
-    {if(!is.null(nitrate[[var]]$dist)) geom_ribbon(data = nitrate[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Nitrate"), alpha = 0.2)} +
-    {if(!is.null(both[[var]]$dist)) geom_ribbon(data = both[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Both"), alpha = 0.2)} +
+    #{if(!is.null(nitrate[[var]]$dist)) geom_ribbon(data = nitrate[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Nitrate"), alpha = 0.2)} +
+    #{if(!is.null(both[[var]]$dist)) geom_ribbon(data = both[[var]]$dist, aes(Date, ymin = p5, ymax = p95, fill = "Both"), alpha = 0.2)} +
     theme_bw(base_size = 12)
   p
   
@@ -42,11 +42,14 @@ plot_four_forecasts <- function(no_da, chla, nitrate, both, var = "chla", obs_pl
   }
 
   p <- p +
-    scale_color_manual(values = c("Chlorophyll-a" = cols[1], "Nitrate" = cols[7], "Max uptake" = cols[4],
-                                  "Member" = l.cols[8], "median" = "black", "95%" = p.cols[5], "75%" = p.cols[6], "Obs" = p.cols[4],
-                                  "Assimilated" = cols[4])) +
-    labs(fill = "DA method") +
-    da_method_fill_scale
+    scale_color_manual(values = c("Chlorophyll-a" = cols[1]),name = "") +
+    labs(fill = "DA method") 
+    #da_method_fill_scale
+  
+  img_file <- "www/compare_da.png"
+  
+  # Save as a png file
+  ggsave(filename = img_file, plot = p,  dpi = 300, width = 203, height = 112, units = "mm")
   
   gp <- ggplotly(p, dynamicTicks = TRUE)
   for (i in 1:length(gp$x$data)){
