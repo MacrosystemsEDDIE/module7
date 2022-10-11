@@ -42,11 +42,14 @@ plot_four_forecasts <- function(no_da, chla, var = "chla", obs_plot, add_obs = F
   }
 
   p <- p +
-    scale_color_manual(values = c("Chlorophyll-a" = cols[1], "Nitrate" = cols[7], "Max uptake" = cols[4],
-                                  "Member" = l.cols[8], "median" = "black", "95%" = p.cols[5], "75%" = p.cols[6], "Obs" = p.cols[4],
-                                  "Assimilated" = cols[4])) +
-    labs(fill = "DA method") +
-    da_method_fill_scale
+    scale_color_manual(values = c("Chlorophyll-a" = cols[1]),name = "") +
+    labs(fill = "DA method") 
+    #da_method_fill_scale
+  
+  img_file <- "www/compare_da.png"
+  
+  # Save as a png file
+  ggsave(filename = img_file, plot = p,  dpi = 300, width = 203, height = 112, units = "mm")
   
   gp <- ggplotly(p, dynamicTicks = TRUE)
   for (i in 1:length(gp$x$data)){

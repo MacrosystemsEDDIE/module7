@@ -1642,6 +1642,27 @@ shinyServer(function(input, output, session) {
     
     req(input$table01_rows_selected != "")
     
+    if(input$run_fc_no_da == 0){
+      validate(
+             shinyalert::shinyalert(title = "Click 'Run forecast' for the forecast with no data assimilation.")
+      )
+    }
+    if(input$assess_fc_no_da == 0){
+      validate(
+        shinyalert::shinyalert(title = "Click 'Assess forecast' for the forecast with no data assimilation.")
+      )
+    }
+    if(input$run_fc_chla_assim == 0){
+      validate(
+        shinyalert::shinyalert(title = "Click 'Run forecast' for the forecast with data assimilation.")
+      )
+    }
+    if(input$assess_fc_chla_assim == 0){
+      validate(
+        shinyalert::shinyalert(title = "Click 'Assess forecast' for the forecast with data assimilation.")
+      )
+    }
+  
     var <- "chla"
     da_method$plot <- plot_four_forecasts(no_da = est_out_no_da$out, chla = est_out_chla_assim$out,
                                           #nitrate = est_out_nitrate_assim$out, both = est_out_both_assim$out, 
@@ -2865,8 +2886,8 @@ shinyServer(function(input, output, session) {
       a7c = input$q7c,
       a8_states = input$rank_list_2,
       a8_pars = input$rank_list_3,
-      a9a = input$q9a,
-      a9b = input$q9b,
+      a9 = input$q9,
+      a9_tab = q9_ans$df,
       a10 = input$q10,
       a11 = input$q11,
       a12 = input$q12,
@@ -2936,17 +2957,17 @@ shinyServer(function(input, output, session) {
       if(input$q6a == "" | input$q6b == "" | input$q6c == "" | input$q6d == "") "Site Selection: Objective 3 - Q.6",
       if(is.null(input$q7a) | is.null(input$q7b) | is.null(input$q7c)) "Activity A: Objective 4 - Q.7",
       if(length(input$rank_list_2) == 0 | length(input$rank_list_3) == 0) "Activity A: Objective 4 - Q.8",
-      if(is.null(input$q9a) & is.null(input$q9b)) "Activity A: Objective 4 - Q.9",
+      if(input$q9 == "") "Activity A: Objective 4 - Q.9",
       if(input$q10 == "") "Activity A: Objective 6 - Q.10",
       if(input$q11 == "") "Activity A: Objective 6 - Q.11",
       if(input$q12 == "") "Activity A: Objective 6 - Q.12",
       if(input$q13 == "") "Activity A: Objective 6 - Q.13",
-      if(input$q14 == "") "Activity B: Objective 7 - Q.14",
+      if(is.null(input$q14)) "Activity B: Objective 7 - Q.14",
       if(input$q15 == "") "Activity B: Objective 7 - Q.15",
       if(input$q16 == "") "Activity B: Objective 7 - Q.16",
       if(input$q17 == "") "Activity B: Objective 7 - Q.17",
       if(input$q18 == "") "Activity B: Objective 7 - Q.18",
-      if(input$q19 == "") "Activity B: Objective 7 - Q.19",
+      if(is.null(input$q19)) "Activity B: Objective 7 - Q.19",
       if(input$q20 == "") "Activity B: Objective 8 - Q.20",
       if(input$q21 == "") "Activity B: Objective 8 - Q.21",
       if(input$q22 == "") "Activity B: Objective 8 - Q.22",
@@ -3029,18 +3050,17 @@ shinyServer(function(input, output, session) {
     updateRadioButtons(session, "q7b", selected = up_answers$a7b)
     updateRadioButtons(session, "q7c", selected = up_answers$a7c)
     #updateTextAreaInput(session, "q8", value = up_answers$a8) #need to figure out how to do rank list
-    updateRadioButtons(session, "q9a", selected = up_answers$a9a)
-    updateRadioButtons(session, "q9b", selected = up_answers$a9b)
+    updateTextAreaInput(session, "q9", value = up_answers$a9)
     updateTextAreaInput(session, "q10", value = up_answers$a10)
     updateTextAreaInput(session, "q11", value = up_answers$a11)
     updateTextAreaInput(session, "q12", value = up_answers$a12)
     updateTextAreaInput(session, "q13", value = up_answers$a13)
-    updateTextAreaInput(session, "q14", value = up_answers$a14)
+    updateRadioButtons(session, "q14", selected = up_answers$a14)
     updateTextAreaInput(session, "q15", value = up_answers$a15)
     updateTextAreaInput(session, "q16", value = up_answers$a16)
     updateTextAreaInput(session, "q17", value = up_answers$a17)
     updateTextAreaInput(session, "q18", value = up_answers$a18)
-    updateTextAreaInput(session, "q19", value = up_answers$a19)
+    updateRadioButtons(session, "q19", selected = up_answers$a19)
     updateTextAreaInput(session, "q20", value = up_answers$a20)
     updateTextAreaInput(session, "q21", value = up_answers$a21)
     updateTextAreaInput(session, "q22", value = up_answers$a22)
@@ -3062,6 +3082,7 @@ shinyServer(function(input, output, session) {
     
     # Update reactive values
     q4_ans$dt <- up_answers$a4
+    q9_ans$df <- up_answers$a9_tab
     
     # for(i in 1:nrow(up_answers$answers)) {
     #   if(qid[i] == "q7") {
@@ -3144,8 +3165,7 @@ shinyServer(function(input, output, session) {
                    a7c = input$q7c,
                    a8_states = input$rank_list_2,
                    a8_pars = input$rank_list_3,
-                   a9a = input$q9a,
-                   a9b = input$q9b,
+                   a9 = input$q9,
                    a10 = input$q10,
                    a11 = input$q11,
                    a12 = input$q12,
@@ -3173,7 +3193,12 @@ shinyServer(function(input, output, session) {
                    a34 = input$q34,
                    a35 = input$q35,
                    a36 = input$q36,
-                   a37 = input$q37
+                   a37 = input$q37,
+                   da_method_plot = "www/compare_da.png",
+                   no_da_rmse = da_method$dt$RMSE[1],
+                   chla_assim_rmse = da_method$dt$RMSE[2],
+                   obs_uc_rmse = obs_uc_rmse$dt,
+                   da_freq_rmse = da_freq_rmse$dt
                    # save_pars = par_file,
                    # pheno_file = pheno_file$img,
                    # site_html = "data/site.html",
@@ -3203,6 +3228,108 @@ shinyServer(function(input, output, session) {
                       envir = new.env(parent = globalenv()))
     progress$set(value = 1)
     report$filepath <- tmp_file #Assigning in the temp file where the .docx is located to the reactive file created above
+  })
+  
+  observeEvent(input$generate2, {
+    
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    progress$set(message = "Gathering data and building report.",
+                 detail = "This may take a while. This window will disappear
+                     when the report is ready.", value = 0)
+    
+    
+    # Set up parameters to pass to Rmd document
+    params <- list(name = input$name,
+                   id_number = input$id_number,
+                   a1 = input$q1,
+                   a2 = input$q2,
+                   a3a = input$q3a,
+                   a3b = input$q3b,
+                   a3c = input$q3c,
+                   a3d = input$q3d,
+                   a3e = input$q3e,
+                   a3f = input$q3f,
+                   a4_at_freq = q4_ans$dt[1,1],
+                   a4_wt_freq = q4_ans$dt[2,1],
+                   a4_swr_freq = q4_ans$dt[3,1],
+                   a4_par_freq = q4_ans$dt[4,1],
+                   a4_n_freq = q4_ans$dt[5,1],
+                   a4_chl_freq = q4_ans$dt[6,1],
+                   a5 = input$q5,
+                   a6a = input$q6a,
+                   a6b = input$q6b,
+                   a6c = input$q6c,
+                   a6d = input$q6d,
+                   a7a = input$q7a,
+                   a7b = input$q7b,
+                   a7c = input$q7c,
+                   a8_states = input$rank_list_2,
+                   a8_pars = input$rank_list_3,
+                   a9 = input$q9,
+                   a10 = input$q10,
+                   a11 = input$q11,
+                   a12 = input$q12,
+                   a13 = input$q13,
+                   a14 = input$q14,
+                   a15 = input$q15,
+                   a16 = input$q16,
+                   a17 = input$q17,
+                   a18 = input$q18,
+                   a19 = input$q19,
+                   a20 = input$q20,
+                   a21 = input$q21,
+                   a22 = input$q22,
+                   a23 = input$q23,
+                   a24 = input$q24,
+                   a25 = input$q25,
+                   a26 = input$q26,
+                   a27 = input$q27,
+                   a28 = input$q28,
+                   a29 = input$q29,
+                   a30 = input$q30,
+                   a31 = input$q31,
+                   a32 = input$q32,
+                   a33 = input$q33,
+                   a34 = input$q34,
+                   a35 = input$q35,
+                   a36 = input$q36,
+                   a37 = input$q37,
+                   da_method_plot = "www/compare_da.png",
+                   no_da_rmse = da_method$dt$RMSE[1],
+                   chla_assim_rmse = da_method$dt$RMSE[2],
+                   obs_uc_rmse = obs_uc_rmse$dt,
+                   da_freq_rmse = da_freq_rmse$dt
+                   # save_pars = par_file,
+                   # pheno_file = pheno_file$img,
+                   # site_html = "data/site.html",
+                   # mod_2019_png = "www/mod_run_2019.png",
+                   # noaa_plot = "www/noaa_fc.png",
+                   # comm_plot = "www/comm_fc_plot.png",
+                   # assess_plot = "www/assess_fc.png",
+                   # update_plot = "www/fc_update.png",
+                   # next_fc_plot = "www/new_fc.png",
+                   # wt_m = lmfit2$m,
+                   # wt_b = lmfit2$b,
+                   # wt_r2 = lmfit2$r2,
+                   # upar_m = lmfit3$m,
+                   # upar_b = lmfit3$b,
+                   # upar_r2 = lmfit3$r2,
+                   # mod_summ = summ_file
+    )
+    print(params)
+    
+    
+    tmp_file <- paste0(tempfile(), ".docx") #Creating the temp where the .pdf is going to be stored
+    
+    rmarkdown::render("report.Rmd",
+                      output_format = "all",
+                      output_file = tmp_file,
+                      params = params,
+                      envir = new.env(parent = globalenv()))
+    progress$set(value = 1)
+    report2$filepath <- tmp_file #Assigning in the temp file where the .docx is located to the reactive file created above
   })
   
   # Hide download button until report is generated
@@ -3242,7 +3369,7 @@ shinyServer(function(input, output, session) {
     # This function returns a string which tells the client
     # browser what name to use when saving the file.
     filename = function() {
-      paste0("report_", input$id_number, ".docx") %>%
+      paste0("module7_report_", input$id_number, ".docx") %>%
         gsub(" ", "_", .)
     },
     
