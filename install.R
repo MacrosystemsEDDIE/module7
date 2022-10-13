@@ -35,6 +35,7 @@ install.packages("rmarkdown")
 install.packages("remotes")
 install.packages("kableExtra")
 install.packages("ggthemes")
+install.packages("magrittr")
 remotes::install_github('yonicd/slickR') # removed from CRAN - now only on GitHub
 
 
