@@ -36,6 +36,13 @@ install.packages("remotes")
 install.packages("kableExtra")
 install.packages("ggthemes")
 install.packages("magrittr")
+install.packages("tidyverse")
+install.packages("fansi")
+install.packages("shinyWidgets")
+install.packages("matrixStats")
+install.packages("googlesheets4")
+install.packages("webshot")
+install.packages("htmlwidgets")
 remotes::install_github('yonicd/slickR') # removed from CRAN - now only on GitHub
 
 
