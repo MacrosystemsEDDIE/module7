@@ -29,7 +29,8 @@ plot_enkf_out_actc <- function(obs_plot, start_date, plot_type, est_out, var, ad
     ylab(y_lab) +
     xlab("Date") +
     theme_bw(base_size = 12) + 
-    scale_x_date(limits = as.Date(c("2020-10-22","2020-11-01")))
+    scale_x_date(limits = as.Date(c("2020-10-22","2020-11-01")), date_labels = "%b %d")+
+    ylim(0,70)
   
   df <- est_out[[var]]$ens
   df$value[df$Date > (as.Date(start_date) + n_days)] <- NA
@@ -91,12 +92,12 @@ plot_enkf_out_actc <- function(obs_plot, start_date, plot_type, est_out, var, ad
       geom_hline(yintercept = h_line, linetype = "dashed") +
       # geom_vline(xintercept = df2$Date[1], col = "darkgray", linetype = "dashed") +
       # geom_vline(xintercept = df2$Date[6], col = "darkgray", linetype = "dashed") +
-      annotate("text", x = df2$Date[2], y = 22, label = "Water quality threshold") 
+      annotate("text", x = df2$Date[4], y = 22, label = "Water quality threshold") 
       # annotate("text", x = df2$Date[8], y = 70, label = "  Date forecast assessed")
     
   }
   
-  gp <- ggplotly(p, dynamicTicks = TRUE) 
+  gp <- ggplotly(p, dynamicTicks = FALSE) 
   for (i in 1:length(gp$x$data)){
     if (!is.null(gp$x$data[[i]]$name)){
       gp$x$data[[i]]$name =  gsub("\\(","", stringr::str_split(gp$x$data[[i]]$name,",")[[1]][1])

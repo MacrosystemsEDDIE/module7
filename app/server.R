@@ -472,7 +472,7 @@ shinyServer(function(input, output, session) {
   
   # Q9 table
   q9_ans <- reactiveValues() # %>% formatStyle(c(1:3), border = '1px solid #ddd'))
-  q9_ans$df <- data.frame(`Variable relationship` = c("Primary productivity (chl-a) vs. water temperature", "Primary productivity (chl-a) vs. light (underwater PAR)", "Primary productivity (chl-a) vs. nutrients (nitrate sensor)"),
+  q9_ans$df <- data.frame(`Variable relationship` = c("Primary productivity vs. water temperature", "Primary productivity vs. light", "Primary productivity vs. nutrients"),
                           `Q.6 Answers` = rep(NA, 3), 
                           `Q.7 Answers` = rep(NA, 3) 
   )
