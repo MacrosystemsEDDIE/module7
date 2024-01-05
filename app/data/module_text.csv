@@ -15,7 +15,7 @@ eco_forecast1,An ecological forecast is a prediction of future environmental con
 eco_forecast2,"An ecological forecast predicts changes in ecosystems in response to environmental drivers such as weather conditions, pollution, or habitat change. It also provides information about how people, economies, and communities may be affected. Local authorities and members of the public use these early warnings to make decisions to protect the health and well-being of a particular area."
 LO1,Define data assimilation (Activity A)
 LO2,Generate an ecological forecast for primary productivity (Activity A)
-LO3,Describe how to assess ecological forecast accuracy (Activity B)
+LO3,Describe how to assess ecological forecast accuracy (Activity A)
 LO4,Describe how data assimilation affects forecast accuracy and uncertainty (Activity B)
 LO5,"Explain how updating models with data collected at different time scales (e.g., daily, weekly) and with different levels of associated uncertainty affects ecological forecasts (Activity B, C)"
 workflow1,"After the instructor completes the PowerPoint presentation, students will launch the Shiny app. Students work in pairs to navigate through the upper tabs (e.g., ""Introduction"", ""Site Selection"", ""Activity A"", ""Activity B"", and ""Activity C"")  to complete each of the objectives embedded within each tab. Within each activity tab, there are individual objectives which must be completed before moving onto the next one (e.g., within Activity A, Objective 1 is ""Select and view site"")."

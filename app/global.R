@@ -1,11 +1,18 @@
 # Load required libraries
+suppressPackageStartupMessages(library(shinyBS, quietly = TRUE))
+suppressPackageStartupMessages(library(shinydashboard, quietly = TRUE))
+suppressPackageStartupMessages(library(rintrojs, quietly = TRUE))
+suppressPackageStartupMessages(library(slickR, quietly = TRUE))
+suppressPackageStartupMessages(library(sortable, quietly = TRUE))
+suppressPackageStartupMessages(library(ggplot2, quietly = TRUE))
+suppressPackageStartupMessages(library(stringr, quietly = TRUE))
+suppressPackageStartupMessages(library(hover, quietly = TRUE))
 suppressPackageStartupMessages(library(shiny, quietly = TRUE))
 suppressPackageStartupMessages(library(shinyjs, quietly = TRUE))
 suppressPackageStartupMessages(library(DT, quietly = TRUE))
 suppressPackageStartupMessages(library(sf, quietly = TRUE))
 suppressPackageStartupMessages(library(leaflet, quietly = TRUE))
 suppressPackageStartupMessages(library(plotly, quietly = TRUE))
-suppressPackageStartupMessages(library(ggpubr, quietly = TRUE))
 suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
 suppressPackageStartupMessages(library(magrittr, quietly = TRUE))
 suppressPackageStartupMessages(library(mvtnorm, quietly = TRUE))
@@ -21,10 +28,16 @@ cols2 <- ggthemes::ggthemes_data$colorblind$value
 l.cols <- RColorBrewer::brewer.pal(8, "Set2")
 p.cols <- RColorBrewer::brewer.pal(12, "Paired")
 
-# Code for viewing colors
-# COL <- l.cols
-# plot(seq_len(length(COL)), rep_len(1, length(COL)),
-#      col = COL, pch = 16, cex = 3, xaxt = 'n', yaxt = 'n', xlab = '', ylab = '')
+# Load text input
+module_text <- read.csv("data/module_text.csv", row.names = 1, header = FALSE)
+
+# colors for theme
+obj_bg <- "#D4ECE1"
+ques_bg <- "#B8E0CD"
+nav_bg <- "#DDE4E1"
+nav_butt <- "#31ED92"
+nav_txt <- "#000000" # white = #fff; black = #000000
+slider_col <- "#2CB572"
 
 # Create scale for plots
 da_method_fill_scale <- scale_fill_manual(values = c("No DA" = l.cols[1], "Chl-a DA" = l.cols[2]), name = "")
@@ -46,13 +59,6 @@ quest <- read.csv("data/student_questions.csv", row.names = 1)
 
 # Help documentation
 help_text <- read.csv("data/help_text.csv", row.names = 1)
-
-# idx <- which(grepl("Name of selected ", quest$Question))
-# idx2 <- which(grepl("Elevation", quest$Question))
-# idx3 <- which(grepl("Air temperature", quest$Question))
-# idx4 <- which(grepl("Underwater PAR", quest$Question))
-# idx5 <- which(grepl("Air temperature", quest$Question))
-# idx6 <- which(grepl("Underwater PAR", quest$Question))
 
 ab1 <- 4:9
 ab2 <- 13:16

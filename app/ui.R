@@ -1,29 +1,3 @@
-# Load required libraries
-suppressPackageStartupMessages(library(shinyjs, quietly = TRUE))
-suppressPackageStartupMessages(library(shinyBS, quietly = TRUE))
-suppressPackageStartupMessages(library(shinydashboard, quietly = TRUE))
-suppressPackageStartupMessages(library(rintrojs, quietly = TRUE))
-suppressPackageStartupMessages(library(slickR, quietly = TRUE))
-suppressPackageStartupMessages(library(sortable, quietly = TRUE))
-suppressPackageStartupMessages(library(ncdf4, quietly = TRUE))
-suppressPackageStartupMessages(library(ggplot2, quietly = TRUE))
-suppressPackageStartupMessages(library(stringr, quietly = TRUE))
-suppressPackageStartupMessages(library(hover, quietly = TRUE))
-
-# Help documentation
-help_text <- read.csv("data/help_text.csv", row.names = 1)
-
-# Load text input
-module_text <- read.csv("data/module_text.csv", row.names = 1, header = FALSE)
-
-# colors for theme
-obj_bg <- "#D4ECE1"
-ques_bg <- "#B8E0CD"
-nav_bg <- "#DDE4E1"
-nav_butt <- "#31ED92"
-nav_txt <- "#000000" # white = #fff; black = #000000
-slider_col <- "#2CB572"
-
 ui <- function(req) {
   
   tagList( # Added functionality for not losing your settings
@@ -51,21 +25,26 @@ ui <- function(req) {
     tags$head(tags$link(rel = "shortcut icon", href = "macroeddi_ico_green.ico")), # Add icon for web bookmarks
     tags$head(includeHTML(("google-analytics.html"))),
     fluidPage(
-      column(1, offset = 11, align = "right",
-             introBox(
-               actionButton("help", label = "", icon = icon("question-circle")), data.step = 7, data.intro = help_text["help", 1]
-             )
+      column(10,
+             br(),
+             p(tags$b("Teaching materials associated with this module can be found at ",
+                      tags$a(href="http://module7.macrosystemseddie.org", 
+                             "http://module7.macrosystemseddie.org.", target="_blank")))
       )
     ),
     navbarPage(title = "Module 7: Using Data to Improve Ecological Forecasts",
                position = "static-top", id = "maintab",
                tags$header(
                  fluidRow(
-                   column(2,
-                          fileInput("upload_answers", "Resume Progress", accept = c(".eddie", ".rds"))
+                   column(11,
+                          bookmarkButton(id = "bookmarkBtn", label = "Bookmark my progress"),
+                          br(), 
+                          p(tags$em("At any time, use this button to obtain a link that saves your progress."))
                    ),
-                   column(2,
-                          actionButton("help2", label = "", icon = icon("question-circle"))
+                   column(1, align = "right",
+                          introBox(
+                            actionButton("help", label = "Help", icon = icon("question-circle")), data.step = 7, data.intro = help_text["help", 1]
+                          )
                    )
                  )
                ),
@@ -184,10 +163,7 @@ ui <- function(req) {
                           h4(tags$b(tags$i("How can we use data to improve ecological forecasts?"))),
                           h3("Summary"),
                           p("To be useful for management, ecological forecasts need to be both accurate enough for managers to be able to rely on them for decision-making",tags$i("and"), " include a representation of forecast uncertainty, so managers can properly interpret the probability of future events. To improve forecast accuracy, we can update forecasts with observational data once they become available, a process known as", tags$b("data assimilation.")," Recent improvements in environmental sensor technology and an increase in the number of sensors deployed in ecosystems have increased the availability of data for assimilation to develop and improve forecasts for natural resource management."),
-                          p("One important test case in which data assimilation may greatly improve the use of ecological forecasts for management is algal blooms in lakes. Algal blooms are increasing in frequency and severity across many freshwater lakes and can substantially impact water quality. Forecasts of the likelihood of future algal blooms may be useful tools in helping water resource managers to mitigate the effect of these blooms. Forecasts can give managers time to take preemptive actions to prevent blooms, such as applying algaecide, or to make plans to reduce the bloom's impact on human health, such as closing recreational beaches."),
-                          p("In this module, we will address the following question: ",tags$b(tags$i("How can we use data to improve a forecast of lake algal biomass?"))),
-                          p("We will address this question by building an ecological model to predict chlorophyll-a (a metric of algal biomass and primary productivity), generating ecological forecasts, and using data science approaches to integrate the most recently collected data into a forecast, a process known as data assimilation. Assimilating the most recent observations into a forecast model allows the forecaster to update the initial conditions, or the starting conditions, of the model, with the goal of improving forecast accuracy. For example, if our task is to generate a forecast of chlorophyll-a concentrations in a lake for tomorrow, it is likely that our forecast will be more accurate if we use today’s measurement of chlorophyll-a as the initial condition for our model, rather than last week’s measurement."),
-                          p("We will explore how assimilating different types of data (e.g., chlorophyll-a, nutrient concentrations, water temperature) at different temporal frequencies (e.g., daily, weekly) affects forecast output. Finally, we will assimilate different types of data into forecasts and examine how data assimilation affects water resource management decisions."),
+                          p("In this module, you will explore how assimilating data with different amounts of observation uncertainty and at different temporal frequencies affects forecasts of lake water quality at an ecological site of your choice."),
                           h3("Learning Outcomes"),
                           tags$line(),
                           tags$ul(
@@ -247,7 +223,7 @@ ui <- function(req) {
                         img(src = "project-eddie-banner-2020_green.png", height = 100,
                             width = 1544, top = 5),
                         fluidRow(
-                          column(4, offset = 1,
+                          column(10, 
                                  h3("Workflow for this module"),
                                  tags$ol(
                                    tags$li(id = "txt_j", module_text["workflow1", ]),
@@ -255,65 +231,25 @@ ui <- function(req) {
                                    tags$li(id = "txt_j", module_text["workflow3", ]),
                                    tags$li(id = "txt_j", module_text["workflow4", ])
                                  )
-                          ),
-                          column(6, align = "center", offset = 1,
-                                 br(), br(),
-                                 img(src = "Mod7_Introduction.png", height = "80%", id = "bla_border",
-                                     width = "80%", tags$style("border: solid 2px black;"))
-                                 
                           )
                         ), hr(),
                         fluidRow(
-                          column(7, offset = 1,
-                                 h3("Student Activities"),
-                                 p(module_text["student_activities", ]),
-                                 box(width = 12, status = "warning",
-                                     solidHeader = TRUE,
-                                     p(tags$b("WARNING:"), " The Shiny app will disconnect from the server if it is left idle for 10 minutes. If this happens you will lose all your inputs into the app. It is recommended to download the user input at the end of the class, but you can also download throughout the class."),
-                                 ),
-                                 p("Alternatively, you can download the questions as a Word (.docx) file  and record your answers there. If you opt for this option, you can hide the green question boxes by unchecking the box below."),
-                                 checkboxInput("show_q1", "Show questions", value = TRUE),
+                          column(6, 
+                                 h3("Student Handout"),
+                                 p("Within the Introduction and Activities A, B and C tabs there are questions for students to complete as part of this module. These can be completed by writing your answers into the final report template, which can be downloaded as a Word document (.docx) below."),
                                  tags$style(type="text/css", "#stud_dl {background-color:#579277;color: white}"),
                                  conditionalPanel("output.handoutbuilt",
-                                                  downloadButton(outputId = "stud_dl", label = "Download Student Handout"),
+                                                  downloadButton(outputId = "stud_dl", label = "Download Final Report Template")
                                  )
                           ),
-                        ), hr(),
-                        #* Generate report buttons ====
-                        fluidRow(
-                          column(4,offset = 1,
+                          column(6,
                                  h3("Saving your progress"),
-                                 p(id = "txt_j", "If you run out of time to finish all the activities you can save your progress and return to it at a later date. Click the 'Save Progress' button at the bottom of the page and a file 'module7_answers_ID_number.eddie' will download. Store this file in a safe place locally on your computer."),
-                                 img(src = "save_button.png", height = "100%", id = "bla_border",
-                                     width = "100%", tags$style("border: solid 2px black;")),
-                                 br(),
-                                 hr(),
-                                 h3("Resuming your progress"),
-                                 img(src = "resume_button.png", height = "100%", id = "bla_border",
-                                     width = "100%", tags$style("border: solid 2px black;")),
-                                 br(),
-                                 p(id = "txt_j", "To reload the app input you can upload the downloaded '.eddie' file at the top of this pae and it will populate your answers into the Shiny app."),
-                                 p(id = "txt_j", HTML(paste0(tags$b("Note:"), " You will need to navigate to tabs Objective 1 in Activity A after uploading your file for the site selection to load there."))),
-                                 p(id = "txt_j", "Currently the plots do not save to the file.  If you generated plots during your last session, you will need to reload the data and reproduce the plots before generating your report.")
-                          ),
-                          column(4, offset = 1,
-                                 introBox(
-                                   h3("Generate Report"),
-                                   p(module_text["generate_report", ]),
-                                   actionButton("generate", "Generate Report (.docx)", icon = icon("file"), width = "190px", class = "btn-primary"
-                                   ), br(), br(),
-                                   data.step = 6, data.intro = help_text["finish", 1]
-                                 ),
-                                 tags$style(type="text/css", "#download {background-color:#579277;color: white}"),
-                                 conditionalPanel(condition = "output.reportbuilt", # This button appears after the report has been generated and is ready for download.
-                                                  downloadButton("download", "Download Report", width = "60px", style = "width:190px;"
-                                                  )), br(),
-                                 h5(tags$b("Questions still to be completed:")),
-                                 wellPanel(
-                                   htmlOutput("check_list")
-                                 )
+                                 p(style="text-align: justify;", "As you go, fill out answers to questions in the final report Word document. Some of the plots you generate in the Shiny app will be needed for the final report. When prompted, be sure to download these plots so you can copy-paste them into the final report."),
+                                 p(style="text-align: justify;", "If you run out of time to finish all the activities you can save your progress and return to it at a later date. Click the 'Bookmark my progress' button at the top of the page and you will obtain a link, which you should save by copy-pasting it at the top of your final report. When you are ready to resume work, paste the link into your web browser, and it will load a Shiny app session that contains your progress."),
+                                 br()
                           )
                         ),
+                        hr(),
                         fluidRow(
                           hr(),
                           column(10, align = "left",
@@ -322,14 +258,11 @@ ui <- function(req) {
                                      fluidRow(
                                        column(8, offset = 1,
                                               h3("Before you start..."),
-                                              p("Input your name and Student ID and this will be added to your final report."),
-                                              textInput("name", "Name:"),
-                                              textInput("id_number", "ID number:"),
+                                              p(id = "txt_j", "Download your final report (Word document) and input your name and Student ID. Then, answer the following questions in the final report."),
                                               introBox(
                                                 h3(tags$b("Think about it!")),
-                                                p("Note: The size of these text boxes can be adjusted by clicking and dragging the bottom right of the text box."),
-                                                textAreaInput2(inputId = qid[1], label = quest[qid[1], 1]),
-                                                textAreaInput2(inputId = qid[2], label = quest[qid[2], 1]),
+                                                p(tags$b(quest["q1", 1])),
+                                                p(tags$b(quest["q2", 1])),
                                                 data.step = 5, data.intro = help_text["questions", 1]
                                                 )
                                               )
@@ -341,7 +274,7 @@ ui <- function(req) {
                         fluidRow(
                           column(6,
                                  h3("Data sources"),
-                                 p(HTML(paste0('This module will introduce key concepts within Ecological forecasting through exploration of ', a(href = "https://www.neonscience.org/", "NEON (National Ecological Observation Network) data", target = "_blank"), ", building a model, and then generating a short-term ecological forecast.")))
+                                 p(HTML(paste0('This module will introduce key concepts within Ecological forecasting through exploration of ', a(href = "https://www.neonscience.org/", "NEON (National Ecological Observatory Network) data", target = "_blank"), ", building a model, and then generating a short-term ecological forecast.")))
                           ),
                           column(6, align = "center",
                                  a(
@@ -714,26 +647,26 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(8, offset = 1,
                                                                    h5(tags$b(quest[qid[21], 1])),
-                                                                   bucket_list(
-                                                                     header = "",
-                                                                     group_name = "bucket_list_group",
-                                                                     orientation = "horizontal",
-                                                                     add_rank_list(
-                                                                       text = tags$b("Drag from here"),
-                                                                       labels = sample(c(state_vars, process_vars)),
-                                                                       input_id = "rank_list_1"
-                                                                     ),
-                                                                     add_rank_list(
-                                                                       text = tags$b("State variable"),
-                                                                       labels = NULL,
-                                                                       input_id = "rank_list_2"
-                                                                     ),
-                                                                     add_rank_list(
-                                                                       text = tags$b("Parameter"),
-                                                                       labels = NULL,
-                                                                       input_id = "rank_list_3"
-                                                                     )
-                                                                   ),
+                                                                   # bucket_list(
+                                                                   #   header = "",
+                                                                   #   group_name = "bucket_list_group",
+                                                                   #   orientation = "horizontal",
+                                                                   #   add_rank_list(
+                                                                   #     text = tags$b("Drag from here"),
+                                                                   #     labels = sample(c(state_vars, process_vars)),
+                                                                   #     input_id = "rank_list_1"
+                                                                   #   ),
+                                                                   #   add_rank_list(
+                                                                   #     text = tags$b("State variable"),
+                                                                   #     labels = NULL,
+                                                                   #     input_id = "rank_list_2"
+                                                                   #   ),
+                                                                   #   add_rank_list(
+                                                                   #     text = tags$b("Parameter"),
+                                                                   #     labels = NULL,
+                                                                   #     input_id = "rank_list_3"
+                                                                   #   )
+                                                                   # ),
                                                                    br(),
                                                                    textAreaInput2(inputId = qid[22], label = quest[qid[22], ], width = "90%"),
                                                                    br(),
