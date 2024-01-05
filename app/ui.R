@@ -318,94 +318,7 @@ border-color: #FFF;
                                              value = "stab1", id = "wh_link",
                                              tags$style("outline: 5px dotted green;"),
                                              # introBox(
-                                             fluidRow(
-                                               column(12,
-                                                      wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3("Objective 1 - Select a Site"),
-                                                                p(module_text["obj_01", ])
-                                                      )
-                                               )
-                                             ),
-                                             # data.step = 4, data.intro = help_text["objectives", 1], data.position = "top"),
-                                             #** NEON Map ====
-                                             fluidRow(
-                                               #** NEON Intro ----
-                                               column(4,
-                                                      h2("Site Description"),
-                                                      p("Select a site in the table to highlight on the map"),
-                                                      conditionalPanel("input.row_num > 25",
-                                                                       selectizeInput("row_num", "Select row",
-                                                                                      choices = 1:nrow(neon_sites_df),
-                                                                                      options = list(
-                                                                                        placeholder = 'Please select a row',
-                                                                                        onInitialize = I('function() { this.setValue(""); }')),
-                                                                       )
-                                                      ),
-                                                      DTOutput("table01"),
-                                                      p(tags$b("Click 'View latest photo' to see the latest image from the webcam on site (this may take 10-30 seconds).")),
-                                                      actionButton("view_webcam", label = "View latest photo", icon = icon("eye"))
-                                               ),
-                                               #** Site map ----
-                                               column(4,
-                                                      h2("Map of NEON sites"),
-                                                      wellPanel(
-                                                        leafletOutput("neonmap")
-                                                      )
-                                               )
-                                               
-                                               ,
-                                               #** Site photo ----
-                                               column(4,
-                                                      h2("Phenocam"),
-                                                      # textOutput("prompt1"),
-                                                      wellPanel(
-                                                        imageOutput("pheno"),
-                                                        p(id = "txt_j", module_text["phenocam", ])
-                                                      )
-                                               )
-                                             ), br(),
-                                             #      span(textOutput("site_name1"), style = "font-size: 22px;
-                                             # font-style: bold;"),
-                                             fluidRow(
-                                               wellPanel(
-                                                 h4(tags$b("About Site")),
-                                                 uiOutput("site_html"),
-                                                 textOutput("prompt2"),
-                                                 htmlOutput("site_link")
-                                               ),
-                                             ),
-                                             fluidRow(
-                                               column(10, align = "left",
-                                                      box(id = "box3", width = 10, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(7, offset = 1,
-                                                                   h3("Questions"),
-                                                                   h4(quest[qid[3], 1],"If the information for your lake is not on the NEON website then you can input NA (Not Available) into the text box.")
-                                                            )
-                                                          ),
-                                                          fluidRow(
-                                                            column(4, offset = 1, align = "left", style = paste0("background: ", ques_bg),
-                                                                   textInput(inputId = qid[4], label = quest[qid[4], 1] , width = "90%"),
-                                                                   textInput(inputId = qid[5], label = quest[qid[5], 1], width = "90%"),
-                                                                   textInput(inputId = qid[6], label = quest[qid[6], 1], width = "90%")
-                                                            ),
-                                                            column(4, offset = 1, align = "left", style = paste0("background: ", ques_bg),
-                                                                   textInput(inputId = qid[7], label = quest[qid[7], 1] , width = "90%"),
-                                                                   textInput(inputId = qid[8], label = quest[qid[8], 1], width = "90%"),
-                                                                   textInput(inputId = qid[9], label = quest[qid[9], 1], width = "90%")
-                                                            )
-                                                          )
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             #*** Next step ----
-                                             fluidRow(
-                                               column(5, offset = 1,
-                                                      h3("Next step"),
-                                                      p("We will explore the data which has been measured at this site by NEON."))
-                                             )
+                                             
                                     ),
                                     #* Objective 2 - Explore data ----
                                     tabPanel(title = tab_names["stab2", 2],  value = "stab2",
@@ -562,125 +475,91 @@ border-color: #FFF;
                         fluidRow(
                           column(12,
                                  wellPanel(style = paste0("background: ", obj_bg),
-                                           h2("Activity A - Build A Model With Uncertainty"),
+                                           h2("Activity A - Build A Model And Generate A Forecast"),
                                            p(module_text["act_A", ])
                                  )
                           ),
                         ),
                         tabsetPanel(id = "tabseries2",
                                     #* Objective 4 - Understand model ====
-                                    tabPanel(title = tab_names["stab4", 2], value = "stab4",
+                                    tabPanel(title = "Objective 1 - Select and view a NEON site", value = "obj1",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab4", 2]),
-                                                                p(id = "txt_j", module_text["obj_04", ])
+                                                                h3("Objective 1 - Select a Site"),
+                                                                p(module_text["obj_01", ])
                                                       )
                                                )
                                              ),
-                                             #* Intro text ====
+                                             # data.step = 4, data.intro = help_text["objectives", 1], data.position = "top"),
+                                             #** NEON Map ====
+                                             fluidRow(
                                                #** NEON Intro ----
-                                             fluidRow(
                                                column(4,
-                                                      h3("What is a Model?"),
-                                                      h4("Read through this section and scroll through the slides"),
-                                                      p(id = "txt_j", module_text["model1", ]),
-                                                      p(id = "txt_j", module_text["model2", ]),
-                                                      p(id = "txt_j", module_text["model3", ]),
-                                                      p(id = "txt_j", module_text["mod_desc", ]),
-                                                      p(id = "txt_j", module_text["phyto_chla", ]),
-                                                      p(tags$i("Click through the images to see how we can go from a conceptual food web model to a mathematical representation of the interaction of Nutrient (N) and Phytoplankton (P)."), id = "txt_j")
+                                                      h2("Site Description"),
+                                                      p("Select a site in the table to highlight on the map"),
+                                                      conditionalPanel("input.row_num > 25",
+                                                                       selectizeInput("row_num", "Select row",
+                                                                                      choices = 1:nrow(neon_sites_df),
+                                                                                      options = list(
+                                                                                        placeholder = 'Please select a row',
+                                                                                        onInitialize = I('function() { this.setValue(""); }')),
+                                                                       )
+                                                      ),
+                                                      DTOutput("table01"),
+                                                      p(tags$b("Click 'View latest photo' to see the latest image from the webcam on site (this may take 10-30 seconds).")),
+                                                      actionButton("view_webcam", label = "View latest photo", icon = icon("eye"))
                                                ),
-                                               column(8,
-                                                      br(), br(), br(),
-                                                      h5("Click on the arrows to navigate through the slides", align = "center"),
+                                               #** Site map ----
+                                               column(4,
+                                                      h2("Map of NEON sites"),
                                                       wellPanel(
-                                                        slickROutput("slck_model", width = "550px", height = "400px")
+                                                        leafletOutput("neonmap")
                                                       )
                                                )
-                                             ),
-                                             hr(),
+                                               
+                                               ,
+                                               #** Site photo ----
+                                               column(4,
+                                                      h2("Phenocam"),
+                                                      # textOutput("prompt1"),
+                                                      wellPanel(
+                                                        imageOutput("pheno"),
+                                                        p(id = "txt_j", module_text["phenocam", ])
+                                                      )
+                                               )
+                                             ), br(),
+                                             #      span(textOutput("site_name1"), style = "font-size: 22px;
+                                             # font-style: bold;"),
                                              fluidRow(
-                                               column(12, align = "left",
-                                                      box(id = "box6", width = 12, status = "primary",
+                                               wellPanel(
+                                                 h4(tags$b("About Site")),
+                                                 uiOutput("site_html"),
+                                                 textOutput("prompt2"),
+                                                 htmlOutput("site_link")
+                                               ),
+                                             ),
+                                             fluidRow(
+                                               column(10, align = "left",
+                                                      box(id = "box3", width = 10, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
-                                                            column(8, offset = 1,
+                                                            column(7, offset = 1,
                                                                    h3("Questions"),
-                                                                   h5(tags$b(quest[qid[17], 1])),
-                                                                   radioButtons(qid[18], quest[qid[18], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   radioButtons(qid[19], quest[qid[19], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   radioButtons(qid[20], quest[qid[20], 1], choices = mod_choices, inline = TRUE, selected = character(0)),
-                                                                   br(),
-                                                                   actionButton("submitButtonQ7", "Submit Q.7 answers"),
-                                                                   br(),
-                                                                   conditionalPanel("input.submitButtonQ7 > 0",
-                                                                                    p(tags$i("Thanks for submitting your answers! They've been used to populate a table for a question later on in Activity A.")),
-                                                                                    br()),
-                                                                   br()
-                                                            ),
-                                                            column(2,
-                                                                   wellPanel(
-                                                                     useShinyjs(),  # Set up shinyjs
-                                                                     actionButton("ans_btn2", "Check answers"),
-                                                                     textOutput("q7a_ans"),
-                                                                     textOutput("q7b_ans"),
-                                                                     textOutput("q7c_ans")
-                                                                   )
+                                                                   p(tags$b(quest["q3", 1])),
+                                                                   p("If the information for your lake is not on the NEON website then you can put NA (Not Available) as your answer.")
                                                             )
-                                                          )
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             
-                                             #** Sort state and process variables ====
-                                             h2(tags$b("Exercise")),
-                                             p(id = "txt_j", "When working with ecological models, the terms 'state variable' and 'parameter' are used. Using the model diagram above, can you identify which are state variables or parameters?"),
-                                             p(id = "txt_j", module_text["state_var", 1]),
-                                             p(id = "txt_j", module_text["parameter", 1]),
-                                             
-                                             fluidRow(
-                                               column(12, align = "left",
-                                                      box(id = "box7", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
+                                                          ),
                                                           fluidRow(
-                                                            column(8, offset = 1,
-                                                                   h5(tags$b(quest[qid[21], 1])),
-                                                                   # bucket_list(
-                                                                   #   header = "",
-                                                                   #   group_name = "bucket_list_group",
-                                                                   #   orientation = "horizontal",
-                                                                   #   add_rank_list(
-                                                                   #     text = tags$b("Drag from here"),
-                                                                   #     labels = sample(c(state_vars, process_vars)),
-                                                                   #     input_id = "rank_list_1"
-                                                                   #   ),
-                                                                   #   add_rank_list(
-                                                                   #     text = tags$b("State variable"),
-                                                                   #     labels = NULL,
-                                                                   #     input_id = "rank_list_2"
-                                                                   #   ),
-                                                                   #   add_rank_list(
-                                                                   #     text = tags$b("Parameter"),
-                                                                   #     labels = NULL,
-                                                                   #     input_id = "rank_list_3"
-                                                                   #   )
-                                                                   # ),
-                                                                   br(),
-                                                                   textAreaInput2(inputId = qid[22], label = quest[qid[22], ], width = "90%"),
-                                                                   br(),
-                                                                   DTOutput("q9_tab"),
-                                                                   br(),
-                                                                   br()
+                                                            column(4, offset = 1, align = "left", style = paste0("background: ", ques_bg),
+                                                                   p(tags$em(quest["q3a", 1] , width = "90%")),
+                                                                   p(tags$em(quest["q3b", 1], width = "90%")),
+                                                                   p(tags$em(quest["q3c", 1], width = "90%"))
                                                             ),
-                                                            column(2,
-                                                                   wellPanel(
-                                                                     useShinyjs(),  # Set up shinyjs
-                                                                     actionButton("ans_btn", "Check answers"),
-                                                                     textOutput("state_ans"),
-                                                                     textOutput("proc_ans")
-                                                                   )
+                                                            column(4, offset = 1, align = "left", style = paste0("background: ", ques_bg),
+                                                                   p(tags$em(quest["q3d", 1] , width = "90%")),
+                                                                   p(tags$em(quest["q3e", 1], width = "90%")),
+                                                                   p(tags$em(quest["q3f", 1], width = "90%"))
                                                             )
                                                           )
                                                       )
@@ -691,8 +570,7 @@ border-color: #FFF;
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("Now we will use this information about the model to build a model to forecast primary productivity in our chosen site.")
-                                               )
+                                                      p("We will explore the data which has been measured at this site by NEON."))
                                              )
                                     ),
                                     #* Objective 5 - Prepare inputs ====
