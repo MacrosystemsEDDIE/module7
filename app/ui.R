@@ -481,7 +481,7 @@ border-color: #FFF;
                           ),
                         ),
                         tabsetPanel(id = "tabseries2",
-                                    #* Objective 4 - Understand model ====
+                                    #* Objective 1 - Select site ====
                                     tabPanel(title = "Objective 1 - Select and view a NEON site", value = "obj1",
                                              fluidRow(
                                                column(12,
@@ -570,78 +570,77 @@ border-color: #FFF;
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("We will explore the data which has been measured at this site by NEON."))
+                                                      p("We will explore the chlorophyll-a data which have been collected at this site by NEON."))
                                              )
                                     ),
-                                    #* Objective 5 - Prepare inputs ====
-                                    tabPanel(title = tab_names["stab5", 2], value = "stab5",
+                                    #* Objective 2 - Explore data ====
+                                    tabPanel(title = "Objective 2 - Explore chlorophyll-a", value = "stab5",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab5", 2]),
-                                                                p(id = "txt_j", module_text["obj_05", ])
+                                                                h3("Objective 2 - Explore chlorophyll-a"),
+                                                                p(id = "txt_j", module_text["obj_02", ])
                                                       )
                                                )
                                              ),
                                              fluidRow(
-                                               column(6,
-                                                      h4("Linear Regression"),
-                                                      p(id = "txt_j", module_text["linear_regression", ]),
-                                                      p("The equation form for a linear regression is: "),
-                                                      p(withMathJax("$$y = mx + b $$"), style = "font-size: 20px;"),
-                                               ),
-                                               column(6, align = "center",
-                                                      img(src = "linear_regression_example.png",
-                                                          height = "50%",
-                                                          width = "50%"),
-                                                      p(tags$em("An example plot showing surface water temperature vs. air temperature with a regression line added (orange dashed) with the corresponding equation."))
+                                               column(4,
+                                                      h3("Chlorophyll-a in lakes"),
+                                                      p(tags$b("Chlorophyll-a")," concentrations are an indicator of algal (phytoplankton) abundance and biomass in a lake. Phytoplankton are important primary producers at the base of the lake food web, and are therefore necessary for healthy lake ecosystem function. However, an overabundance of phytoplankton can lead to harmful ",tags$b("blooms.")),
+                                                      p("Blooms compromise water quality via unsightly scums, clogging of filters at water treatment plants, release of noxious taste and odor compounds, and in some cases release of toxins that pose substantial risk to human and animal health."),
+                                                      p("Forecasts of chlorophyll-a concentrations days to weeks into the future can give water managers important information about the likelihood of a bloom event. This permits pre-emptive management to prevent or mitigate water quality concerns caused by blooms.")
+                                                      ),
+                                               column(8,
+                                                      img(src = "hab_Erie.jpg", height = "100%", id = "bla_border",
+                                                          width = "100%", tags$style("border: solid 2px black;")),
+                                                      br(),
+                                                      br(),
+                                                      box(id = "box4", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Question"),
+                                                                   p(tags$b(quest["q4", 1], width = "90%"))
+                                                            )
+                                                          )
+                                                      )
                                                )
                                              ),
                                              hr(),
+                                             #* Time series plot ----
                                              fluidRow(
-                                               column(6,
-                                                      h3("Air vs Surface water temperature"),
-                                                      wellPanel(
-                                                        plotlyOutput("at_wt")
+                                               column(5,
+                                                      h3("Explore chlorophyll-a"),
+                                                      p(id = "txt_j", "Click 'Plot chlorophyll-a' to view a time series of the real chlorophyll-a data measured at the lake you chose."),
+                                                      p(tags$em("Most plots throughout the app are interactive; hover on the plot to see the various options for manipulating the plot that will appear as a menu in the top right corner")),
+                                                      p(tags$b("Note that gaps in chlorophyll-a data are normal, as sensor buoys cannot always be left in lakes through the winter in cold climates.")),
+                                                      fluidRow(
+                                                        column(12, align = "right",
+                                                               actionButton("plot_chla", "Plot chlorophyll-a")
+                                                        )
                                                       ),
-                                                      p("Because we are using real NEON data, we will need to run",tags$b(" data quality assurance and quality control (QAQC)")," procedures on our data before using the data as inputs to our model. Please click the button below to remove data that are incorrect due to sensor error."),
-                                                      actionButton("run_qaqc1", "Run QAQC"),
-                                                      conditionalPanel("input.run_qaqc1 > 0",
-                                                      p("Now, you can add a linear regression to the QAQCed dataset."),
-                                                      actionButton("add_lm2", "Add linear regression"),
                                                       br(),
-                                                      wellPanel(
-                                                        p(tags$b("Linear regression equation:")),
-                                                        uiOutput('lm2_eqn')
-                                                      ))
-                                               ),
-                                               column(6,
-                                                      h3("Shortwave radiation vs underwater PAR"),
-                                                      wellPanel(
-                                                        plotlyOutput("sw_upar")
+                                                      box(id = "box12", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h4("Questions"),
+                                                                   p(tags$b(quest["q5", 1])),
+                                                            )
+                                                          ),
+                                                          br(),
                                                       ),
-                                                      p("Because we are using real NEON data, we will need to run",tags$b(" data quality assurance and quality control (QAQC)")," procedures on our data before using the data as inputs to our model. Please click the button below to remove data that are below the threshold at which the sensor can reliably quantify underwater light."),
-                                                      actionButton("run_qaqc2", "Run QAQC"),
-                                                      conditionalPanel("input.run_qaqc2 > 0",
-                                                                       p("Now, you can add a linear regression to the QAQCed dataset."),
-                                                                       actionButton("add_lm3", "Add linear regression"),
-                                                                       br(),
-                                                                       wellPanel(
-                                                                         p(tags$b("Linear regression equation:")),
-                                                                         uiOutput('lm3_eqn')
-                                                                       ))
-                                               ),
-                                             ),
-                                             fluidRow(
-                                               column(12,
-                                                      h3("Convert NOAA weather forecast"),
-                                                      p("The model we are using to predict chl-a uses data on a daily timestep so we will aggregate the hourly weather forecast to daily averages. Then, we need to convert our air temperature forecast into water temperature and the shortwave forecast into underwater PAR, so we will use the linear model you developed above to convert the 30 members in the ensemble from air temperature (predictor variable) to surface water temperature (response variable) and shortwave radiation (predictor variable) to underwater PAR (response variable)."),
-                                                      actionButton("conv_fc", "Convert forecast!", icon = icon("exchange-alt")),
-                                                      br(),
-                                                      wellPanel(
-                                                        plotlyOutput("conv_plot", height = "600px"),
+                                                      hr(),
+                                                      fluidRow(
+                                                        br(),
                                                       ),
-                                                      hr()
+                                               ),
+                                               column(7,
+                                                      h4("Time series of chlorophyll-a"),
+                                                      wellPanel(
+                                                        plotlyOutput("chla_plot")
+                                                      ),
+                                                      downloadButton("save_chla_plot", "Download plot", icon = icon("download"))
                                                )
                                              ),
                                              hr(),
@@ -649,17 +648,17 @@ border-color: #FFF;
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("Now we have converted the weather forecast data into inputs that are used by our model (surface water temperature and underwater PAR), we will use them to generate a forecast of primary productivity with the model we built in Objective 5.")
+                                                      p("Now we fit a model to the chlorophyll-a data from your lake that we can use for forecasting.")
                                                )
                                              )
                                     ),
-                                    #* Objective 6 - Forecast! ====
-                                    tabPanel(title = tab_names["stab6", 2], value = "stab6",
+                                    #* Objective 3 - Fit model ====
+                                    tabPanel(title = "Objective 3 - Fit model", value = "stab6",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab6", 2]),
-                                                                p(id = "txt_j", module_text["obj_06", ])
+                                                                h3("Objective 3 - Fit model"),
+                                                                p(id = "txt_j", module_text["obj_03", ])
                                                       )
                                                )
                                              ),

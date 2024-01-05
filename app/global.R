@@ -18,7 +18,22 @@ suppressPackageStartupMessages(library(magrittr, quietly = TRUE))
 suppressPackageStartupMessages(library(mvtnorm, quietly = TRUE))
 suppressPackageStartupMessages(library(ggpubr, quietly = TRUE))
 suppressPackageStartupMessages(library(ncdf4, quietly = TRUE))
+suppressPackageStartupMessages(library(tidyverse, quietly = TRUE))
+suppressPackageStartupMessages(library(lubridate, quietly = TRUE))
 library(shinyalert, quietly = TRUE, warn.conflicts = FALSE)
+
+# Icons
+neonIcons <- iconList(
+  Aquatic = makeIcon("icons/water-icon.png", iconWidth = 28, iconHeight = 28),
+  Terrestrial = makeIcon("icons/mountain-icon.png", iconWidth =  28, iconHeight = 28)
+)
+
+# Slides for slickR
+model_slides <- list.files("www/model_slides", full.names = TRUE)
+
+# Reference for downloading variables
+neon_vars <- read.csv("data/neon_variables.csv")
+met_pars <- read.csv("data/met_params.csv", fileEncoding = "UTF-8-BOM")
 
 # Colors for plots
 scale_colour_discrete <- ggthemes::scale_colour_colorblind

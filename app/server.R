@@ -1,24 +1,13 @@
-
-# Icons
-neonIcons <- iconList(
-  Aquatic = makeIcon("icons/water-icon.png", iconWidth = 28, iconHeight = 28),
-  Terrestrial = makeIcon("icons/mountain-icon.png", iconWidth =  28, iconHeight = 28)
-)
-
-# Slides for slickR
-model_slides <- list.files("www/model_slides", full.names = TRUE)
-
-# Reference for downloading variables
-neon_vars <- read.csv("data/neon_variables.csv")
-met_pars <- read.csv("data/met_params.csv", fileEncoding = "UTF-8-BOM")
-
-
 shinyServer(function(input, output, session) {
+  
+  #### Presentation ----
 
   #** Recap Presentation slides ----
   output$slides <- renderSlickR({
     slickR(recap_slides) + settings(dots = TRUE)
   })
+  
+  #### Objective 1 ----
 
   # NEON Sites datatable ----
   output$table01 <- DT::renderDT(
@@ -69,27 +58,13 @@ shinyServer(function(input, output, session) {
                  detail = "This may take a while. This window will disappear
                      when it is loaded.", value = 0.33)
     #load NEON data and format for input into EnKF
-    lake_data$df <- format_enkf_inputs(siteID = siteID$lab, neon_vars = neon_vars)
+    lake_data_file = paste0("./data/neon/",siteID$lab,"_chla_microgramsPerLiter.csv")
+    lake_data$df <- read_csv(lake_data_file, show_col_types = FALSE) %>%
+      rename(datetime = Date, chla = V1) %>%
+      filter(cumsum(!is.na(chla)) > 0) %>%
+      mutate(chla = ifelse(chla < 0, 0, chla))
 
-    progress$set(message = "Loading NOAA forecast data",
-                 detail = "This may take a while. This window will disappear
-                     when it is loaded.", value = 0.67)
-    noaa_fc$list <- load_noaa_forecast(siteID = siteID$lab, start_date = start_date)
-    
     idx <- which(lake_data$df$Date == start_date)
-    
-    # Historical data
-    df <- lake_data$df[(idx-7):(idx+1), ]
-    df$chla[nrow(df)] <- NA
-    df$Date <- as.Date(df$datetime)
-    df$maxUptake <- as.numeric(NA)
-    obs_plot$hist <- df
-    
-    # Future data
-    df <- lake_data$df[(idx+1):(idx+35), ]
-    df$Date <- as.Date(df$datetime)
-    df$maxUptake <- as.numeric(NA)
-    obs_plot$future <- df
     
   })
 
@@ -166,94 +141,62 @@ shinyServer(function(input, output, session) {
     })
   })
   #** Create prompt ----
-  persist_df <- reactiveValues(df = NULL)
-  airt_swt <- reactiveValues(df = NULL)
-  wtemp_fc_data <- reactiveValues(lst = as.list(rep(NA, 4)), hist = NULL, fut = NULL)
-  
   observeEvent(input$table01_rows_selected, {
     output$prompt2 <- renderText({
       "Click on the link below to find out more information about your site."
     })
-
-    ref <- "Air temperature"
-    x_var <- neon_vars$id[which(neon_vars$Short_name == ref)][1]
-    x_units <- neon_vars$units[which(neon_vars$Short_name == ref)][1]
-    x_file <- file.path("data", "neon", paste0(siteID$lab, "_", x_var, "_", x_units, ".csv"))
-    validate(
-      need(file.exists(x_file), message = paste0(ref, " is not available at this site."))
-    )
-    xvar <- read.csv(x_file)
-    xvar[, 1] <- as.POSIXct(xvar[, 1], tz = "UTC")
-    xvar$Date <- as.Date(xvar[, 1])
-    xvar <- plyr::ddply(xvar, c("Date"), function(x) mean(x[, 2], na.rm = TRUE)) # Daily average - also puts everything on same timestamp
-
-
-    ref2 <- "Surface water temperature"
-    y_var <- neon_vars$id[which(neon_vars$Short_name == ref2)][1]
-    y_units <- neon_vars$units[which(neon_vars$Short_name == ref2)][1]
-    y_file <- file.path("data", "neon", paste0(siteID$lab, "_", y_var, "_", y_units, ".csv"))
-    validate(
-      need(file.exists(y_file), message = paste0(ref2, " is not available at this site."))
-    )
-    yvar <- read.csv(y_file)
-    yvar[, 1] <- as.POSIXct(yvar[, 1], tz = "UTC")
-    yvar$Date <- as.Date(yvar[, 1])
-    if(ref2 == "Surface water temperature") {
-      yvar <- yvar[yvar[, 2] == min(yvar[, 2], na.rm = TRUE), c(1, 3)] # subset to Surface water temperature
-    }
-    yvar <- plyr::ddply(yvar, c("Date"), function(y) mean(y[, 2], na.rm = TRUE)) # Daily average - also puts everything on same timestamp
-
-    df <- merge(xvar, yvar, by = "Date")
-
-    validate(
-      need(nrow(df) > 0, message = "No variables at matching timesteps.")
-    )
-    df$month <- lubridate::month(df$Date)
-    df <- df[(df$month %in% 5:10), 1:3]
-    colnames(df)[-1] <- c("airt", "wtemp")
-    airt_swt$df <- df
-    df$Mod <- c(NA, df$wtemp[-nrow(df)])
-    persist_df$df <- df
-
-
-    dat <- data.frame(Date = airt_swt$df$Date, wtemp = airt_swt$df$wtemp, airt = airt_swt$df$airt)
-
-    wtemp_fc_data$hist <- dat[dat$Date <= as.Date("2020-10-02") & dat$Date >= "2020-09-22", ]
-    wtemp_fc_data$hist$wtemp[wtemp_fc_data$hist$Date > as.Date("2020-09-25")] <- NA
-    wtemp_fc_data$hist$airt[wtemp_fc_data$hist$Date > as.Date("2020-09-25")] <- NA
-    wtemp_fc_data$fut <- dat[dat$Date > as.Date("2020-09-25") & dat$Date <= "2020-10-02", ]
-    wtemp_fc_data$fut$airt[wtemp_fc_data$fut$Date > as.Date("2020-09-25")] <- NA
-
-
   })
 
-  # Read in site data ----
-  neon_DT <- reactive({ # view_var
+  #### Objective 2 ----
+  
+  # Plot chlorophyll-a
+  plot.chla <- reactiveValues(main=NULL)
+  
+  output$chla_plot <- renderPlotly({ 
+    
     validate(
       need(input$table01_rows_selected != "",
            message = "Please select a site in Objective 1.")
     )
-
-    read_var <- neon_vars$id[which(neon_vars$Short_name == input$view_var)][1]
-    units <- neon_vars$units[which(neon_vars$Short_name == input$view_var)][1]
-    file <- file.path("data", "neon", paste0(siteID$lab, "_", read_var, "_", units, ".csv"))
     validate(
-      need(file.exists(file), message = "This variable is not available at this site. Please select a different variable or site.")
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
     )
-    df <- read.csv(file)
-    df[, 1] <- as.POSIXct(df[, 1], tz = "UTC")
-    df[, -1] <- signif(df[, -1], 4)
-    names(df)[ncol(df)] <- read_var
-
-    if(input$view_var == "Surface water temperature") {
-      df <- df[df[, 2] == min(df[, 2], na.rm = TRUE), c(1, 3)] # subset to surface temperature
-    }
-
-    sel <- tryCatch(df[(selected$sel$pointNumber+1), , drop=FALSE] , error=function(e){NULL})
-
-
-    return(list(data = df, sel = sel))
+    validate(
+      need(input$plot_chla > 0,
+           message = "Click 'Plot chlorophyll-a'")
+    )
+    
+    df <- lake_data$df
+    
+    p <- ggplot(data = df, aes(x = datetime, y = chla))+
+      geom_line(aes(color = "Chl-a"))+
+      xlab("")+
+      ylab("Chlorophyll-a (ug/L)")+
+      scale_color_manual(values = c("Chl-a" = "chartreuse4"), name = "")+
+      theme_bw()
+    
+    plot.chla$main <- p
+    
+    return(ggplotly(p, dynamicTicks = TRUE))
+    
   })
+  
+  # Download plot of air and water temperature
+  output$save_chla_plot <- downloadHandler(
+    filename = function() {
+      paste("Q5-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.chla$main, device = device)
+    }
+  )
+  
+  ##########OLD
 
   # NEON variable description table ----
   output$var_desc <- renderDT({

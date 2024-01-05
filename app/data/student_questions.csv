@@ -8,8 +8,8 @@ q3c,Latitude:,Site Selection: Objective 1
 q3d,Longitude:,Site Selection: Objective 1
 q3e,Lake area (km2):,Site Selection: Objective 1
 q3f,Elevation (m):,Site Selection: Objective 1
-q4,Scroll over the interactive plot to determine how frequently different types of data are collected. Fill out the table below with the collection frequency of the listed environmental variables. To edit the table you must double click the cell and then type in your answer.,Site Selection: Objective 2
-q5,Why might some types of data be collected more frequently than others? Try to think of two reasons.,Site Selection: Objective 2
+q4,Why might a forecast of lake chlorophyll-a concentration days to weeks into the future be a useful tool for water managers?,Site Selection: Objective 2
+q5,Describe how chlorophyll-a changes over time in your lake. Do you notice any patterns or trends?,Site Selection: Objective 2
 q6,Describe the effect of each of the following variables on chlorophyll-a. Chlorophyll-a is used as a proxy measurement for algal biomass (phytoplankton concentration) and primary productivity in aquatic environments.,Site Selection: Objective 3
 q6a,Air temperature,Site Selection: Objective 3
 q6b,Surface water temperature,Site Selection: Objective 3
