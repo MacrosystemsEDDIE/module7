@@ -26,6 +26,7 @@ shinyServer(function(input, output, session) {
   start_date <- "2020-09-25"
   noaa_fc <- reactiveValues(list = NULL, conv = NULL)
   lake_data <- reactiveValues(df = NULL)
+  autocorrelation_data <- reactiveValues(df = NULL)
   obs_plot <- reactiveValues(hist = NULL, future = NULL)
   
   observeEvent(input$table01_rows_selected, {
@@ -63,6 +64,13 @@ shinyServer(function(input, output, session) {
       rename(datetime = Date, chla = V1) %>%
       filter(cumsum(!is.na(chla)) > 0) %>%
       mutate(chla = ifelse(chla < 0, 0, chla))
+   
+    #create autocorrelation dataset
+    autocorrelation_data$df <- lake_data$df %>%
+      filter(datetime < start_date) %>%
+      mutate(chla = na.approx(chla, na.rm = F)) %>% 
+      mutate(chla_lag = lag(chla)) %>%
+      filter(complete.cases(.))
 
     idx <- which(lake_data$df$Date == start_date)
     
@@ -196,6 +204,119 @@ shinyServer(function(input, output, session) {
     }
   )
   
+  #### Objective 3 ----
+  
+  # Plot lagged chlorophyll-a time series
+  plot.lag1 <- reactiveValues(main=NULL)
+  
+  output$lag_plot1 <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(input$plot_lag1 > 0,
+           message = "Click 'Plot lagged timeseries'")
+    )
+    
+    df <- autocorrelation_data$df
+    
+    plot_data <- df %>%
+      filter(datetime > "2019-06-01" & datetime < "2019-10-01")
+    
+    p <- plot_chla_lag(plot_data)
+    
+    plot.lag1$main <- p
+    
+    return(ggplotly(p, dynamicTicks = TRUE))
+    
+  })
+  
+  # Download timeseries of lagged chl-a
+  output$save_lag_plot1 <- downloadHandler(
+    filename = function() {
+      paste("Q7-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.lag1$main, device = device)
+    }
+  )
+  
+  # Plot lagged chlorophyll-a scatterplot
+  plot.lag2 <- reactiveValues(main=NULL)
+  
+  output$lag_plot2 <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(input$plot_lag2 > 0,
+           message = "Click 'Plot lag scatterplot'")
+    )
+    
+    df <- autocorrelation_data$df
+    
+    p <- ggplot(data = df, aes(x = chla_lag, y = chla))+
+      geom_point()+
+      xlab("1 day lag of chlorophyll-a (ug/L)")+
+      ylab("chlorophyll-a (ug/L)")+
+      geom_abline(slope = 1, intercept = 0, linetype = 2)+
+      theme_bw()
+    
+    plot.lag2$main <- p
+    
+    return(ggplotly(p, dynamicTicks = TRUE))
+    
+  })
+  
+  # Download scatterplot of lagged chl-a
+  output$save_lag_plot2 <- downloadHandler(
+    filename = function() {
+      paste("Q8-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.lag2$main, device = device)
+    }
+  )
+  
+  # Autocorrelation calculation ----
+  output$out_ac <- renderText({
+    
+    validate(
+      need(!is.null(autocorrelation_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    
+    df <- autocorrelation_data$df
+    
+    autocorrelation_lag1 = round(sum((df$chla[-1] - mean(df$chla[-1]))*(df$chla_lag[-1] - mean(df$chla[-1])))/sum((df$chla - mean(df$chla))^2),3)
+    
+    autocorrelation_lag1
+    
+    out_ac <- paste("Autocorrelation:",autocorrelation_lag1, sep = " ")
+    
+    return(out_ac)
+  })
+  
   ##########OLD
 
   # NEON variable description table ----
@@ -257,29 +378,9 @@ shinyServer(function(input, output, session) {
     }
     return(ggplotly(p, dynamicTicks = TRUE, source = "A"))
   })
-
-  # Q4 table
-  q4_ans <- reactiveValues(dt = q4_table) # %>% formatStyle(c(1:3), border = '1px solid #ddd'))
-  
-  output$q4_tab <- DT::renderDT(
-    q4_ans$dt, #%>% formatStyle(c(1:dim(q6_ans$dt)[2]), border = '1px solid #ddd'),
-    selection = "none", class = "cell-border stripe",
-    options = list(searching = FALSE, paging = FALSE, ordering= FALSE, dom = "t"),
-    server = FALSE, escape = FALSE, rownames= c("Air temperature", "Surface water temperature", "Shortwave radiation", "Underwater PAR", "Nitrogen", "Chlorophyll-a"), colnames=c("Data collection frequency"), editable = TRUE
-  )
-  
-  q4_proxy <- dataTableProxy("q4_tab")
-  observeEvent(input$q4_tab_cell_edit, {
-    info = input$q4_tab_cell_edit
-    i = info$row
-    j = info$col
-    v = info$value
-    q4_ans$dt[i, j] <<- DT::coerceValue(v, q4_ans$dt[i, j])
-    # replaceData(q6_proxy, q6_ans$dt, resetPaging = FALSE)  # important
-  })
   
   # Slickr model output
-  output$slck_model <- renderSlickR({
+  output$model_slides <- renderSlickR({
     slickR(model_slides)
   })
 
@@ -2803,252 +2904,11 @@ shinyServer(function(input, output, session) {
     shinyalert(title = "Resume Progress", text = "Use this field to upload your '.eddie' file to resume your progress.", type = "info")
   })
   
-  #** Answers checklist ----
   
-  ans_list <- reactiveValues()
-  observe({
-    ans_list <<- list(
-      name = input$name,
-      id_number = input$id_number,
-      a1 = input$q1,
-      a2 = input$q2,
-      a3a = input$q3a,
-      a3b = input$q3b,
-      a3c = input$q3c,
-      a3d = input$q3d,
-      a3e = input$q3e,
-      a3f = input$q3f,
-      a4 = q4_ans$dt,
-      a5 = input$q5,
-      a6a = input$q6a,
-      a6b = input$q6b,
-      a6c = input$q6c,
-      a6d = input$q6d,
-      a7a = input$q7a,
-      a7b = input$q7b,
-      a7c = input$q7c,
-      a8_states = input$rank_list_2,
-      a8_pars = input$rank_list_3,
-      a9 = input$q9,
-      a9_tab = q9_ans$df,
-      a10 = input$q10,
-      a11 = input$q11,
-      a12 = input$q12,
-      a13 = input$q13,
-      a14 = input$q14,
-      a15 = input$q15,
-      a16 = input$q16,
-      a17 = input$q17,
-      a18 = input$q18,
-      a19 = input$q19,
-      a20 = input$q20,
-      a21 = input$q21,
-      a22 = input$q22,
-      a23 = input$q23,
-      a24 = input$q24,
-      a25 = input$q25,
-      a26 = input$q26,
-      a27 = input$q27,
-      a28 = input$q28,
-      a29 = input$q29,
-      a30 = input$q30,
-      a31 = input$q31,
-      a32 = input$q32,
-      a33 = input$q33,
-      a34 = input$q34,
-      a35 = input$q35,
-      a36 = input$q36,
-      a37 = input$q37
-      # param_df = par_save$value,
-      # site_row = input$table01_rows_selected,
-      # mod_input = input$mod_sens,
-      # wt_m = lmfit2$m,
-      # wt_b = lmfit2$b,
-      # wt_r2 = lmfit2$r2,
-      # upar_m = lmfit3$m,
-      # upar_b = lmfit3$b,
-      # upar_r2 = lmfit3$r2
-    )
-  })
-  
-  # ans_list <- reactiveValues()
-  # observe({
-  #   for(i in 1:nrow(answers)) {
-  #     if(length(input[[qid[i]]]) != 0) {
-  #       answers[qid[i], 1] <<- input[[qid[i]]]
-  #     }
-  #   }
-  #   
-  #   ans_list <<- list(
-  #     name = input$name,
-  #     id_number = input$id_number,
-  #     answers = answers,
-  #     site_row = input$table01_rows_selected
-  #   )
-  # })
-  
-  # Checklist for user inputs
-  chk_list <- reactive({
-    out_chk <- c(
-      if(input$name == "") {"Introduction: Name"},
-      if(input$id_number == "") "Introduction: ID number",
-      if(input$q1 == "") "Introduction: Q. 1",
-      if(input$q2 == "") "Introduction: Q. 2",
-      if(input$q3a == "" | input$q3b == "" | input$q3c == "" |input$q3d == "" |input$q3e == "" |input$q3f == "") "Site Selection: Objective 1 - Q.3",
-      if(any(is.na(q4_ans$dt[, 1]))) "Site Selection: Objective 2 - Q.4",
-      if(input$q5 == "") "Site Selection: Objective 2 - Q.5",
-      if(input$q6a == "" | input$q6b == "" | input$q6c == "" | input$q6d == "") "Site Selection: Objective 3 - Q.6",
-      if(is.null(input$q7a) | is.null(input$q7b) | is.null(input$q7c)) "Activity A: Objective 4 - Q.7",
-      if(length(input$rank_list_2) == 0 | length(input$rank_list_3) == 0) "Activity A: Objective 4 - Q.8",
-      if(input$q9 == "") "Activity A: Objective 4 - Q.9",
-      if(input$q10 == "") "Activity A: Objective 6 - Q.10",
-      if(input$q11 == "") "Activity A: Objective 6 - Q.11",
-      if(input$q12 == "") "Activity A: Objective 6 - Q.12",
-      if(input$q13 == "") "Activity A: Objective 6 - Q.13",
-      if(is.null(input$q14)) "Activity B: Objective 7 - Q.14",
-      if(input$q15 == "") "Activity B: Objective 7 - Q.15",
-      if(input$q16 == "") "Activity B: Objective 7 - Q.16",
-      if(input$q17 == "") "Activity B: Objective 7 - Q.17",
-      if(input$q18 == "") "Activity B: Objective 7 - Q.18",
-      if(is.null(input$q19)) "Activity B: Objective 7 - Q.19",
-      if(input$q20 == "") "Activity B: Objective 8 - Q.20",
-      if(input$q21 == "") "Activity B: Objective 8 - Q.21",
-      if(input$q22 == "") "Activity B: Objective 8 - Q.22",
-      if(input$q23 == "") "Activity B: Objective 9 - Q.23",
-      if(input$q24 == "") "Activity B: Objective 9 - Q.24",
-      if(input$q25 == "") "Activity B: Objective 9 - Q.25",
-      if(input$q26 == "") "Activity B: Objective 9 - Q.26",
-      if(input$q27 == "") "Activity B: Objective 9 - Q.27",
-      if(input$q28 == "") "Activity B: Summary - Q.28",
-      if(input$q29 == "") "Activity B: Summary - Q.29",
-      if(input$q30 == "") "Activity C: Objective 10 - Q.30",
-      if(input$q31 == "") "Activity C: Objective 10 - Q.31",
-      if(input$q32 == "") "Activity C: Objective 10 - Q.32",
-      if(input$q33 == "") "Activity C: Objective 10 - Q.33",
-      if(input$q34 == "") "Activity C: Objective 10 - Q.34",
-      if(input$q35 == "") "Activity C: Objective 10 - Q.35",
-      if(input$q36 == "") "Activity C: Objective 10 - Q.36",
-      if(input$q37 == "") "Activity C: Objective 10 - Q.37"
-    )
     
     
-    if(length(out_chk) == 0) {
-      out_chk <- "Finished! All answers have been input into the app."
-    }
-    
-    HTML(
-      paste(
-        out_chk,
-        collapse = "<br/>"
-      )
-    )
-  })
-  
-  
-  output$check_list <- renderUI({
-    chk_list()
-  })
-  output$check_list2 <- renderUI({
-    chk_list()
-  })
-  
-  
-  output$download_answers <- downloadHandler(
-    
-    # This function returns a string which tells the client
-    # browser what name to use when saving the file.
-    filename = function() {
-      paste0("module7_answers_", input$id_number, ".eddie") %>%
-        gsub(" ", "_", .)
-    },
-    
-    # This function should write data to a file given to it by
-    # the argument 'file'.
-    content = function(file) {
-      # write.csv(ans_list, file)
-      saveRDS(ans_list, file = file)
-    }
-  )
-  
-  #** Upload .eddie file ----
-  observeEvent(input$upload_answers, {
-    
-    up_answers <<- readRDS(input$upload_answers$datapath)
-    updateTextAreaInput(session, "name", value = up_answers$name)
-    updateTextAreaInput(session, "id_number", value = up_answers$id_number)
-    updateTextAreaInput(session, "q1", value = up_answers$a1)
-    updateTextAreaInput(session, "q2", value = up_answers$a2)
-    updateTextAreaInput(session, "q3a", value = up_answers$a3a)
-    updateTextAreaInput(session, "q3b", value = up_answers$a3b)
-    updateTextAreaInput(session, "q3c", value = up_answers$a3c)
-    updateTextAreaInput(session, "q3d", value = up_answers$a3d)
-    updateTextAreaInput(session, "q3e", value = up_answers$a3e)
-    updateTextAreaInput(session, "q3f", value = up_answers$a3f)
-    updateTextAreaInput(session, "q5", value = up_answers$a5)
-    updateTextAreaInput(session, "q6a", value = up_answers$a6a)
-    updateTextAreaInput(session, "q6b", value = up_answers$a6b)
-    updateTextAreaInput(session, "q6c", value = up_answers$a6c)
-    updateTextAreaInput(session, "q6d", value = up_answers$a6d)
-    updateRadioButtons(session, "q7a", selected = up_answers$a7a)
-    updateRadioButtons(session, "q7b", selected = up_answers$a7b)
-    updateRadioButtons(session, "q7c", selected = up_answers$a7c)
-    #updateTextAreaInput(session, "q8", value = up_answers$a8) #need to figure out how to do rank list
-    updateTextAreaInput(session, "q9", value = up_answers$a9)
-    updateTextAreaInput(session, "q10", value = up_answers$a10)
-    updateTextAreaInput(session, "q11", value = up_answers$a11)
-    updateTextAreaInput(session, "q12", value = up_answers$a12)
-    updateTextAreaInput(session, "q13", value = up_answers$a13)
-    updateRadioButtons(session, "q14", selected = up_answers$a14)
-    updateTextAreaInput(session, "q15", value = up_answers$a15)
-    updateTextAreaInput(session, "q16", value = up_answers$a16)
-    updateTextAreaInput(session, "q17", value = up_answers$a17)
-    updateTextAreaInput(session, "q18", value = up_answers$a18)
-    updateRadioButtons(session, "q19", selected = up_answers$a19)
-    updateTextAreaInput(session, "q20", value = up_answers$a20)
-    updateTextAreaInput(session, "q21", value = up_answers$a21)
-    updateTextAreaInput(session, "q22", value = up_answers$a22)
-    updateTextAreaInput(session, "q23", value = up_answers$a23)
-    updateTextAreaInput(session, "q24", value = up_answers$a24)
-    updateTextAreaInput(session, "q25", value = up_answers$a25)
-    updateTextAreaInput(session, "q26", value = up_answers$a26)
-    updateTextAreaInput(session, "q27", value = up_answers$a27)
-    updateTextAreaInput(session, "q28", value = up_answers$a28)
-    updateTextAreaInput(session, "q29", value = up_answers$a29)
-    updateTextAreaInput(session, "q30", value = up_answers$a30)
-    updateTextAreaInput(session, "q31", value = up_answers$a31)
-    updateTextAreaInput(session, "q32", value = up_answers$a32)
-    updateTextAreaInput(session, "q33", value = up_answers$a33)
-    updateTextAreaInput(session, "q34", value = up_answers$a34)
-    updateTextAreaInput(session, "q35", value = up_answers$a35)
-    updateTextAreaInput(session, "q36", value = up_answers$a36)
-    updateTextAreaInput(session, "q37", value = up_answers$a37)
-    
-    # Update reactive values
-    q4_ans$dt <- up_answers$a4
-    q9_ans$df <- up_answers$a9_tab
-    
-    # for(i in 1:nrow(up_answers$answers)) {
-    #   if(qid[i] == "q7") {
-    #     updateRadioButtons(session, qid[i], selected = up_answers$answers[qid[i], 1])
-    #   } else if(!(qid[i] %in% c("q3", "q7"))) {
-    #     updateTextAreaInput(session, qid[i], value = up_answers$answers[qid[i], 1])
-    #   }
-    # }
-    
-    showModal(
-      modalDialog(
-        title = "Upload complete!",
-        "All your answers have been uploaded. You will need to regenerate the plots within the Shiny app before generating your final report.")
-    )
-    
-  })
-  
   # Select site when uploading answers
-  observe({
-    req(input$maintab == "mtab4" & exists("up_answers") & input$tabseries1 == "obj1")
-    req(!is.null(up_answers$site_row))
-    tryCatch(updateSelectizeInput(session, "row_num", selected = up_answers$site_row), error = function(e) {NA})
-  })
+  
   observe({
     if(input$row_num != "") {
       dt_proxy <- dataTableProxy("table01")

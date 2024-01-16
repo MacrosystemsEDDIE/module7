@@ -180,7 +180,7 @@ ui <- function(req) {
                               width = "80%", align = "left")
                    )
                  ), data.step = 8, data.intro = help_text["start", 1]
-               ),
+               )
                ),
                
                # 2. Presentation recap ----
@@ -285,190 +285,8 @@ ui <- function(req) {
                         )
                ),
                
-               # 4. Site Selection ----
-               tabPanel(title = tab_names["mtab4", 2], value = "mtab4",
-                        tags$style(".nav-tabs {
-  background-color: #DDE4E1;
-  border-color: #FFF;
-
-}
-
-.nav-tabs-custom .nav-tabs li.active:hover a, .nav-tabs-custom .nav-tabs li.active a {
-background-color: #4D6A5C;
-border-color: #FFF;
-}
-
-.nav-tabs-custom .nav-tabs li.active {
-    border-top-color: #FFF;
-    background-color: #4D6A5C;
-}"),
-                        # tags$style(type="text/css", "body {padding-top: 65px;}"),
-                        img(src = "project-eddie-banner-2020_green.png", height = 100,
-                            width = 1544, top = 5),
-                        fluidRow(
-                          column(12,
-                                 h3("Site Selection: Select a NEON site and visualize the data"),
-                                 p("Complete Objectives 1-2 to familiarize yourself with the data from your selected site and learn about the data you will be using.")
-                          )
-                        ),
-                        
-                        #* Objective 1 - Select and view site ====
-                        tabsetPanel(id = "tabseries1",
-                                    tabPanel(title = tab_names["stab1", 2],
-                                             value = "stab1", id = "wh_link",
-                                             tags$style("outline: 5px dotted green;"),
-                                             # introBox(
-                                             
-                                    ),
-                                    #* Objective 2 - Explore data ----
-                                    tabPanel(title = tab_names["stab2", 2],  value = "stab2",
-                                             fluidRow(
-                                               column(12,
-                                                      wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab2", 2]),
-                                                                p("If there are some variables which you are not familiar with, visit the ", a(href = "https://data.neonscience.org/home", "NEON Data Portal", target = "_blank"), "and click 'Explore Data Products' to learn more about how the data are collected.")
-                                                      )
-                                               )
-                                             ),
-                                             fluidRow(
-                                               column(8, offset = 2,
-                                                      h3("Variable descriptions"),
-                                                      DT::DTOutput("var_desc")
-                                               )
-                                             ),
-                                             hr(),
-                                             fluidRow(
-                                               #** Data Table ----
-                                               column(4,
-                                                      h3("Data Table"),
-                                                      p("This is a Shiny data table. It is interactive and allows you to navigate through the data table by searching or clicking through the different pages."),
-                                                      DT::DTOutput("neon_datatable")
-                                               ),
-                                               #** Plot of data ----
-                                               column(8,
-                                                      h3("Data Plot"),
-                                                      p("All plots in this Shiny app are generated using Plotly. This allows you to hover your mouse over the plot to get information from each of the plots. You can inspect the data closely by clicking and zooming into particular areas. There is a tool box at the top of the plot which has the selection function required for Q6."),
-                                                      selectizeInput("view_var", "Select variable",
-                                                                     choices = unique(neon_vars$Short_name),
-                                                                     options = list(
-                                                                       placeholder = 'Please select a variable',
-                                                                       onInitialize = I('function() { this.setValue(""); }')),
-                                                      ),
-                                                      plotlyOutput("var_plot"),
-                                                      useShinyjs(),  # Set up shinyjs
-                                                      wellPanel(
-                                                        h4("Variable Description"),
-                                                        textOutput("txt_out")
-                                                      )
-                                               )
-                                             ), hr(),
-                                             fluidRow(
-                                               column(10, offset = 1,
-                                                      box(id = "box4", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   h5(tags$b(quest["q4", 1])), 
-                                                                   box(width = 10, status = "warning",
-                                                                       solidHeader = TRUE,
-                                                                       p(tags$b("WARNING:"), " Careful! If you delete variables from the data table by deleting text in the left column, the server will disconnect and you will lose any responses entered since the last time you saved your progress!"),
-                                                                   ),
-                                                                   DTOutput("q4_tab"),
-                                                                   bsTooltip("q4_tab", title = "Double click the cell to edit", placement = "top", trigger = "hover"),
-                                                                   br(),
-                                                                   textAreaInput2(inputId = qid[11], label = quest[qid[11], ], width = "90%")
-                                                            )
-                                                          )
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             fluidRow(
-                                               column(5, offset = 1,
-                                                      h3("Next step"),
-                                                      p("We will build models that will allow us to predict water temperature and underwater light."))
-                                             )
-                                    ),
-                                    #* Objective 3 - Explore variable relationships ====
-                                    tabPanel(title = tab_names["stab3", 2], value = "stab3",
-                                             fluidRow(
-                                               column(12,
-                                                      wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab3", 2]),
-                                                                p(id = "txt_j", module_text["obj_03", ])
-                                                      )
-                                               )
-                                             ),
-                                             fluidRow(
-                                               #** Data Table ----
-                                               column(4,
-                                                      h3("Investigate variable relationships"),
-                                                      p("For Q.6 you will keep 'Chlorophyll-a' as the y-variable and explore its relationship with the other variables at this site."),
-                                                      selectizeInput("y_var", "Select Y variable",
-                                                                     choices = unique(neon_vars$Short_name),
-                                                                     options = list(
-                                                                       placeholder = 'Please select a variable',
-                                                                       onInitialize = I('function() { this.setValue("Chlorophyll-a"); }'))),
-                                                      selectizeInput("x_var", "Select X variable",
-                                                                     choices = unique(neon_vars$Short_name),
-                                                                     options = list(
-                                                                       placeholder = 'Please select a variable',
-                                                                       onInitialize = I('function() { this.setValue(""); }'))),
-                                                      #p("While for Q.7, you can select any two variables and investigate if there is any relationship. e.g. air temperature and surface water temperature")
-                                               ),
-                                               #** Plot of data ----
-                                               column(6,
-                                                      h3("Comparison Plot"),
-                                                      wellPanel(
-                                                        plotlyOutput("xy_plot")
-                                                      )
-                                               )
-                                             ),
-                                             fluidRow(
-                                               hr(),
-                                               column(10, align = "left",
-                                                      box(id = "box5", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   p(tags$b(quest[qid[12], ])),
-                                                                   textAreaInput2(inputId = qid[13], label = quest[qid[13], ],
-                                                                                  width = "90%"),
-                                                                   textAreaInput2(inputId = qid[14], label = quest[qid[14], ],
-                                                                                  width = "90%"),
-                                                                   textAreaInput2(inputId = qid[15], label = quest[qid[15], ],
-                                                                                  width = "90%"),
-                                                                   textAreaInput2(inputId = qid[16], label = quest[qid[16], ],
-                                                                                  width = "90%"),
-                                                                   # textAreaInput2(inputId = qid[17], label = quest[qid[17], ],
-                                                                   #                width = "90%"),
-                                                                   br(),
-                                                                   actionButton("submitButtonQ6", "Submit Q.6 answers"),
-                                                                   br(),
-                                                                   conditionalPanel("input.submitButtonQ6 > 0",
-                                                                                    p(tags$i("Thanks for submitting your answers! They've been used to populate a table for a question later on in Activity A.")),
-                                                                                    br()),
-                                                                   br()
-                                                            )
-                                                          )
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             #*** Next step ----
-                                             fluidRow(
-                                               column(12,
-                                                      h3("Next step"),
-                                                      p("Next we will use these data and the identified related variables to help build our ecological model.")
-                                               )
-                                             )
-                                    )
-                        )
-               ),
                
-               # 5. Activity A ----
+               # 4. Activity A ----
                tabPanel(title = tab_names["mtab5", 2], value = "mtab5",
                         img(src = "project-eddie-banner-2020_green.png", height = 100,
                             width = 1544, top = 5),
@@ -478,7 +296,7 @@ border-color: #FFF;
                                            h2("Activity A - Build A Model And Generate A Forecast"),
                                            p(module_text["act_A", ])
                                  )
-                          ),
+                          )
                         ),
                         tabsetPanel(id = "tabseries2",
                                     #* Objective 1 - Select site ====
@@ -503,7 +321,7 @@ border-color: #FFF;
                                                                                       choices = 1:nrow(neon_sites_df),
                                                                                       options = list(
                                                                                         placeholder = 'Please select a row',
-                                                                                        onInitialize = I('function() { this.setValue(""); }')),
+                                                                                        onInitialize = I('function() { this.setValue(""); }'))
                                                                        )
                                                       ),
                                                       DTOutput("table01"),
@@ -537,7 +355,7 @@ border-color: #FFF;
                                                  uiOutput("site_html"),
                                                  textOutput("prompt2"),
                                                  htmlOutput("site_link")
-                                               ),
+                                               )
                                              ),
                                              fluidRow(
                                                column(10, align = "left",
@@ -625,15 +443,15 @@ border-color: #FFF;
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h4("Questions"),
-                                                                   p(tags$b(quest["q5", 1])),
+                                                                   p(tags$b(quest["q5", 1]))
                                                             )
                                                           ),
-                                                          br(),
+                                                          br()
                                                       ),
                                                       hr(),
                                                       fluidRow(
-                                                        br(),
-                                                      ),
+                                                        br()
+                                                      )
                                                ),
                                                column(7,
                                                       h4("Time series of chlorophyll-a"),
@@ -662,124 +480,127 @@ border-color: #FFF;
                                                       )
                                                )
                                              ),
+                                             #** Introduce models ----
                                              fluidRow(
                                                column(4,
-                                                      h3("Initial Condition(s) Uncertainty"),
-                                                      p(module_text["init_uncert", ]),
-                                                      p("Here, we are focused on the initial condition of chlorophyll-a. Even though we have measurements of chlorophyll-a from our lake, we know that chlorophyll-a varies rapidly throughout the day and also over the surface of the lake, so one measurement might not capture perfectly the exact chlorophyll-a in our lake at this time.")
+                                                      h3("Before we fit our model to data..."),
+                                                      p(tags$em("Use the slides and text below to understand the forecast model we will be using.")),
+                                                      p(tags$b("What is an autoregressive model?")),
+                                                      tags$ul(
+                                                        tags$li("An ",tags$b("autoregressive model"), " uses past and/or current values of a variable to predict future values. In our case, we are interested in using past and current values of lake chlorophyll-a to predict future chlorophyll-a.")
+                                                      ),
+                                                      p(tags$b("What is autocorrelation?")),
+                                                      tags$ul(
+                                                        tags$li(tags$b("Autocorrelation")," is the correspondence between a value and previous values of that variable which have been recently observed. For example, mean daily air temperature over the course of a year exhibits autocorrelation, as today's mean daily air temperature is related to the mean daily air temperatures observed over the days and weeks prior to today.")
+                                                      ),
+                                                      p(tags$b("What is a lag?")),
+                                                      tags$ul(
+                                                        tags$li("A ",tags$b("lag")," is a particular amount of time that has passed between when we observe a value we are using as an explanatory, or independent, variable, and when we observe a value that we are trying to predict. For example, if you use today's air temperature to predict tomorrow's air temperature, you are using a 1-day lag of air temperature to predict tomorrow's air temperature. ")
+                                                      )
                                                ),
                                                column(8,
                                                       h5("Click the arrows to navigate through the slides", align = "center"),
                                                       wellPanel(
-                                                        slickROutput("ic_uc_slides", width = "640px", height = "360px")
+                                                        slickROutput("model_slides", width = "640px", height = "480px")
                                                       )
                                                )
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(4,
-                                                      h4("Forecasting with Initial Condition Uncertainty"),
-                                                      p("To account for initial condition uncertainty we can generate a distribution around this value and then run our model with slightly different initial conditions to account for this uncertainty."),
-                                                      p("Use the input below to set the value of the initial condition for chlorophyll-a."),
-                                                      numericInput("ic_val", "Initial condition value:", min = 0.5,
-                                                                   value = 7, max = 20, step = 0.5),
-                                                      actionButton("gen_ic1", "Generate distribution"),
-                                                      hr(),
+                                               column(10, align = "left",
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q6", 1]))                                                                   
+                                                            )
+                                                          )
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Plot 1-day lag of chlorophyll-a"),
+                                                      p(id = "txt_j", "Let's explore lags and autocorrelation in chl-a data at your chosen lake site."),
+                                                      p(id = "txt_j", "To make it easier to see the 1-day lag in chlorophyll-a on the figure, we will only plot a few months of data."),
+                                                      br(),
+                                                      actionButton("plot_lag1", "Plot lagged timeseries"),
+                                                      br(), br(),
                                                       box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[25], label = quest[qid[25], ], width = "90%"),
-                                                                   br()
+                                                                   p(tags$b(quest["q7", 1]))
                                                             )
                                                           )
                                                       )
                                                ),
-                                               # column(4,
-                                               #        h4("Recent Observations"),
-                                               #        wellPanel(
-                                               #          plotlyOutput("ic_obs_plot")
-                                               #        )
-                                               # ),
-                                               column(4, offset = 2,
-                                                      h4("Distribution of Initial Conditions"),
+                                               column(6,
                                                       wellPanel(
-                                                        plotOutput("ic_uc_plot1")
-                                                      )
+                                                        plotlyOutput("lag_plot1")
+                                                      ),
+                                                      downloadButton("save_lag_plot1", "Download plot", icon = icon("download"))
                                                )
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(4,
-                                                      h4("Forecasting with Initial Condition Uncertainty"),
-                                                      p("To account for initial condition uncertainty we can generate a distribution around this value and then run our model with slightly different initial conditions to account for this uncertainty."),
-                                                      p("Use the slider below to adjust the standard deviation and then generate a normal distribution around the observation"),
-                                                      sliderInput("ic_uc", "Standard deviation", min = 0, max = 5, value = 0.5, 
-                                                                  step = 0.5),
-                                                      actionButton("gen_ic2", "Generate distribution"),
-                                                      hr(),
+                                               column(6,
+                                                      p(id = "txt_j", "To visualize the relationship between chlorophyll and a 1 day lag of chlorophyll in a different way, we will also plot these two timeseries on a scatterplot. The dashed diagonal line represents the 1:1 line. The closer the points fall to this line, the stronger of the linear relationship between the independent variable (x axis) and the dependent variable (y axis)."),
+                                                      p(id = "txt_j", "Note that now, we are plotting the complete dataset."),
+                                                      br(),
+                                                      actionButton("plot_lag2", "Plot lag scatterplot"),
+                                                      br(), br(),
                                                       box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[26], label = quest[qid[26], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[27], label = quest[qid[27], ], width = "90%"),
-                                                                   br()
+                                                                   p(tags$b(quest["q8", 1]))
                                                             )
                                                           )
                                                       )
                                                ),
-                                               # column(4,
-                                               #        h4("Recent Observations"),
-                                               #        wellPanel(
-                                               #          plotlyOutput("ic_obs_plot")
-                                               #        )
-                                               # ),
-                                               column(4, offset = 2,
-                                                      h4("Distribution of Initial Conditions"),
+                                               column(6,
                                                       wellPanel(
-                                                        plotOutput("ic_uc_plot2")
-                                                      )
+                                                        plotlyOutput("lag_plot2")
+                                                      ),
+                                                      downloadButton("save_lag_plot2", "Download plot", icon = icon("download"))
                                                )
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(4,
-                                                      h3("Forecast!"),
-                                                      p("Now we will generate forecasts with different initial conditions for each of our models."),
-                                                      box(width = 10, status = "warning",
-                                                          solidHeader = TRUE,
-                                                          p("Note that ",tags$b("every time you generate a forecast,")," even if you do not change the value of the initial condition or initial condition uncertainty, ",tags$b("the forecast will look slightly different")," because it is generated using random draws from the initial conditions distribution.")
+                                               column(6,
+                                                      h3("Calculating autocorrelation"),
+                                                      p(id = "txt_j", "In addition to visualizing autocorrelation, we can also calculate it. The autocorrelation between chlorophyll-a",tags$em("(Chla)"), " and a 1-day lag of chlorophyll-a ",tags$em("(ChlaLag)")," is represented by the following equation:"),
+                                                      wellPanel(
+                                                        h4("Autocorrelation:"),
+                                                        #div("$$Autocorrelation = \frac {\sum_{t = 2}^{T} (Chla - \overline{Chla}) * (ChlaLag - \overline{Chla})}{\sum_{t = 1}^{T} (Chla - \overline{Chla})^2}$$"),
+                                                        #p("where $T$ is the timeseries of observations in the timeseries and $t$ represents which observation in that timeseries we are starting with (either the 1st or 2nd observation). Recall that the capital sigma $(\sum)$ indicates a sum and the overline $(\overline{Chla})$ indicates the mean.")
                                                       ),
                                                       br(),
-                                                      actionButton("run_fc1", label = div("Run Forecast", icon("running"))),
-                                                      br(),
-                                                      p("We will use multiple different initial condtions in the forecast ensemble. These will be sampled from the distribution generated above."),
-                                                      
-                                                      sliderInput("n_mem1", "No. of members", min = 5, max = 100, value = 30, step = 5),
-                                                      br(),
+                                                      actionButton("calc_ac", "Calculate autocorrelation"),
+                                                      br(),br(),
+                                                      wellPanel(
+                                                        textOutput("out_ac")
+                                                      ),
                                                       box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[28], label = quest[qid[28], ], width = "90%"),
-                                                                   br()
+                                                                   p(tags$b(quest["q9", 1]))
                                                             )
                                                           )
                                                       )
                                                ),
-                                               column(8,
+                                               column(6,
                                                       wellPanel(
-                                                        plotlyOutput("chla_fc1"),
-                                                        sliderInput("run_fc1_nday", "Number of forecast days", min = 1, max = 35, 
-                                                                    value = 1, 
-                                                                    step = 1, animate = TRUE),
-                                                        radioButtons("plot_type1", "Plot type", c("Line", "Distribution"),
-                                                                     inline = TRUE)
-                                                      )
+                                                        plotlyOutput("lag_plot1")
+                                                      ),
+                                                      downloadButton("save_lag_plot1", "Download plot", icon = icon("download"))
                                                )
                                              ),
                                              hr(),
@@ -803,7 +624,7 @@ border-color: #FFF;
                                            h2("Activity B - Assimilate Data"),
                                            p(module_text["act_B", ])
                                  )
-                          ),
+                          )
                         ),
                         tabsetPanel(id = "tabseries3",
                                     # #* Activity B - Overview ====
@@ -867,7 +688,7 @@ border-color: #FFF;
                                                             column(10, offset = 1,
                                                                    h3("Question"),
                                                                    radioButtons(qid[29], quest[qid[29], 1], choices = assim_choices, inline = TRUE, selected = character(0)),
-                                                                   br(),
+                                                                   br()
                                                             )
                                                           )
                                                       )
@@ -1435,7 +1256,7 @@ border-color: #FFF;
                                                                )
                                                         )
                                                       ),
-                                                      hr(),
+                                                      hr()
                                                       )
                                                ),
                                              hr(),
@@ -1468,7 +1289,7 @@ border-color: #FFF;
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
                                                                    textAreaInput2(inputId = qid[43], label = quest[qid[43], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[44], label = quest[qid[44], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[44], label = quest[qid[44], ], width = "90%")
                                                             )
                                                           )
                                                       )
@@ -1488,7 +1309,7 @@ border-color: #FFF;
                                            h2("Activity C - Management Scenario"),
                                            p(module_text["act_C", ])
                                  )
-                          ),
+                          )
                         ),
                         tabsetPanel(id = "tabseries4",
                                     #* Objective 10 - Management Scenario ====
@@ -1509,7 +1330,7 @@ border-color: #FFF;
                                                       p("The water authority that manages Green Reservoir has developed a forecast system that assimilates monthly chlorophyll-a observations which are collected manually at the beginning of each month by water authority personnel. But managers are interested in exploring whether they can increase the accuracy of their forecasts by investing in a high-frequency chlorophyll-a sensor."),
                                                       p("The water authority of Green Reservoir has budgeted $15,000 for new forecast sensors. After doing some market research, the forecast development team at the water authority has identified two options for chl-a sensors: "),
                                                       p("Sensor A costs $15,000, including the cost of the technology needed to wirelessly transmit data from this sensor to computers that will run the forecast model as well as personnel to install and maintain the sensor."),
-                                                      p("Sensor B costs $20,000, including the cost of the technology and personnel. Sensor B is more expensive because it is able to make more precise observations (less observation error) and is somewhat more reliable than Sensor A (less likely to experience sensor malfunction)."),
+                                                      p("Sensor B costs $20,000, including the cost of the technology and personnel. Sensor B is more expensive because it is able to make more precise observations (less observation error) and is somewhat more reliable than Sensor A (less likely to experience sensor malfunction).")
                                                       ),
                                                column(6,
                                                       img(src = "Objective10_Scenario1.jpg", height = "80%", id = "bla_border",
@@ -1562,7 +1383,7 @@ border-color: #FFF;
                                                                                       textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%")
                                                                                )
                                                                              )
-                                                                         ),
+                                                                         )
                                                         ),
                                                         p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
                                                         checkboxInput("add_obs_actc3a", "Add observations")
@@ -1590,7 +1411,7 @@ border-color: #FFF;
                                                                                       textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
                                                                                )
                                                                              )
-                                                                         ),
+                                                                         )
                                                         ),
                                                         p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
                                                         checkboxInput("add_obs_actc1a", "Add observations")
@@ -1617,7 +1438,7 @@ border-color: #FFF;
                                                                                       textAreaInput2(inputId = qid[48], label = quest[qid[48], ], width = "90%")
                                                                                )
                                                                              )
-                                                                         ),
+                                                                         )
                                                         ),
                                                         p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
                                                         checkboxInput("add_obs_actc2a", "Add observations")

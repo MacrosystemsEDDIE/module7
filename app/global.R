@@ -28,8 +28,6 @@ neonIcons <- iconList(
   Terrestrial = makeIcon("icons/mountain-icon.png", iconWidth =  28, iconHeight = 28)
 )
 
-# Slides for slickR
-model_slides <- list.files("www/model_slides", full.names = TRUE)
 
 # Reference for downloading variables
 neon_vars <- read.csv("data/neon_variables.csv")
@@ -71,75 +69,14 @@ invisible(sapply(list.files("R", full.names = TRUE), source))
 
 # Load and format questions
 quest <- read.csv("data/student_questions.csv", row.names = 1)
+qid <- row.names(quest)
 
 # Help documentation
 help_text <- read.csv("data/help_text.csv", row.names = 1)
 
-ab1 <- 4:9
-ab2 <- 13:16
-ab3 <- 18:20
-ab4 <- 23:24
-
-l1 <- length(ab1)
-l2 <- length(ab2)
-l3 <- length(ab3)
-l4 <- length(ab4)
-
-# Number rows
-row.names(quest) <- NULL
-row.names(quest)[1:(ab1[1]-1)] <- paste0("q", 1:(ab1[1] -1))
-row.names(quest)[ab1[1]:ab1[l1]] <- paste0("q", (ab1[1] -1), letters[1:l1])
-row.names(quest)[(ab1[l1]+1):(ab2[1]-1)] <- paste0("q", ((ab1[l1]+1):(ab2[1] -1) - l1))
-row.names(quest)[ab2[1]:ab2[l2]] <- paste0("q", (ab2[1]-1-l1), letters[1:l2])
-row.names(quest)[(ab2[l2]+1):(ab3[1] -1)] <- paste0("q", (((ab2[l2]+1):(ab3[1] -1)) -(l1+l2)))
-row.names(quest)[ab3[1]:ab3[l3]] <- paste0("q", (ab3[1]-1-l1-l2), letters[1:l3])
-row.names(quest)[(ab3[l3]+1):(ab4[1] -1)] <- paste0("q", (((ab3[l3]+1):(ab4[1] -1)) -(l1+l2+l3)))
-row.names(quest)[ab4[1]:ab4[l4]] <- paste0("q", (ab4[1]-1-l1-l2-l3), letters[1:l4])
-row.names(quest)[(ab4[l4]+1):nrow(quest)] <- paste0("q", (((ab4[l4]+1):nrow(quest)) -(l1+l2+l3+l4)))
-
-
-
-qid <- row.names(quest)
-# Number questions
-quest$Question[1:(ab1[1]-1)] <- paste0("Q.", 1:(ab1[1]-1), " ", quest$Question[1:(ab1[1]-1)])
-quest$Question[ab1[1]:ab1[l1]] <- paste0(letters[1:l1], ". ", quest$Question[ab1[1]:ab1[l1]])
-quest$Question[(ab1[l1]+1):(ab2[1]-1)] <- paste0("Q.", (((ab1[l1]+1):(ab2[1] -1))-l1), " ", quest$Question[(((ab1[l1]+1):(ab2[1] -1)))])
-quest$Question[ab2[1]:ab2[l2]] <- paste0(letters[1:l2], ". ", quest$Question[ab2[1]:ab2[l2]])
-quest$Question[(ab2[l2]+1):(ab3[1]-1)] <- paste0("Q.", (((ab2[l2]+1):(ab3[1] -1))-l1-l2), " ", quest$Question[(((ab2[l2]+1):(ab3[1] -1)))])
-quest$Question[ab3[1]:ab3[l3]] <- paste0(letters[1:l3], ". ", quest$Question[ab3[1]:ab3[l3]])
-quest$Question[(ab3[l3]+1):(ab4[1]-1)] <- paste0("Q.", (((ab3[l3]+1):(ab4[1] -1))-l1-l2-l3), " ", quest$Question[(((ab3[l3]+1):(ab4[1] -1)))])
-quest$Question[ab4[1]:ab4[l4]] <- paste0(letters[1:l4], ". ", quest$Question[ab4[1]:ab4[l4]])
-quest$Question[(ab4[l4]+1):nrow(quest)] <- paste0("Q.", (((ab4[l4]+1):(nrow(quest)))-l1-l2-l3-l4), " ", quest$Question[(((ab4[l4]+1):(nrow(quest))))])
-
-
-# Number location
-idx1 <- grep("Q.10", quest$Question)
-quest$location[1:(idx1-1)] <- paste0(quest$location[1:(idx1-1)], " - ", substr(quest$Question[1:(idx1-1)], 1, 3))
-#quest$location[(idx1+1):(idx1+2)] <- paste0(quest$location[(idx1+1):(idx1+2)], " - ", substr(quest$Question[(idx1+1):(idx1+2)], 1, 4))
-quest$location[idx1] <- paste0(quest$location[idx1], " - ", substr(quest$Question[idx1], 1, 4))
-quest$location[(idx1+1):nrow(quest)] <- paste0(quest$location[(idx1+1):nrow(quest)], " - ", substr(quest$Question[(idx1+1):nrow(quest)], 1, 4))
-# quest$location[idx:(ab1[l1])] <- paste0(quest$location[idx:ab1[l1]],letters[1:length(idx:ab1[l1])], ". ", )
-# quest$location[(ab1[l1]+1):(ab2[1]-1)] <- paste0(quest$location[(ab1[l1]+1):(ab2[1]-1)], " - Q.", ((ab1[l1]+1):(ab2[1]-1) - l1))
-# Create dataframe for answers
-answers <- quest
-quest$location <- NULL
-colnames(answers)[1] <- "Answer"
-answers[, 1] <- ""
-
-#Table for Q4 and Q9
-q4_table <- data.frame(
-  Frequency = rep(NA, 6),
-  row.names = c("Air temperature", "Surface water temperature", "Shortwave radiation", "Underwater PAR", "Nitrogen", "Chlorophyll-a")
-)
-
-# q9_table <- data.frame(
-#   Q.6.answers = rep(NA, 3),
-#   Q.7.answers = rep(NA, 3),
-#   row.names = c("Primary productivity vs. water temperature", "Primary productivity vs. light", "Primary productivity vs. nutrients")
-# )
-
 # Slides
 recap_slides <- list.files("www/Mod7_key_slides", full.names = TRUE)
+model_slides <- list.files("www/model_slides", full.names = TRUE)
 ic_uc_slides <- list.files("www/ic_uc_slides", full.names = TRUE)
 chla_slides <- list.files("www/chla_data_collection", full.names = TRUE)
 nitrate_slides <- list.files("www/nitrate_data_collection/", full.names = TRUE)
@@ -202,6 +139,7 @@ process_vars <- c("Mortality", "Uptake")
 budget_options <- read.csv("data/wq_monitoring_budget2.csv", fileEncoding = "UTF-8-BOM")
 budget_options$label <- paste0(budget_options$item, " ($", formatC(budget_options$cost, big.mark = ",", format = "d"), ")")
 budget <- data.frame(variable = c("Budget"), value = c(10000), fill = c("Budget"))
+
 
 # ggplot theme
 mytheme <- theme(axis.line.x = element_line(colour = "black"), axis.line.y = element_line(colour = "black"),
@@ -328,11 +266,5 @@ obs_plot_c$future <- df
 
 gap_df <- obs_plot_c
 
-# data_collect_options <- data.frame(text = c("High-quality manual data from all depths collected weekly",
-#                           "Sensor data that is high-frequency (hourly) and high-quality but fixed at one depth",
-#                           "Sensor data that is high-frequency but low-quality and at multiple depths"),
-#                           chla_freq = c(7, 1, 1), obs_cv = c(0.01, 0.02, 0.08))
-
-# data_collect_options <- data_collect_options[sample(1:3, size = 3, replace = FALSE)]
 
 # end

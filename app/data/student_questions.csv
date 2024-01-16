@@ -1,53 +1,46 @@
-﻿q_no,Question,location
-q1,What is meant by the term 'data assimilation' in the context of ecological forecasting?,Introduction:
-q2,How do you think the process of integrating the most recently observed data into models can improve forecasts? ,Introduction:
-q3,Fill out information about your selected NEON site.,Site Selection: Objective 1
-q3a,Name of selected site:,Site Selection: Objective 1
-q3b,Four letter site identifier:,Site Selection: Objective 1
-q3c,Latitude:,Site Selection: Objective 1
-q3d,Longitude:,Site Selection: Objective 1
-q3e,Lake area (km2):,Site Selection: Objective 1
-q3f,Elevation (m):,Site Selection: Objective 1
-q4,Why might a forecast of lake chlorophyll-a concentration days to weeks into the future be a useful tool for water managers?,Site Selection: Objective 2
-q5,Describe how chlorophyll-a changes over time in your lake. Do you notice any patterns or trends?,Site Selection: Objective 2
-q6,Describe the effect of each of the following variables on chlorophyll-a. Chlorophyll-a is used as a proxy measurement for algal biomass (phytoplankton concentration) and primary productivity in aquatic environments.,Site Selection: Objective 3
-q6a,Air temperature,Site Selection: Objective 3
-q6b,Surface water temperature,Site Selection: Objective 3
-q6c,Underwater PAR,Site Selection: Objective 3
-q6d,Nitrate sensor,Site Selection: Objective 3
-q7,"In our ecological model of primary productivity, what is the relationship between each of these driver variables and productivity? For example, if the driver variable increases, will it cause productivity to increase (positive relationship), decrease (negative relationship), or have no effect (stay the same). Hint: Use the slides at the top of the page to help you if you are not sure of the answer.",Activity A: Objective 4
-q7a,Surface water temperature,Activity A: Objective 4
-q7b,Incoming light,Activity A: Objective 4
-q7c,Available nutrients,Activity A: Objective 4
-q8,Classify the following as either a state variable or a driver variable by dragging it into the corresponding bin.,Activity A: Objective 4
-q9,Compare your answers between Q.6 and Q.7. Are there any differences in the relationships between primary productivity and driver variables that you observed in the lake data (Q.6) and the relationships between primary productivity and driver variables in the ecological model (Q.7)?,Activity A: Objective 4
-q9a,Increases in water temperature,Activity A: Objective 4
-q9b,Increases in underwater light,Activity A: Objective 4
-q10,"How sensitive is your forecast to the initial condition of chlorophyll-a? Specifically, if you start the model at low or high values of chlorophyll-a concentration, how does this affect forecast output?",Activity A: Objective 6
-q11,"How sensitive is your forecast to initial condition uncertainty? Specifically, if you start the model using a normal distribution of initial conditions with a small versus a large standard deviation, how does this affect forecast output?",Activity A: Objective 6
-q12,"Based on your answer to questions 10 and 11, how do you think your forecast would be affected by assimilating the most recently observed data into the model to inform the value of the initial condition of chlorophyll-a?",Activity A: Objective 6
-q13,How does changing the value of the initial condition AND the uncertainty of the initial condition affect your ensemble forecast output?,Activity A: Objective 6
-q14,"Make a hypothesis by choosing the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation.""",Activity B: Objective 7
-q15,Describe the predicted vs. observed plot for your forecast with no data assimilation. How accurate do you think the forecast is?,Activity B: Objective 7
-q16,Record the RMSE of your forecast with no data assimilation.,Activity B: Objective 7
-q17,Describe the predicted vs. observed plot for your forecast with chlorophyll-a data assimilation. How accurate do you think the forecast is?,Activity B: Objective 7
-q18,Record the RMSE of your forecast with chlorophyll-a data assimilation.,Activity B: Objective 7
-q19,"Using RMSE from the table above, choose the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation."" Remember, a lower RMSE value indicates a more accurate forecast.",Activity B: Objective 7
-q20,"Using the table above, briefly characterize the relative amount of observation uncertainty associated with chl-a sensors and chl-a lab measurements.",Activity B: Objective 8
-q21,Make a hypothesis: how do you think a high level of observation uncertainty might affect the process of data assimilation into forecasts and forecast output?,Activity B: Objective 8
-q22,Describe the effect of changes in observation uncertainty on your forecast output. Does this match your stated expectation from the previous question?,Activity B: Objective 8
-q23,"Referring to the table above, what are some of the most common factors affecting how often data are available for assimilation into ecological forecasts?",Activity B: Objective 9
-q24,"Make a hypothesis: how do you think the frequency of data assimilation might affect forecast output? Specifically, how do you think that a forecast which assimilates data once a month might differ from a forecast that assimilates data every day?",Activity B: Objective 9
-q25,"Generate a forecast with chl-a data assimilation every 10 days, and record the RMSE of the forecast.",Activity B: Objective 9
-q26,"Generate a forecast with daily data assimilation for chl-a, and record the RMSE of the forecast.",Activity B: Objective 9
-q27,Compare the RMSEs of forecasts when data are assimilated every day vs. when data are only assimilated every 10 days. How do they compare? What does this comparison indicate about the effect of data assimilation frequency on forecast output?,Activity B: Objective 9
-q28,What are some characteristics of environmental data that would make data easier or harder to assimilate into forecasts? Explain your reasoning.,Activity B: Summary
-q29,What are some characteristics of environmental data that would lead to the greatest improvement in forecast accuracy when those data are assimilated? Explain your reasoning.,Activity B: Summary
-q30,Briefly explain your decision to purchase either Sensor A (cheap sensor) or Sensor B (expensive sensor).,Activity C: Objective 10
-q31,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
-q32,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
-q33,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
-q34,How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor A (cheaper sensor)?,Activity C: Objective 10
-q35,How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor B (expensive sensor)?,Activity C: Objective 10
-q36,How did the management decision made using a forecast with Sensor A (cheaper sensor) compare to the decision made using a forecast with Sensor B (expensive sensor)?,Activity C: Objective 10
-q37,"Now that you can see forecasts generated with each sensor as well as all the data collected during the forecast period, would you change your recommendation to the water authority about which sensor to use? Why or why not?",Activity C: Objective 10
+﻿q_no,Question
+q1,Q1. What is meant by the term 'data assimilation' in the context of ecological forecasting?
+q2,Q2. How do you think the process of integrating the most recently observed data into models can improve forecasts? 
+q3,Q3. Fill out information about your selected NEON site.
+q3a,a. Name of selected site:
+q3b,b. Four letter site identifier:
+q3c,c. Latitude:
+q3d,d. Longitude:
+q3e,e. Lake area (km2):
+q3f,f. Elevation (m):
+q4,Q4. Why might a forecast of lake chlorophyll-a concentration days to weeks into the future be a useful tool for water managers?
+q5,Q5. Describe how chlorophyll-a changes over time in your lake. Do you notice any patterns or trends?
+q6,"Q6. Explain, in your own words, how autocorrelation in a variable can help forecasters make predictions of the future."
+q7,Q7. Describe what you observe on the timeseries figure of chlorophyll-a. How do the two lines plotted on the timeseries (chlorophyll and 1 day lag of chlorophyll) relate to each other?
+q8,Q8. Describe what you observe on the scatterplot figure above. Do you think the chlorophyll-a data at your chosen lake site exhibit autocorrelation? Why or why not?
+q9,Compare your answers between Q.6 and Q.7. Are there any differences in the relationships between primary productivity and driver variables that you observed in the lake data (Q.6) and the relationships between primary productivity and driver variables in the ecological model (Q.7)?
+q9a,Increases in water temperature
+q9b,Increases in underwater light
+q10,"How sensitive is your forecast to the initial condition of chlorophyll-a? Specifically, if you start the model at low or high values of chlorophyll-a concentration, how does this affect forecast output?"
+q11,"How sensitive is your forecast to initial condition uncertainty? Specifically, if you start the model using a normal distribution of initial conditions with a small versus a large standard deviation, how does this affect forecast output?"
+q12,"Based on your answer to questions 10 and 11, how do you think your forecast would be affected by assimilating the most recently observed data into the model to inform the value of the initial condition of chlorophyll-a?"
+q13,How does changing the value of the initial condition AND the uncertainty of the initial condition affect your ensemble forecast output?
+q14,"Make a hypothesis by choosing the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation."""
+q15,Describe the predicted vs. observed plot for your forecast with no data assimilation. How accurate do you think the forecast is?
+q16,Record the RMSE of your forecast with no data assimilation.
+q17,Describe the predicted vs. observed plot for your forecast with chlorophyll-a data assimilation. How accurate do you think the forecast is?
+q18,Record the RMSE of your forecast with chlorophyll-a data assimilation.
+q19,"Using RMSE from the table above, choose the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation."" Remember, a lower RMSE value indicates a more accurate forecast."
+q20,"Using the table above, briefly characterize the relative amount of observation uncertainty associated with chl-a sensors and chl-a lab measurements."
+q21,Make a hypothesis: how do you think a high level of observation uncertainty might affect the process of data assimilation into forecasts and forecast output?
+q22,Describe the effect of changes in observation uncertainty on your forecast output. Does this match your stated expectation from the previous question?
+q23,"Referring to the table above, what are some of the most common factors affecting how often data are available for assimilation into ecological forecasts?"
+q24,"Make a hypothesis: how do you think the frequency of data assimilation might affect forecast output? Specifically, how do you think that a forecast which assimilates data once a month might differ from a forecast that assimilates data every day?"
+q25,"Generate a forecast with chl-a data assimilation every 10 days, and record the RMSE of the forecast."
+q26,"Generate a forecast with daily data assimilation for chl-a, and record the RMSE of the forecast."
+q27,Compare the RMSEs of forecasts when data are assimilated every day vs. when data are only assimilated every 10 days. How do they compare? What does this comparison indicate about the effect of data assimilation frequency on forecast output?
+q28,What are some characteristics of environmental data that would make data easier or harder to assimilate into forecasts? Explain your reasoning.
+q29,What are some characteristics of environmental data that would lead to the greatest improvement in forecast accuracy when those data are assimilated? Explain your reasoning.
+q30,Briefly explain your decision to purchase either Sensor A (cheap sensor) or Sensor B (expensive sensor).
+q31,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?"
+q32,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?"
+q33,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?"
+q34,How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor A (cheaper sensor)?
+q35,How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor B (expensive sensor)?
+q36,How did the management decision made using a forecast with Sensor A (cheaper sensor) compare to the decision made using a forecast with Sensor B (expensive sensor)?
+q37,"Now that you can see forecasts generated with each sensor as well as all the data collected during the forecast period, would you change your recommendation to the water authority about which sensor to use? Why or why not?"
