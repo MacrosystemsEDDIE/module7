@@ -626,7 +626,7 @@ ui <- function(req) {
                                            h2("Activity B - Assimilate Data"),
                                            p(module_text["act_B", ])
                                  )
-                          ),
+                          )
                         ),
                         tabsetPanel(id = "tabseries3",
                                     # #* Activity B - Overview ====
@@ -690,7 +690,7 @@ ui <- function(req) {
                                                             column(10, offset = 1,
                                                                    h3("Question"),
                                                                    radioButtons(qid[29], quest[qid[29], 1], choices = assim_choices, inline = TRUE, selected = character(0)),
-                                                                   br(),
+                                                                   br()
                                                             )
                                                           )
                                                       )
@@ -1258,7 +1258,7 @@ ui <- function(req) {
                                                                )
                                                         )
                                                       ),
-                                                      hr(),
+                                                      hr()
                                                       )
                                                ),
                                              hr(),
@@ -1291,7 +1291,7 @@ ui <- function(req) {
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
                                                                    textAreaInput2(inputId = qid[43], label = quest[qid[43], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[44], label = quest[qid[44], ], width = "90%"),
+                                                                   textAreaInput2(inputId = qid[44], label = quest[qid[44], ], width = "90%")
                                                             )
                                                           )
                                                       )
@@ -1311,7 +1311,7 @@ ui <- function(req) {
                                            h2("Activity C - Management Scenario"),
                                            p(module_text["act_C", ])
                                  )
-                          ),
+                          )
                         ),
                         tabsetPanel(id = "tabseries4",
                                     #* Objective 10 - Management Scenario ====
@@ -1332,7 +1332,7 @@ ui <- function(req) {
                                                       p("The water authority that manages Green Reservoir has developed a forecast system that assimilates monthly chlorophyll-a observations which are collected manually at the beginning of each month by water authority personnel. But managers are interested in exploring whether they can increase the accuracy of their forecasts by investing in a high-frequency chlorophyll-a sensor."),
                                                       p("The water authority of Green Reservoir has budgeted $15,000 for new forecast sensors. After doing some market research, the forecast development team at the water authority has identified two options for chl-a sensors: "),
                                                       p("Sensor A costs $15,000, including the cost of the technology needed to wirelessly transmit data from this sensor to computers that will run the forecast model as well as personnel to install and maintain the sensor."),
-                                                      p("Sensor B costs $20,000, including the cost of the technology and personnel. Sensor B is more expensive because it is able to make more precise observations (less observation error) and is somewhat more reliable than Sensor A (less likely to experience sensor malfunction)."),
+                                                      p("Sensor B costs $20,000, including the cost of the technology and personnel. Sensor B is more expensive because it is able to make more precise observations (less observation error) and is somewhat more reliable than Sensor A (less likely to experience sensor malfunction).")
                                                       ),
                                                column(6,
                                                       img(src = "Objective10_Scenario1.jpg", height = "80%", id = "bla_border",
@@ -1385,7 +1385,7 @@ ui <- function(req) {
                                                                                       textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%")
                                                                                )
                                                                              )
-                                                                         ),
+                                                                         )
                                                         ),
                                                         p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
                                                         checkboxInput("add_obs_actc3a", "Add observations")
@@ -1413,7 +1413,7 @@ ui <- function(req) {
                                                                                       textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
                                                                                )
                                                                              )
-                                                                         ),
+                                                                         )
                                                         ),
                                                         p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
                                                         checkboxInput("add_obs_actc1a", "Add observations")
@@ -1440,7 +1440,7 @@ ui <- function(req) {
                                                                                       textAreaInput2(inputId = qid[48], label = quest[qid[48], ], width = "90%")
                                                                                )
                                                                              )
-                                                                         ),
+                                                                         )
                                                         ),
                                                         p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
                                                         checkboxInput("add_obs_actc2a", "Add observations")
