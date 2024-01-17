@@ -556,24 +556,16 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[26], label = quest[qid[26], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[27], label = quest[qid[27], ], width = "90%"),
-                                                                   br()
+                                                                   p(tags$b(quest["q8", 1]))
                                                             )
                                                           )
                                                       )
                                                ),
-                                               # column(4,
-                                               #        h4("Recent Observations"),
-                                               #        wellPanel(
-                                               #          plotlyOutput("ic_obs_plot")
-                                               #        )
-                                               # ),
-                                               column(4, offset = 2,
-                                                      h4("Distribution of Initial Conditions"),
+                                               column(6,
                                                       wellPanel(
-                                                        plotOutput("ic_uc_plot2")
-                                                      )
+                                                        plotlyOutput("lag_plot2")
+                                                      ),
+                                                      downloadButton("save_lag_plot2", "Download plot", icon = icon("download"))
                                                )
                                              ),
                                              hr(),
