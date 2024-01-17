@@ -442,15 +442,15 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h4("Questions"),
-                                                                   p(tags$b(quest["q5", 1])),
+                                                                   p(tags$b(quest["q5", 1]))
                                                             )
                                                           ),
-                                                          br(),
+                                                          br()
                                                       ),
                                                       hr(),
                                                       fluidRow(
-                                                        br(),
-                                                      ),
+                                                        br()
+                                                      )
                                                ),
                                                column(7,
                                                       h4("Time series of chlorophyll-a"),
