@@ -681,11 +681,61 @@ ui <- function(req) {
                                                       )
                                              ),
                                              hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Assess model fit"),
+                                                      p("Before we use this model for forecasting, it is a good idea to see how well it fits our data. We have already assessed our model fit visually, using the plot of model predictions vs. observations above. Now we will explore two more methods for assessing model fit:"),
+                                                      tags$ul(
+                                                        tags$li(tags$b("Bias")," is the mean difference between model predictions and observations. The smaller the absolute value of the bias, the better your model fit.")
+                                                      ),
+                                                      tags$ul(
+                                                        tags$li(tags$b("Root mean square error (RMSE)")," is the mean sum of squared errors (differences between predictions and observations), and can be calculated as:")
+                                                      ),
+                                                      wellPanel(
+                                                        div("$$RMSE = \\sqrt{\\frac{\\sum_{i=1}^{N}(Predicted_i - Observed_i)^2}{N}}$$"),
+                                                        p("The closer RMSE is to 0, the better your model fit.")
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      h4(tags$em("Let's calculate bias and RMSE for the AR model you just fit!")),
+                                                      fluidRow(
+                                                        column(6,
+                                                               actionButton("calc_bias",label = "Calculate bias")
+                                                        ),
+                                                        column(6,
+                                                               wellPanel(
+                                                                 htmlOutput("out_bias")
+                                                               )
+                                                        )
+                                                      ),
+                                                      fluidRow(
+                                                        column(6,
+                                                               actionButton("calc_rmse",label = "Calculate RMSE")
+                                                        ),
+                                                        column(6,
+                                                               wellPanel(
+                                                                 htmlOutput("out_rmse")
+                                                               )
+                                                        )
+                                                      ),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q16", 1])),
+                                                                   p(tags$b(quest["q17", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      )
+                                             ),
+                                             hr(),
                                              #*** Next step ----
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("We will assimilate observed data into your forecast!")
+                                                      p("We will use the autoregressive model you fitted to generate a forecast of chlorophyll-a with uncertainty!")
                                                )
                                              )
                                     )

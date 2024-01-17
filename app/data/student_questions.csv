@@ -20,8 +20,8 @@ q12,Q12. Examine the PACF plot. Which lag contributes the most to autocorrelatio
 q13,"Q13. Once again, imagine you are asked to develop a forecasting model that uses lagged values of chlorophyll-a to predict future chlorophyll-a. Examining the PACF plot above, how many lags of chlorophyll-a would you include in your forecasting model? Provide your answer in days (e.g., I would include up to a 3-day lag) and explain your reasoning."
 q14,Q14. Did the number of lags you chose to include in your forecasting model change from Q11 to Q13? Why or why not?
 q15,Q15. Use the plot above to assess the model fit to data. How well do the predictions match the observations?
-q16,Record the RMSE of your forecast with no data assimilation.
-q17,Describe the predicted vs. observed plot for your forecast with chlorophyll-a data assimilation. How accurate do you think the forecast is?
+q16,"Q16. Record your model bias. Then, use the calculated bias to assess the model fit to data. How good is the model fit? Explain your reasoning."
+q17,"Q17. Record your model RMSE. Then, use the calculated RMSE to assess the model fit to data. How good is the model fit? Explain your reasoning."
 q18,Record the RMSE of your forecast with chlorophyll-a data assimilation.
 q19,"Using RMSE from the table above, choose the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation."" Remember, a lower RMSE value indicates a more accurate forecast."
 q20,"Using the table above, briefly characterize the relative amount of observation uncertainty associated with chl-a sensors and chl-a lab measurements."

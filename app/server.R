@@ -460,6 +460,7 @@ shinyServer(function(input, output, session) {
   })
   
   # Model fit plot ----
+  model_fit_data <- reactiveValues(df = NULL)
   plot.arfit <- reactiveValues(main=NULL)
   
   output$arfit_plot <- renderPlotly({ 
@@ -481,11 +482,12 @@ shinyServer(function(input, output, session) {
     
     mod <- ar.model$intercept + ar.model$ar1 * (df$chla - ar.model$chla_mean) + ar.model$chla_mean
     
-    model_fit_plot_data <- tibble(date = df$datetime,
-                                  chla = df$chla,
-                                  model = mod)
+    model_fit_data$df <- tibble(date = df$datetime,
+                                chla = df$chla,
+                                model = mod,
+                                residuals = (mod - df$chla))
     
-    p <- plot_mod_predictions(model_fit_plot_data = model_fit_plot_data, variable_name = "Chlorophyll-a (ug/L)")
+    p <- plot_mod_predictions(model_fit_plot_data = model_fit_data$df, variable_name = "Chlorophyll-a (ug/L)")
     
     plot.arfit$main <- p
     
@@ -507,6 +509,55 @@ shinyServer(function(input, output, session) {
     }
   )
   
+  # Text output for bias ----
+  output$out_bias <- renderUI({
+    
+    validate(
+      need(!is.null(autocorrelation_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model above.")
+    )
+    validate(
+      need(input$calc_bias > 0,
+           message = "Click 'Calculate bias'")
+    )
+    
+    df <- model_fit_data$df
+    
+    bias <- round(mean(model_fit_data$df$model - model_fit_data$df$chla, na.rm = TRUE),4)
+    
+    out_bias <- paste("<b>","Bias: ",bias,"</b>", sep = "")
+    
+    HTML(paste(out_bias))
+  })
+  
+  # Text output for RMSE ----
+  output$out_rmse <- renderUI({
+    
+    validate(
+      need(!is.null(autocorrelation_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model above.")
+    )
+    validate(
+      need(input$calc_rmse > 0,
+           message = "Click 'Calculate RMSE'")
+    )
+    
+    df <- model_fit_data$df
+    
+    rmse <- round(sqrt(mean((model_fit_data$df$model - model_fit_data$df$chla)^2, na.rm = TRUE)), 2)
+    
+    out_rmse <- paste("<b>","RMSE: ",rmse,"</b>", sep = "")
+    
+    HTML(paste(out_rmse))
+  })
   
   ##########OLD
 
