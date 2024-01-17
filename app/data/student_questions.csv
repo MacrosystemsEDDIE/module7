@@ -13,14 +13,12 @@ q5,Q5. Describe how chlorophyll-a changes over time in your lake. Do you notice 
 q6,"Q6. Explain, in your own words, how autocorrelation in a variable can help forecasters make predictions of the future."
 q7,Q7. Describe what you observe on the timeseries figure of chlorophyll-a. How do the two lines plotted on the timeseries (chlorophyll and 1 day lag of chlorophyll) relate to each other?
 q8,Q8. Describe what you observe on the scatterplot figure above. Do you think the chlorophyll-a data at your chosen lake site exhibit autocorrelation? Why or why not?
-q9,Q.9 Interpret the autocorrelation value you calculated; does this value indicate low or high autocorrelation between chlorophyll-a and a 1-day lag of chlorophyll-a?
-q9a,Increases in water temperature
-q9b,Increases in underwater light
-q10,"How sensitive is your forecast to the initial condition of chlorophyll-a? Specifically, if you start the model at low or high values of chlorophyll-a concentration, how does this affect forecast output?"
-q11,"How sensitive is your forecast to initial condition uncertainty? Specifically, if you start the model using a normal distribution of initial conditions with a small versus a large standard deviation, how does this affect forecast output?"
-q12,"Based on your answer to questions 10 and 11, how do you think your forecast would be affected by assimilating the most recently observed data into the model to inform the value of the initial condition of chlorophyll-a?"
-q13,How does changing the value of the initial condition AND the uncertainty of the initial condition affect your ensemble forecast output?
-q14,"Make a hypothesis by choosing the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation."""
+q9,Q9. Interpret the autocorrelation value you calculated; does this value indicate low or high autocorrelation between chlorophyll-a and a 1-day lag of chlorophyll-a?
+q10,Q10. Describe how autocorrelation changes as the lag in days increases. Why do you think this pattern occurs?
+q11,"Q11. Imagine you are asked to develop a forecasting model that uses lagged values of chlorophyll-a to predict future chlorophyll-a. Examining the autocorrelation plot above, how many lags of chlorophyll-a would you include in your forecasting model? Provide your answer in days (e.g., I would include up to a 3-day lag) and explain your reasoning."
+q12,Q12. Examine the PACF plot. Which lag contributes the most to autocorrelation in the chlorophyll-a data? Explain how you know.
+q13,"Q13. Once again, imagine you are asked to develop a forecasting model that uses lagged values of chlorophyll-a to predict future chlorophyll-a. Examining the PACF plot above, how many lags of chlorophyll-a would you include in your forecasting model? Provide your answer in days (e.g., I would include up to a 3-day lag) and explain your reasoning."
+q14,Q14. Did the number of lags you chose to include in your forecasting model change from Q11 to Q13? Why or why not?
 q15,Describe the predicted vs. observed plot for your forecast with no data assimilation. How accurate do you think the forecast is?
 q16,Record the RMSE of your forecast with no data assimilation.
 q17,Describe the predicted vs. observed plot for your forecast with chlorophyll-a data assimilation. How accurate do you think the forecast is?

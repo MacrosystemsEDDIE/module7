@@ -321,6 +321,109 @@ shinyServer(function(input, output, session) {
     HTML(paste(out_ac))
   })
   
+  # Autocorrelation plot many lags ----
+  plot.ac <- reactiveValues(main=NULL)
+  
+  output$ac_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(input$plot_ac > 0,
+           message = "Click 'Plot autocorrelation for many lags'")
+    )
+    
+    df <- autocorrelation_data$df
+    
+    acf_list <- acf(df$chla, plot = FALSE)
+    
+    acf_plot_data <- tibble(Lag = acf_list$lag,
+                            ACF = round(acf_list$acf, 2))
+    
+    p <- ggplot(data = acf_plot_data, aes(x = Lag, y = ACF))+
+      geom_bar(stat = "identity", color = "#2CB572", fill = "#D4ECE1")+
+      xlab("Lag in days")+
+      ylab("Chl-a autocorrelation")+
+      theme_bw()
+    
+    plot.ac$main <- p
+    
+    return(ggplotly(p, dynamicTicks = TRUE))
+    
+  })
+  
+  # Download ac plot
+  output$save_ac_plot <- downloadHandler(
+    filename = function() {
+      paste("Q10-Q11-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.ac$main, device = device)
+    }
+  )
+  
+  # PACF plot ----
+  plot.pacf <- reactiveValues(main=NULL)
+  
+  output$pacf_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(input$plot_pacf > 0,
+           message = "Click 'Plot PACF'")
+    )
+    
+    df <- autocorrelation_data$df
+    
+    pacf_list <- acf(df$chla, type = c("partial"), plot = FALSE)
+    
+    pacf_plot_data <- tibble(Lag = pacf_list$lag,
+                             Partial_ACF = round(pacf_list$acf, 2))
+    
+    p <- ggplot(data = pacf_plot_data, aes(x = Lag, y = Partial_ACF))+
+      geom_bar(stat = "identity", color = "deepskyblue4", fill = "darkslategray3")+
+      xlab("Lag in days")+
+      ylab("Partial autocorrelation of chl-a data")+
+      theme_bw()
+    
+    plot.pacf$main <- p
+    
+    return(ggplotly(p, dynamicTicks = TRUE))
+    
+  })
+  
+  # Download scatterplot of pacf
+  output$save_pacf_plot <- downloadHandler(
+    filename = function() {
+      paste("Q12-Q14-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.pacf$main, device = device)
+    }
+  )
+  
+  
   ##########OLD
 
   # NEON variable description table ----

@@ -593,21 +593,58 @@ ui <- function(req) {
                                                                    p(tags$b(quest["q9", 1]))
                                                             )
                                                           )
-                                                      ),
-                                                      br(),
-                                                      p("Next, we can calculate and plot the autocorrelation values for many different lags of our chlorophyll-a data."),
-                                                      actionButton("plot_ac", label = "Plot autocorrelation for many lags")
+                                                      )
                                                ),
                                                column(6,
+                                                      h3("Plotting autocorrelation"),
+                                                      p("Next, we can calculate and plot the autocorrelation values for many different lags of our chlorophyll-a data."),
+                                                      actionButton("plot_ac", label = "Plot autocorrelation for many lags"),
+                                                      br(),br(),
                                                       wellPanel(
-                                                        plotlyOutput("chla_fc1"),
-                                                        sliderInput("run_fc1_nday", "Number of forecast days", min = 1, max = 35, 
-                                                                    value = 1, 
-                                                                    step = 1, animate = TRUE),
-                                                        radioButtons("plot_type1", "Plot type", c("Line", "Distribution"),
-                                                                     inline = TRUE)
+                                                        plotlyOutput("ac_plot"),
+                                                      ),
+                                                      downloadButton("save_ac_plot", "Download plot", icon = icon("download")),
+                                                      br(),br(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q10", 1])),
+                                                                   p(tags$b(quest["q11", 1]))
+                                                            )
+                                                          )
                                                       )
                                                )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Partial autocorrelation"),
+                                                      p("As you may have discovered while answering Q.11, it can be difficult to decide exactly how many lags to include in a forecasting model. Fortunately, forecasters have developed tools to help make this decision. One such tool is the ", tags$b("partial autocorrelation function"), " or ", tags$b("PACF.")," This function calculates the autocorrelation of a particular lag ",tags$em("while removing")," the effects of indirect correlations with other lags."),
+                                                      p("To explain another way: the ",tags$b("autocorrelation")," of chlorophyll-a and the 7-day lag of chlorophyll-a is affected by the autocorrelation of chlorophyll-a with the 1-day lag, the 2-day lag, the 3-day lag, and so on, as well as the relationship of the 7-day lag to the 1-day lag, the 2-day lag, the 3-day lag, and so on."),
+                                                      p("The PACF avoids this problem. You can think of it as only measuring the effect of one particular set of lagged values (e.g., the 5-day lagged values), while accounting for (and thereby removing the influence of) all other lags."),
+                                                      p("Let's plot the PACF of chlorophyll-a data at your chosen lake site."),
+                                                      actionButton("plot_pacf",label = "Plot PACF"),
+                                                      br(),br(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q12", 1])),
+                                                                   p(tags$b(quest["q13", 1])),
+                                                                   p(tags$b(quest["q14", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      wellPanel(
+                                                        plotlyOutput("pacf_plot"),
+                                                      ),
+                                                      downloadButton("save_pacf_plot", "Download plot", icon = icon("download"))
+                                                      )
                                              ),
                                              hr(),
                                              #*** Next step ----
