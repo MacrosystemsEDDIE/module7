@@ -481,14 +481,25 @@ ui <- function(req) {
                                              ),
                                              fluidRow(
                                                column(4,
-                                                      h3("Initial Condition(s) Uncertainty"),
-                                                      p(module_text["init_uncert", ]),
-                                                      p("Here, we are focused on the initial condition of chlorophyll-a. Even though we have measurements of chlorophyll-a from our lake, we know that chlorophyll-a varies rapidly throughout the day and also over the surface of the lake, so one measurement might not capture perfectly the exact chlorophyll-a in our lake at this time.")
+                                                      h3("Before we fit our model to data..."),
+                                                      p(tags$em("Use the slides and text below to understand the forecast model we will be using.")),
+                                                      p(tags$b("What is an autoregressive model?")),
+                                                      tags$ul(
+                                                        tags$li("An ",tags$b("autoregressive model"), " uses past and/or current values of a variable to predict future values. In our case, we are interested in using past and current values of lake chlorophyll-a to predict future chlorophyll-a.")
+                                                      ),
+                                                      p(tags$b("What is autocorrelation?")),
+                                                      tags$ul(
+                                                        tags$li(tags$b("Autocorrelation")," is the correspondence between a value and previous values of that variable which have been recently observed. For example, mean daily air temperature over the course of a year exhibits autocorrelation, as today's mean daily air temperature is related to the mean daily air temperatures observed over the days and weeks prior to today.")
+                                                      ),
+                                                      p(tags$b("What is a lag?")),
+                                                      tags$ul(
+                                                        tags$li("A ",tags$b("lag")," is a particular amount of time that has passed between when we observe a value we are using as an explanatory, or independent, variable, and when we observe a value that we are trying to predict. For example, if you use today's air temperature to predict tomorrow's air temperature, you are using a 1-day lag of air temperature to predict tomorrow's air temperature. ")
+                                                      )
                                                ),
                                                column(8,
                                                       h5("Click the arrows to navigate through the slides", align = "center"),
                                                       wellPanel(
-                                                        slickROutput("ic_uc_slides", width = "640px", height = "360px")
+                                                        slickROutput("model_slides", width = "640px", height = "480px")
                                                       )
                                                )
                                              ),
