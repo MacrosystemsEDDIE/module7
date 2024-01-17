@@ -647,6 +647,40 @@ ui <- function(req) {
                                                       )
                                              ),
                                              hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Fit model!"),
+                                                      p("Today, we will fit a simple form of an autoregressive, or AR model, which uses yesterday's chlorophyll-a observation (so, a 1-day lag) to predict today's observation. This model can be written as:"),
+                                                      wellPanel(
+                                                        div("$$Chla_{t} = \\beta_0 + \\beta_1 * (Chla_{t-1} - \\overline{Chla}) + \\overline{Chla}$$"),
+                                                        p("where ",tags$em("Chla")," is our timeseries of chlorophyll-a data, \\(\\beta_0\\) is the intercept parameter, \\(\\beta_1\\) is the coefficient on the 1-day lag of chlorophyll-a, and \\(\\overline{Chla}\\) is the mean of the chlorophyll-a timeseries."),
+                                                        p("Note that a subscript of ",tags$em("t")," represents today's chlorophyll-a, while ", tags$em("t-1"), " represents the 1-day lag of chlorophyll-a.")
+                                                      ),
+                                                      p("Let's fit this model to our data!"),
+                                                      actionButton("fit_model",label = "Fit model"),
+                                                      br(),br(),
+                                                      wellPanel(
+                                                        uiOutput("ar_model")
+                                                      ),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q15", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      h3("Plot of model predictions vs. observations"),
+                                                      wellPanel(
+                                                        plotlyOutput("arfit_plot")
+                                                      ),
+                                                      downloadButton("save_arfit_plot", "Download plot", icon = icon("download"))
+                                                      )
+                                             ),
+                                             hr(),
                                              #*** Next step ----
                                              fluidRow(
                                                column(5, offset = 1,

@@ -423,6 +423,90 @@ shinyServer(function(input, output, session) {
     }
   )
   
+  # Text output of fitted AR model ----
+  
+  #create reactive model object
+  ar.model <- reactiveValues(fit = NULL, intercept = NULL,
+                             ar1 = NULL, chla_mean = NULL, eqn = NULL)
+  
+  output$ar_model <- renderUI({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(input$fit_model > 0,
+           message = "Click 'Fit model'")
+    )
+    
+    #assign dataframe
+    df <- autocorrelation_data$df
+    
+    #fit model
+    ar.model$fit <- ar.ols(df$chla, order.max = 1, aic = FALSE,
+                       intercept = TRUE, demean = TRUE)
+    
+    #extract parameters
+    ar.model$intercept = round(c(ar.model$fit$x.intercept),2) #beta_0
+    ar.model$ar1 = round(c(ar.model$fit$ar),2) #beta_1
+    ar.model$chla_mean = round(c(ar.model$fit$x.mean),2) #mean chla
+    
+    #make equation
+    ar.model$eqn <- paste0("$$Chla_{t} = ",ar.model$intercept," + ",ar.model$ar1," * (Chla_{t-1} - ",ar.model$chla_mean,") + ",ar.model$chla_mean,"$$")
+    
+    return(withMathJax(
+      tags$p(ar.model$eqn)
+    ))
+  })
+  
+  # Model fit plot ----
+  plot.arfit <- reactiveValues(main=NULL)
+  
+  output$arfit_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(input$fit_model > 0,
+           message = "Click 'Fit model'")
+    )
+    
+    df <- autocorrelation_data$df
+    
+    mod <- ar.model$intercept + ar.model$ar1 * (df$chla - ar.model$chla_mean) + ar.model$chla_mean
+    
+    model_fit_plot_data <- tibble(date = df$datetime,
+                                  chla = df$chla,
+                                  model = mod)
+    
+    p <- plot_mod_predictions(model_fit_plot_data = model_fit_plot_data, variable_name = "Chlorophyll-a (ug/L)")
+    
+    plot.arfit$main <- p
+    
+    return(ggplotly(p, dynamicTicks = TRUE))
+    
+  })
+  
+  # Download scatterplot of pacf
+  output$save_arfit_plot <- downloadHandler(
+    filename = function() {
+      paste("Q15-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.arfit$main, device = device)
+    }
+  )
+  
   
   ##########OLD
 
