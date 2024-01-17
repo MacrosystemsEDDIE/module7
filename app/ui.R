@@ -180,7 +180,7 @@ ui <- function(req) {
                               width = "80%", align = "left")
                    )
                  ), data.step = 8, data.intro = help_text["start", 1]
-               ),
+               )
                ),
                
                # 2. Presentation recap ----
