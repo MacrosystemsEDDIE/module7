@@ -320,7 +320,7 @@ ui <- function(req) {
                                                                                       choices = 1:nrow(neon_sites_df),
                                                                                       options = list(
                                                                                         placeholder = 'Please select a row',
-                                                                                        onInitialize = I('function() { this.setValue(""); }')),
+                                                                                        onInitialize = I('function() { this.setValue(""); }'))
                                                                        )
                                                       ),
                                                       DTOutput("table01"),
