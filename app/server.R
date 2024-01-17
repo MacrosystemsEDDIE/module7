@@ -299,7 +299,7 @@ shinyServer(function(input, output, session) {
   )
   
   # Autocorrelation calculation ----
-  output$out_ac <- renderText({
+  output$out_ac <- renderUI({
     
     validate(
       need(!is.null(autocorrelation_data$df),
@@ -316,9 +316,9 @@ shinyServer(function(input, output, session) {
     
     autocorrelation_lag1
     
-    out_ac <- paste("Autocorrelation:",autocorrelation_lag1, sep = " ")
+    out_ac <- paste("<b>","Autocorrelation: ",autocorrelation_lag1,"</b>", sep = "")
     
-    return(out_ac)
+    HTML(paste(out_ac))
   })
   
   ##########OLD

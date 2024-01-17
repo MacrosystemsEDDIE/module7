@@ -13,7 +13,7 @@ q5,Q5. Describe how chlorophyll-a changes over time in your lake. Do you notice 
 q6,"Q6. Explain, in your own words, how autocorrelation in a variable can help forecasters make predictions of the future."
 q7,Q7. Describe what you observe on the timeseries figure of chlorophyll-a. How do the two lines plotted on the timeseries (chlorophyll and 1 day lag of chlorophyll) relate to each other?
 q8,Q8. Describe what you observe on the scatterplot figure above. Do you think the chlorophyll-a data at your chosen lake site exhibit autocorrelation? Why or why not?
-q9,Compare your answers between Q.6 and Q.7. Are there any differences in the relationships between primary productivity and driver variables that you observed in the lake data (Q.6) and the relationships between primary productivity and driver variables in the ecological model (Q.7)?
+q9,Q.9 Interpret the autocorrelation value you calculated; does this value indicate low or high autocorrelation between chlorophyll-a and a 1-day lag of chlorophyll-a?
 q9a,Increases in water temperature
 q9b,Increases in underwater light
 q10,"How sensitive is your forecast to the initial condition of chlorophyll-a? Specifically, if you start the model at low or high values of chlorophyll-a concentration, how does this affect forecast output?"

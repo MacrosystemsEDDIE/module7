@@ -582,7 +582,8 @@ ui <- function(req) {
                                                       actionButton("calc_ac", "Calculate autocorrelation"),
                                                       br(),br(),
                                                       wellPanel(
-                                                        textOutput("out_ac")
+                                                        htmlOutput("out_ac"),
+                                                        p("The closer the autocorrelation is to 1, the stronger the autocorrelation between the variable and its lag.")
                                                       ),
                                                       box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
@@ -592,7 +593,10 @@ ui <- function(req) {
                                                                    p(tags$b(quest["q9", 1]))
                                                             )
                                                           )
-                                                      )
+                                                      ),
+                                                      br(),
+                                                      p("Next, we can calculate and plot the autocorrelation values for many different lags of our chlorophyll-a data."),
+                                                      actionButton("plot_ac", label = "Plot autocorrelation for many lags")
                                                ),
                                                column(6,
                                                       wellPanel(
