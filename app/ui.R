@@ -505,14 +505,27 @@ ui <- function(req) {
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(4,
-                                                      h4("Forecasting with Initial Condition Uncertainty"),
-                                                      p("To account for initial condition uncertainty we can generate a distribution around this value and then run our model with slightly different initial conditions to account for this uncertainty."),
-                                                      p("Use the input below to set the value of the initial condition for chlorophyll-a."),
-                                                      numericInput("ic_val", "Initial condition value:", min = 0.5,
-                                                                   value = 7, max = 20, step = 0.5),
-                                                      actionButton("gen_ic1", "Generate distribution"),
-                                                      hr(),
+                                               column(10, align = "left",
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q6", 1]))                                                                   
+                                                            )
+                                                          )
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Plot 1-day lag of chlorophyll-a"),
+                                                      p(id = "txt_j", "Let's explore lags and autocorrelation in chl-a data at your chosen lake site."),
+                                                      p(id = "txt_j", "To make it easier to see the 1-day lag in chlorophyll-a on the figure, we will only plot a few months of data."),
+                                                      br(),
+                                                      actionButton("plot_lag1", "Plot lagged timeseries"),
+                                                      br(), br(),
                                                       box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
