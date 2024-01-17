@@ -570,32 +570,31 @@ ui <- function(req) {
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(4,
-                                                      h3("Forecast!"),
-                                                      p("Now we will generate forecasts with different initial conditions for each of our models."),
-                                                      box(width = 10, status = "warning",
-                                                          solidHeader = TRUE,
-                                                          p("Note that ",tags$b("every time you generate a forecast,")," even if you do not change the value of the initial condition or initial condition uncertainty, ",tags$b("the forecast will look slightly different")," because it is generated using random draws from the initial conditions distribution.")
+                                               column(6,
+                                                      h3("Calculating autocorrelation"),
+                                                      p(id = "txt_j", "In addition to visualizing autocorrelation, we can also calculate it. The autocorrelation between chlorophyll-a",tags$em("(Chla)"), " and a 1-day lag of chlorophyll-a ",tags$em("(ChlaLag)")," is represented by the following equation:"),
+                                                      wellPanel(
+                                                        h4("Autocorrelation:"),
+                                                        div("$$Autocorrelation = \\frac {\\sum_{t = 2}^{T} (Chla - \\overline{Chla}) * (ChlaLag - \\overline{Chla})}{\\sum_{t = 1}^{T} (Chla - \\overline{Chla})^2}$$"),
+                                                        p("where", tags$em("T")," is the timeseries of observations in the timeseries, and ",tags$em("t"), " represents which observation in that timeseries we are starting with (either the 1st or 2nd observation). Recall that the capital sigma (\\(\\sum_{}\\)) indicates a sum and the overline (\\(\\overline{Chla}\\)) indicates the mean.")
                                                       ),
                                                       br(),
-                                                      actionButton("run_fc1", label = div("Run Forecast", icon("running"))),
-                                                      br(),
-                                                      p("We will use multiple different initial condtions in the forecast ensemble. These will be sampled from the distribution generated above."),
-                                                      
-                                                      sliderInput("n_mem1", "No. of members", min = 5, max = 100, value = 30, step = 5),
-                                                      br(),
+                                                      actionButton("calc_ac", "Calculate autocorrelation"),
+                                                      br(),br(),
+                                                      wellPanel(
+                                                        textOutput("out_ac")
+                                                      ),
                                                       box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[28], label = quest[qid[28], ], width = "90%"),
-                                                                   br()
+                                                                   p(tags$b(quest["q9", 1]))
                                                             )
                                                           )
                                                       )
                                                ),
-                                               column(8,
+                                               column(6,
                                                       wellPanel(
                                                         plotlyOutput("chla_fc1"),
                                                         sliderInput("run_fc1_nday", "Number of forecast days", min = 1, max = 35, 
