@@ -559,6 +559,15 @@ shinyServer(function(input, output, session) {
     HTML(paste(out_rmse))
   })
   
+  ## Objective 4 ----
+  
+  # Forecast uncertainty slides ----
+  
+  # Slickr model output
+  output$fc_uc_slides <- renderSlickR({
+    slickR(fc_uc_slides)
+  })
+  
   ##########OLD
 
   # NEON variable description table ----

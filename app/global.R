@@ -77,6 +77,7 @@ help_text <- read.csv("data/help_text.csv", row.names = 1)
 # Slides
 recap_slides <- list.files("www/Mod7_key_slides", full.names = TRUE)
 model_slides <- list.files("www/model_slides", full.names = TRUE)
+fc_uc_slides <- list.files("www/fc_uc_slides", full.names = TRUE)
 ic_uc_slides <- list.files("www/ic_uc_slides", full.names = TRUE)
 chla_slides <- list.files("www/chla_data_collection", full.names = TRUE)
 nitrate_slides <- list.files("www/nitrate_data_collection/", full.names = TRUE)
