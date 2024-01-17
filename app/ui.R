@@ -354,7 +354,7 @@ ui <- function(req) {
                                                  uiOutput("site_html"),
                                                  textOutput("prompt2"),
                                                  htmlOutput("site_link")
-                                               ),
+                                               )
                                              ),
                                              fluidRow(
                                                column(10, align = "left",
