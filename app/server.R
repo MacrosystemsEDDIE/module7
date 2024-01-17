@@ -305,6 +305,10 @@ shinyServer(function(input, output, session) {
       need(!is.null(autocorrelation_data$df),
            message = "Please select a site in Objective 1.")
     )
+    validate(
+      need(input$calc_ac > 0,
+           message = "Click 'Calculate autocorrelation'")
+    )
     
     df <- autocorrelation_data$df
     
