@@ -738,6 +738,25 @@ ui <- function(req) {
                                                       p("We will use the autoregressive model you fitted to generate a forecast of chlorophyll-a with uncertainty!")
                                                )
                                              )
+                                    ),
+                                    #* Objective 4 - Generate forecast ====
+                                    tabPanel(title = "Objective 4 - Generate forecast", value = "stab5",
+                                             fluidRow(
+                                               column(12,
+                                                      wellPanel(style = paste0("background: ", obj_bg),
+                                                                h3("Objective 4 - Generate forecast"),
+                                                                p(id = "txt_j", module_text["obj_04", ])
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             #*** Next step ----
+                                             fluidRow(
+                                               column(5, offset = 1,
+                                                      h3("Next step"),
+                                                      p("Now we fit a model to the chlorophyll-a data from your lake that we can use for forecasting.")
+                                               )
+                                             )
                                     )
                         )
                ),
