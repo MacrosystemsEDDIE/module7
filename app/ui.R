@@ -285,7 +285,7 @@ ui <- function(req) {
                         )
                ),
                
-               # 5. Activity A ----
+               # 4. Activity A ----
                tabPanel(title = tab_names["mtab5", 2], value = "mtab5",
                         img(src = "project-eddie-banner-2020_green.png", height = 100,
                             width = 1544, top = 5),
@@ -295,7 +295,7 @@ ui <- function(req) {
                                            h2("Activity A - Build A Model And Generate A Forecast"),
                                            p(module_text["act_A", ])
                                  )
-                          ),
+                          )
                         ),
                         tabsetPanel(id = "tabseries2",
                                     #* Objective 1 - Select site ====
