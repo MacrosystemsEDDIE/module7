@@ -531,35 +531,26 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[25], label = quest[qid[25], ], width = "90%"),
-                                                                   br()
+                                                                   p(tags$b(quest["q7", 1]))
                                                             )
                                                           )
                                                       )
                                                ),
-                                               # column(4,
-                                               #        h4("Recent Observations"),
-                                               #        wellPanel(
-                                               #          plotlyOutput("ic_obs_plot")
-                                               #        )
-                                               # ),
-                                               column(4, offset = 2,
-                                                      h4("Distribution of Initial Conditions"),
+                                               column(6,
                                                       wellPanel(
-                                                        plotOutput("ic_uc_plot1")
-                                                      )
+                                                        plotlyOutput("lag_plot1")
+                                                      ),
+                                                      downloadButton("save_lag_plot1", "Download plot", icon = icon("download"))
                                                )
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(4,
-                                                      h4("Forecasting with Initial Condition Uncertainty"),
-                                                      p("To account for initial condition uncertainty we can generate a distribution around this value and then run our model with slightly different initial conditions to account for this uncertainty."),
-                                                      p("Use the slider below to adjust the standard deviation and then generate a normal distribution around the observation"),
-                                                      sliderInput("ic_uc", "Standard deviation", min = 0, max = 5, value = 0.5, 
-                                                                  step = 0.5),
-                                                      actionButton("gen_ic2", "Generate distribution"),
-                                                      hr(),
+                                               column(6,
+                                                      p(id = "txt_j", "To visualize the relationship between chlorophyll and a 1 day lag of chlorophyll in a different way, we will also plot these two timeseries on a scatterplot. The dashed diagonal line represents the 1:1 line. The closer the points fall to this line, the stronger of the linear relationship between the independent variable (x axis) and the dependent variable (y axis)."),
+                                                      p(id = "txt_j", "Note that now, we are plotting the complete dataset."),
+                                                      br(),
+                                                      actionButton("plot_lag2", "Plot lag scatterplot"),
+                                                      br(), br(),
                                                       box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
