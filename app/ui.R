@@ -831,18 +831,62 @@ ui <- function(req) {
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(10, align = "left",
-                                                      box(id = "box10", width = 12, status = "primary",
+                                               column(6,
+                                                      h3("Calculate process uncertainty distribution"),
+                                                      p("We will use the residuals from the model you fit in Objective 3 to calculate a process uncertainty distribution for your forecast."),
+                                                      p("Click the button below to calculate and view your process uncertainty distribution."),
+                                                      actionButton("calc_proc_distrib","Calculate process uncertainty distribution"),
+                                                      br(),br(),
+                                                      wellPanel(
+                                                        htmlOutput("proc_uc_sd")
+                                                      ),
+                                                      box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   h4("Hint: Read through the slides above before attempting to answer these questions!"),
-                                                                   p(tags$b(quest["q21", 1])),
-                                                                   p(tags$b(quest["q22", 1])),
-                                                                   p(tags$b(quest["q23", 1]))
+                                                                   p(tags$b(quest["q19", 1]))
                                                             )
                                                           )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      wellPanel(
+                                                        plotlyOutput("proc_uc_distrib")
+                                                      ),
+                                                      downloadButton("save_proc_uc_distrib_plot", "Download plot", icon = icon("download"))
+                                                      )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      h3("Initial Conditions Uncertainty")
+                                               )
+                                             ),
+                                             fluidRow(
+                                               column(6,
+                                                      p(tags$b("Initial conditions")," are the starting conditions used by a model. In our autoregressive model, the initial condition is today's chlorophyll-a,"),
+                                                      div("$$Chla_{t}$$"),
+                                                      p("which is needed to forecast tomorrow's chlorophyll-a:"),
+                                                      wellPanel(
+                                                        div("$$Chla_{t+1} = \\beta_0 + \\beta_1 * (Chla_{t} - \\overline{Chla}) + \\overline{Chla} + W_t$$"),
+                                                        p("where t = today and t+1 = tomorrow")
+                                                      )
+                                               ),
+                                               column(6,
+                                                      p(id = "txt_j", tags$b("Initial conditions uncertainty")," refers to uncertainty arising because the current conditions in an ecosystem - in our case, ",tags$b("lake chlorophyll-a"), " - are not precisely known."),
+                                                      p(id = "txt_j", "Even though we have daily measurements of chlorophyll-a from our lake, we know that chlorophyll-a varies throughout the day so this measurement might not capture exactly the chlorophyll-a in our lake at this time. Additionally, there may be observation error in our chlorophyll-a measurements.")
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      wellPanel(
+                                                        h4(tags$em("Scroll through the slides below to understand how",tags$b(" initial conditions uncertainty "), "is calculated and accounted for in a forecast."))
+                                                      ),
+                                                      h5("Click the arrows to navigate through the slides", align = "center"),
+                                                      wellPanel(
+                                                        slickROutput("ic_uc_slides", width = "1000px", height = "563px")
                                                       )
                                                )
                                              ),

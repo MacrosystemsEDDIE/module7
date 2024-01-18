@@ -149,7 +149,7 @@ plot_process_dist <- function(proc_uc){
   ggplot() +
     geom_vline(xintercept = 0) +
     geom_density(aes(proc_uc), fill = l.cols[1], alpha = 0.3) +
-    xlab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")"))) +
+    xlab("Chlorophyll-a (ug/L)") +
     ylab("Density") +
     theme_bw(base_size = 18)+
     ggtitle("Process uncertainty distribution")

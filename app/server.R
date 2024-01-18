@@ -575,6 +575,97 @@ shinyServer(function(input, output, session) {
     slickR(proc_uc_slides)
   })
   
+  # Create reactive object for forecasts
+  first_forecast <- reactiveValues(ic_distribution = NULL,
+                                  process_distribution = NULL,
+                                  curr_chla = NULL,
+                                  start_date = NULL,
+                                  forecast_date = NULL,
+                                  n_members = NULL,
+                                  forecast_chla = NULL,
+                                  sigma = NULL,
+                                  ic_sd = NULL)
+  
+  # Text output for proc uc sd ----
+  output$proc_uc_sd <- renderUI({
+    
+    validate(
+      need(!is.null(autocorrelation_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(input$calc_proc_distrib > 0,
+           message = "Click 'Calculate process uncertainty distribution'")
+    )
+    
+    df <- model_fit_data$df
+    
+    first_forecast$sigma <- sd(df$residuals, na.rm = TRUE)
+    
+    proc_uc_sd <- paste("<b>","Process uncertainty standard deviation: ",round(first_forecast$sigma,2),"</b>", sep = "")
+    
+    HTML(paste(proc_uc_sd))
+  })
+  
+  # Process uncertainty distribution plot ----
+  plot.proc.uc.distrib <- reactiveValues(main=NULL)
+  
+  output$proc_uc_distrib <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(input$calc_proc_distrib > 0,
+           message = "Click 'Calculate process uncertainty distribution'")
+    )
+    
+    first_forecast$n_members <- 500
+    
+    first_forecast$process_distribution <- rnorm(n = first_forecast$n_members, mean = 0, sd = first_forecast$sigma)
+    
+    p <- plot_process_dist(proc_uc = first_forecast$process_distribution)
+    
+    plot.proc.uc.distrib$main <- p
+    
+    return(ggplotly(p, dynamicTicks = TRUE))
+    
+  })
+  
+  # Download scatterplot of pacf
+  output$save_proc_uc_distrib_plot <- downloadHandler(
+    filename = function() {
+      paste("Q19-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.proc.uc.distrib$main, device = device)
+    }
+  )
+  
+  #** Slickr Initial conditions UC slides ----
+  output$ic_uc_slides <- renderSlickR({
+    slickR(ic_uc_slides) + settings(dots = TRUE)
+  })
+  
+  
+  
   ##########OLD
 
   # NEON variable description table ----
@@ -1164,10 +1255,7 @@ shinyServer(function(input, output, session) {
     return(gp)
   })
   
-  #** Slickr Initial conditions UC slides ----
-  output$ic_uc_slides <- renderSlickR({
-    slickR(ic_uc_slides) + settings(dots = TRUE)
-  })
+  
   
   #** Initial Condition Uncertainty ----
   ic_dist <- reactiveValues(df = NULL)

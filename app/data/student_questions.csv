@@ -23,7 +23,7 @@ q15,Q15. Use the plot above to assess the model fit to data. How well do the pre
 q16,"Q16. Record your model bias. Then, use the calculated bias to assess the model fit to data. How good is the model fit? Explain your reasoning."
 q17,"Q17. Record your model RMSE. Then, use the calculated RMSE to assess the model fit to data. How good is the model fit? Explain your reasoning."
 q18,"Q18. Explain, in your own words, what forecast uncertainty is and why it is important to account for uncertainty in forecasts."
-q19,"Using RMSE from the table above, choose the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation."" Remember, a lower RMSE value indicates a more accurate forecast."
+q19,"Q19. Record the value of your process uncertainty standard deviation in ug/L, and explain in your own words how this value was calculated."
 q20,"Using the table above, briefly characterize the relative amount of observation uncertainty associated with chl-a sensors and chl-a lab measurements."
 q21,Make a hypothesis: how do you think a high level of observation uncertainty might affect the process of data assimilation into forecasts and forecast output?
 q22,Describe the effect of changes in observation uncertainty on your forecast output. Does this match your stated expectation from the previous question?
