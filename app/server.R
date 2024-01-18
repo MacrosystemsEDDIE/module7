@@ -568,6 +568,13 @@ shinyServer(function(input, output, session) {
     slickR(fc_uc_slides)
   })
   
+  # Process uncertainty slides ----
+  
+  # Slickr model output
+  output$proc_uc_slides <- renderSlickR({
+    slickR(proc_uc_slides)
+  })
+  
   ##########OLD
 
   # NEON variable description table ----

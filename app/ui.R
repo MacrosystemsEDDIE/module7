@@ -803,6 +803,50 @@ ui <- function(req) {
                                                )
                                              ),
                                              hr(),
+                                             #** Process Uncertainty ----
+                                             fluidRow(
+                                               column(12,
+                                                      h3("Process Uncertainty")
+                                               )
+                                             ),
+                                             fluidRow(
+                                               column(12,
+                                                      h4(tags$b("Process uncertainty")," is uncertainty caused by our inability to model all processes as observed in the real world."),
+                                                      p(id = "txt_j", "Our autoregressive chlorophyll-a model uses previous chlorophyll-a values to forecast tomorrow's chlorophyll-a."),
+                                                      p(id = "txt_j", "But we know that chlorophyll-a can be affected by other processes as well (such as water temperature, available light for photosynthesis, and nutrients needed for phytoplankton growth) and that our model has simplified or ignored these factors. To account for the uncertainty these simplifications introduce, we can add in ",tags$b("process noise (W)")," at each time step. In this model, chlorophyll-a tomorrow is a function of a 1-day lag of chlorophyll-a plus some noise ",tags$b("(W):")),
+                                                      div("$$Chla_{t+1} = \\beta_0 + \\beta_1 * (Chla_{t} - \\overline{Chla}) + \\overline{Chla} + W_t$$")
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      wellPanel(
+                                                        h4(tags$em("Scroll through the slides below to learn how",tags$b(" process uncertainty")," is calculated and accounted for in a forecast."))
+                                                      ),
+                                                      h5("Click the arrows to navigate through the slides", align = "center"),
+                                                      wellPanel(
+                                                        slickROutput("proc_uc_slides", width = "1000px", height = "563px")
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(10, align = "left",
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   h4("Hint: Read through the slides above before attempting to answer these questions!"),
+                                                                   p(tags$b(quest["q21", 1])),
+                                                                   p(tags$b(quest["q22", 1])),
+                                                                   p(tags$b(quest["q23", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
                                              #*** Next step ----
                                              fluidRow(
                                                column(5, offset = 1,
