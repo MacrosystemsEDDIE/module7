@@ -128,10 +128,9 @@ plot_ic_dist <- function(curr_chla, ic_uc){
   
   #Build plot
   ggplot() +
-    # geom_vline(data = df, aes(xintercept = x, color = label)) +
     geom_vline(xintercept = curr_chla) +
     geom_density(aes(ic_uc), fill = l.cols[2], alpha = 0.3) +
-    xlab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")"))) +
+    xlab("Chlorophyll-a (ug/L)")+
     ylab("Density") +
     theme_bw(base_size = 18)+
     ggtitle("Initial condition distribution")
@@ -165,7 +164,7 @@ plot_fc_dist <- function(forecast_dist){
   #Build plot
   ggplot() +
     geom_density(aes(forecast_dist), fill = l.cols[3], alpha = 0.3) +
-    xlab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")"))) +
+    xlab("Chlorophyll-a (ug/L)") +
     ylab("Density") +
     theme_bw(base_size = 18)+
     ggtitle("Chl-a forecast distribution")
@@ -197,9 +196,9 @@ plot_fc_1day <- function(curr_chla, start_date, forecast_date, ic_distribution, 
                 scale = "width", width = 0.7)+
     geom_violinhalf(data = ic, aes(x = date, y = ens, fill = "Initial condition"), color = "cornflowerblue", alpha = 0.4, scale = "width", width = 0.7)+
     geom_point(data = obs, aes(x = date, y = obs, color = "Observation"), size = 3)+
-    ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+
+    ylab("Chlorophyll-a (ug/L)")+
     xlab("")+
-    theme_bw()+
+    theme_bw(18)+
     theme(panel.grid.major.x = element_line(colour = "black", linetype = "dashed"),
           panel.grid.major.y = element_blank(),
           panel.grid.minor.y = element_blank(),

@@ -24,12 +24,12 @@ q16,"Q16. Record your model bias. Then, use the calculated bias to assess the mo
 q17,"Q17. Record your model RMSE. Then, use the calculated RMSE to assess the model fit to data. How good is the model fit? Explain your reasoning."
 q18,"Q18. Explain, in your own words, what forecast uncertainty is and why it is important to account for uncertainty in forecasts."
 q19,"Q19. Record the value of your process uncertainty standard deviation in ug/L, and explain in your own words how this value was calculated."
-q20,"Using the table above, briefly characterize the relative amount of observation uncertainty associated with chl-a sensors and chl-a lab measurements."
-q21,Make a hypothesis: how do you think a high level of observation uncertainty might affect the process of data assimilation into forecasts and forecast output?
-q22,Describe the effect of changes in observation uncertainty on your forecast output. Does this match your stated expectation from the previous question?
-q23,"Referring to the table above, what are some of the most common factors affecting how often data are available for assimilation into ecological forecasts?"
-q24,"Make a hypothesis: how do you think the frequency of data assimilation might affect forecast output? Specifically, how do you think that a forecast which assimilates data once a month might differ from a forecast that assimilates data every day?"
-q25,"Generate a forecast with chl-a data assimilation every 10 days, and record the RMSE of the forecast."
+q20,Q20. What data from your chosen lake are needed to provide the initial condition for your forecast model?
+q21,Q21. Examine the plot of high-frequency chlorophyll-a data. How variable is chlorophyll-a over the course of a day?
+q22,"Q22. Record the value of your initial condition uncertainty standard deviation in ug/L, and explain in your own words how this value was calculated."
+q23,"Q23. What is the forecasted chlorophyll-a concentration for Sept. 26, 2020?"
+q24,"Q24. What is the relationship between the observed chlorophyll-a for Sept. 25, 2020, and the initial condition distribution (shown in blue)?"
+q25,"Q25. Each one of the gray lines in the figure above represents an ensemble member. Explain what this means in your own words, with specific reference to the autoregressive model we are using for forecasting in this exercise."
 q26,"Generate a forecast with daily data assimilation for chl-a, and record the RMSE of the forecast."
 q27,Compare the RMSEs of forecasts when data are assimilated every day vs. when data are only assimilated every 10 days. How do they compare? What does this comparison indicate about the effect of data assimilation frequency on forecast output?
 q28,What are some characteristics of environmental data that would make data easier or harder to assimilate into forecasts? Explain your reasoning.

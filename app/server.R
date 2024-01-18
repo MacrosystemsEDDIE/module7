@@ -579,8 +579,6 @@ shinyServer(function(input, output, session) {
   first_forecast <- reactiveValues(ic_distribution = NULL,
                                   process_distribution = NULL,
                                   curr_chla = NULL,
-                                  start_date = NULL,
-                                  forecast_date = NULL,
                                   n_members = NULL,
                                   forecast_chla = NULL,
                                   sigma = NULL,
@@ -663,6 +661,284 @@ shinyServer(function(input, output, session) {
   output$ic_uc_slides <- renderSlickR({
     slickR(ic_uc_slides) + settings(dots = TRUE)
   })
+  
+  # High frequency data plot ----
+  high_frequency_data <- reactiveValues(df=NULL)
+  plot.high.freq <- reactiveValues(main=NULL)
+  
+  output$high_freq_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(input$plot_high_freq > 0,
+           message = "Click 'Plot high-frequency data'")
+    )
+    
+    if(siteID$lab == "LIRO"){
+      high_frequency_data$df <- read_csv("data/chla_microgramsPerLiter_highFrequency.csv", show_col_types = FALSE) %>%
+        mutate(date = date(datetime),
+               time = hms::as_hms(datetime)) %>%
+        filter(site_id == siteID$lab & date >= "2019-09-15" & date <= "2019-09-18")
+    } else if(siteID$lab == "PRPO") {
+      high_frequency_data$df <- read_csv("data/chla_microgramsPerLiter_highFrequency.csv", show_col_types = FALSE) %>%
+        mutate(date = date(datetime),
+               time = hms::as_hms(datetime)) %>%
+        filter(site_id == siteID$lab & date >= "2019-10-08" & date <= "2019-10-11")
+    } else {
+    high_frequency_data$df <- read_csv("data/chla_microgramsPerLiter_highFrequency.csv", show_col_types = FALSE) %>%
+      mutate(date = date(datetime),
+             time = hms::as_hms(datetime)) %>%
+      filter(site_id == siteID$lab & date >= "2019-10-09" & date <= "2019-10-12")
+    }
+    
+    p <- ggplot(data = high_frequency_data$df)+
+      geom_line(aes(x = time, y = chla, group = date, color = as.factor(date)))+
+      theme_bw()+
+      labs(color = "Date")+
+      xlab("Hour of day")+
+      ylab("Chlorophyll-a (ug/L)")
+    
+    plot.high.freq$main <- p
+    
+    return(ggplotly(p, dynamicTicks = FALSE))
+    
+  })
+  
+  # Download scatterplot of pacf
+  output$save_high_freq_plot <- downloadHandler(
+    filename = function() {
+      paste("Q21-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.high.freq$main, device = device)
+    }
+  )
+  
+  # Text output for ic uc sd ----
+  output$ic_uc_sd <- renderUI({
+    
+    validate(
+      need(!is.null(autocorrelation_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(high_frequency_data$df),
+           message = "Please load and plot the high-frequency data above.")
+    )
+    validate(
+      need(input$calc_ic_uc > 0,
+           message = "Click 'Calculate initial conditions uncertainty'")
+    )
+    
+    df <- high_frequency_data$df
+    
+    ic_sd_dataframe <- df %>%
+      group_by(date) %>%
+      summarize(daily_sd_chla = sd(chla, na.rm = TRUE))
+    
+    first_forecast$ic_sd <- mean(ic_sd_dataframe$daily_sd_chla, na.rm = TRUE)
+    
+    ic_uc_sd <- paste("<b>","Initial condition uncertainty standard deviation: ",round(first_forecast$ic_sd,2),"</b>", sep = "")
+    
+    HTML(paste(ic_uc_sd))
+  })
+  
+  #IC distribution plot
+  first_forecast_dates <- reactiveValues(start_date = NULL,
+                                         forecast_date = NULL)
+  plot.ic.uc.distrib <- reactiveValues(main=NULL)
+  
+  output$ic_distrib_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(high_frequency_data$df),
+           message = "Please load and plot the high-frequency data above.")
+    )
+    validate(
+      need(input$calc_ic_uc > 0,
+           message = "Click 'Calculate initial conditions uncertainty'")
+    )
+    
+    df <- lake_data$df
+    
+    start_date <- "2020-09-25"
+    first_forecast_dates$start_date <- "2020-09-25"
+    
+    curr_chla <- df %>%
+      filter(abs(difftime(datetime,start_date)) == min(abs(difftime(datetime,start_date)))) %>%
+      pull(chla)
+    first_forecast$curr_chla <- curr_chla
+    
+    n_members <- as.numeric(first_forecast$n_members)
+    ic_sd <- as.numeric(first_forecast$ic_sd)
+    
+    ic_distribution <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd)
+    first_forecast$ic_distribution <- ic_distribution
+    
+    p <- plot_ic_dist(curr_chla = curr_chla, ic_uc = ic_distribution)
+    
+    plot.ic.uc.distrib$main <- p
+    
+    return(ggplotly(p, dynamicTicks = FALSE))
+    
+  })
+  
+  # Download scatterplot of pacf
+  output$save_ic_distrib_plot <- downloadHandler(
+    filename = function() {
+      paste("Q22-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.ic.uc.distrib$main, device = device)
+    }
+  )
+  
+  #First forecast plot
+  plot.fc1 <- reactiveValues(main=NULL)
+  
+  output$fc1_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(first_forecast$process_distribution),
+           message = "Please generate a process uncertainty distribution above.")
+    )
+    validate(
+      need(!is.null(first_forecast$ic_distribution),
+           message = "Please generate an initial conditions distribution above.")
+    )
+    validate(
+      need(input$fc1 > 0,
+           message = "Click 'Generate forecast'")
+    )
+    
+    intercept = as.numeric(ar.model$intercept)
+    ar1 = as.numeric(ar.model$ar1)
+    chla_mean = as.numeric(ar.model$chla_mean)
+    ic_distribution = as.numeric(first_forecast$ic_distribution)
+    process_distribution = as.numeric(first_forecast$process_distribution)
+    
+    forecast_chla = intercept + ar1 * (ic_distribution - chla_mean) + chla_mean + process_distribution
+    first_forecast$forecast_chla <- forecast_chla
+    
+    p <- plot_fc_dist(forecast_dist = forecast_chla)
+    
+    plot.fc1$main <- p
+    
+    return(ggplotly(p, dynamicTicks = FALSE))
+    
+  })
+  
+  
+  #First forecast visualization over time
+  plot.fc1.viz <- reactiveValues(main=NULL)
+  
+  output$fc1_viz_plot <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(first_forecast$process_distribution),
+           message = "Please generate a process uncertainty distribution above.")
+    )
+    validate(
+      need(!is.null(first_forecast$ic_distribution),
+           message = "Please generate an initial conditions distribution above.")
+    )
+    validate(
+      need(!is.null(first_forecast$forecast_chla),
+           message = "Please generate a forecast above.")
+    )
+    validate(
+      need(input$fc1_viz > 0,
+           message = "Click 'Visualize forecast'")
+    )
+    
+    curr_chla = as.numeric(first_forecast$curr_chla)
+    start_date = first_forecast_dates$start_date
+    forecast_date = "2020-09-26"
+    first_forecast_dates$forecast_date <- forecast_date
+    ic_distribution = as.numeric(first_forecast$ic_distribution)
+    forecast_chla = as.numeric(first_forecast$forecast_chla)
+    n_members = as.numeric(first_forecast$n_members)
+    
+    p <- plot_fc_1day(curr_chla, start_date, forecast_date, ic_distribution, forecast_chla, n_members)
+    
+    plot.fc1.viz$main <- p
+    
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_fc1_viz_plot <- downloadHandler(
+    filename = function() {
+      paste("Q23-Q25-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.fc1.viz$main, device = device)
+    }
+  )
   
   
   

@@ -891,11 +891,139 @@ ui <- function(req) {
                                                )
                                              ),
                                              hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   h4("Hint: Read through the slides above before attempting to answer this question!"),
+                                                                   p(tags$b(quest["q20", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Plot high-frequency data"),
+                                                      p("So far, we have been working with daily mean chlorophyll-a values from your chosen lake site to fit our model."),
+                                                      p("Now, we will use some high-frequency (5-minute) chlorophyll-a data from our lake to estimate initial conditions uncertainty. For ease of visualization, we will only look at data from a few days. Click the button below to visualize the high-frequency data."),
+                                                      actionButton("plot_high_freq","Plot high-frequency data"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q21", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                        wellPanel(
+                                                          plotlyOutput("high_freq_plot")
+                                                        ),
+                                                        downloadButton("save_high_freq_plot", "Download plot", icon = icon("download"))
+                                                      )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Calculate initial condition uncertainty distribution"),
+                                                      p("Now, we will calculate the mean daily standard deviation of our high-frequency chl-a measurements and use this value to an initial condition uncertainty distribution for our forecast. Click the button below to calculate initial conditions uncertainty."),
+                                                      actionButton("calc_ic_uc","Calculate initial conditions uncertainty"),
+                                                      br(),br(),
+                                                      wellPanel(
+                                                        htmlOutput("ic_uc_sd")
+                                                      ),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q22", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      wellPanel(
+                                                        plotlyOutput("ic_distrib_plot")
+                                                      ),
+                                                      downloadButton("save_ic_distrib_plot", "Download plot", icon = icon("download"))
+                                                      )
+                                             ),
+                                             br(),
+                                             fluidRow(
+                                               column(12,
+                                                      box(id = "box2", width = 12, status = "warning",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h4(tags$b("To learn more about forecast uncertainty, explore our sister module ",
+                                                                             tags$a(href="http://module6.macrosystemseddie.org", 
+                                                                                    "Macrosystems EDDIE Module 6: Understanding Uncertainty in Ecological Forecasts.", target="_blank")))
+                                                            )
+                                                          )
+                                                      )
+                                                      )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      h2("Forecast!"),
+                                                      )
+                                             ),
+                                             fluidRow(
+                                               column(6,
+                                                      p("Finally, we are ready to use our autoregressive model to generate a one-day-ahead forecast with uncertainty. Notice that we are using our initial condition and process uncertainty distributions to run our model many times with slightly different random noise (W) and initial conditions values. This allows us to account for uncertainty in our forecast."),
+                                                      img(src = "fc_w_uncert.png", height = "90%", id = "bla_border",
+                                                          width = "90%", tags$style("border: solid 2px black;"))
+                                                      ),
+                                               column(6,
+                                                      actionButton("fc1","Generate forecast"),
+                                                      br(),br(),
+                                                      wellPanel(
+                                                        plotlyOutput("fc1_plot")
+                                                      ),
+                                                      )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Visualize forecast"),
+                                                      p("To prepare you for our next activity, let's visualize this forecast in a different way. We will use plots very similar to this one to help explain the process of data assimilation later on."),
+                                                      actionButton("fc1_viz","Visualize forecast"),
+                                                      br(),br(),
+                                                      box(id = "box2", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q23", 1])),
+                                                                   p(tags$b(quest["q24", 1])),
+                                                                   p(tags$b(quest["q25", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      wellPanel(
+                                                        plotOutput("fc1_viz_plot")
+                                                      ),
+                                                      downloadButton("save_fc1_viz_plot", "Download plot", icon = icon("download"))
+                                                      )
+                                             ),
+                                             hr(),
                                              #*** Next step ----
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("Now we fit a model to the chlorophyll-a data from your lake that we can use for forecasting.")
+                                                      p("Now that we have generated a forecast, we will explore the effect of data assimilation on forecast accuracy and uncertainty.")
                                                )
                                              )
                                     )
