@@ -948,7 +948,8 @@ shinyServer(function(input, output, session) {
                                         updated_ic = NULL,
                                         second_forecast_date = NULL,
                                         second_forecast_da = NULL,
-                                        updated_ic_no_da = NULL)
+                                        updated_ic_no_da = NULL,
+                                        second_forecast_no_da = NULL)
   
   # Text output for new observation ----
   output$new_obs <- renderUI({
@@ -1189,6 +1190,81 @@ shinyServer(function(input, output, session) {
                        res = 200, units = "in")
       }
       ggsave(file, plot = plot.updated.ic.no.da$main, device = device)
+    }
+  )
+  
+  # Second forecast figure
+  plot.second.fc.no.da <- reactiveValues(main=NULL)
+  
+  output$second_fc_no_da_plot <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$view_ic_no_da > 0,
+           message = "Please click 'Run ensemble Kalman filter with missing observation' above.")
+    )
+    validate(
+      need(input$second_forecast_no_da > 0,
+           message = "Please click 'Generate forecast'.")
+    )
+    
+    #unpacking values we will need
+    intercept = as.numeric(ar.model$intercept)
+    ar1 = as.numeric(ar.model$ar1)
+    chla_mean = as.numeric(ar.model$chla_mean)
+    ic_update_no_da = EnKF_inputs_outputs$updated_ic_no_da
+    process_distribution = as.numeric(first_forecast$process_distribution)
+    
+    #generate second forecast
+    second_forecast_no_da = intercept + ar1 * (ic_update_no_da - chla_mean) + chla_mean + process_distribution
+    EnKF_inputs_outputs$second_forecast_no_da = second_forecast_no_da
+    
+    #assign dates
+    forecast_dates = EnKF_inputs_outputs$forecast_dates
+
+    curr_chla = as.numeric(first_forecast$curr_chla)
+    new_obs = NA
+    chla_obs = c(curr_chla, new_obs) #vector of observations to use for plotting
+    start_date = first_forecast_dates$start_date
+    ic_distribution = as.numeric(first_forecast$ic_distribution)
+    forecast_chla = as.numeric(first_forecast$forecast_chla)
+    n_members = as.numeric(first_forecast$n_members)
+    
+    p <- plot_second_forecast(chla_obs, start_date, forecast_dates, ic_distribution, 
+                              ic_update_no_da, forecast_chla, second_forecast_no_da, n_members)
+    
+    plot.second.fc.no.da$main <- p
+    
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_second_fc_no_da_plot <- downloadHandler(
+    filename = function() {
+      paste("Q30-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.second.fc.no.da$main, device = device)
     }
   )
   

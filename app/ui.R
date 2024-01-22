@@ -1130,7 +1130,7 @@ ui <- function(req) {
                                                column(6,
                                                       h3("Make a second forecast after assimilating data"),
                                                       p("Now we will make a second forecast for the next day using our updated initial conditions."),
-                                                      p("We will plot both of our forecasts together with the initial conditions for each forecast. We will also plot the observation for 2020-09-27 so we can visually assess the accuracy of our second forecast."),
+                                                      p("We will plot both of our forecasts together with the initial conditions for each forecast."),
                                                       actionButton("second_forecast_da","Generate forecast"),
                                                       br(),br(),
                                                       box(id = "box10", width = 12, status = "primary",
@@ -1178,6 +1178,31 @@ ui <- function(req) {
                                                       ),
                                                       downloadButton("save_updated_ic_no_da_plot", "Download plot", icon = icon("download"))
                                                       )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Make a second forecast when no data have been assimilated"),
+                                                      p("Now we will make a second forecast. You have seen that when an observation is missing, the initial condition cannot be updated. Let's see how this affects the second forecast."),
+                                                      p("We will plot both of our forecasts together with the initial conditions for each forecast"),
+                                                      actionButton("second_forecast_no_da","Generate forecast"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q30", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               column(6,
+                                                      wellPanel(
+                                                        plotOutput("second_fc_no_da_plot")
+                                                      ),
+                                                      downloadButton("save_second_fc_no_da_plot", "Download plot", icon = icon("download"))
+                                               )
                                              ),
                                              hr(),
                                              #*** Next step ----
