@@ -1151,7 +1151,34 @@ ui <- function(req) {
                                                       )
                                              ),
                                              hr(),
-                                             fluidRow(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Updating initial conditions when observations are missing"),
+                                                      p("We have explored how the ensemble Kalman filter can update the forecast initial condition using a new observation.",tags$b("But what if there is no observation to use for updating?")," What will be the outcome of the applying the ensemble Kalman filter in this situation?"),
+                                                      p("Let's pretend that instead of recording a new observation, a thunderstorm came up and we were unable to sample at your chosen lake. We will run the ensemble Kalman filter with an 'NA' in place of an observation."),
+                                                      p("Click the button below to see what happens to the initial condition when an observation is missing"),
+                                                      actionButton("view_ic_no_da","Run ensemble Kalman filter with missing observation"),
+                                                      br(),br(),
+                                                      conditionalPanel("input.view_ic_no_da > 0",
+                                                                       checkboxInput("show_ic", "Click to show/remove the initial condition for 2020-09-26.", value = TRUE),
+                                                                       ),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q29", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      wellPanel(
+                                                        plotOutput("updated_ic_no_da_plot")
+                                                      ),
+                                                      downloadButton("save_updated_ic_no_da_plot", "Download plot", icon = icon("download"))
+                                                      )
+                                             ),
                                              hr(),
                                              #*** Next step ----
                                              fluidRow(

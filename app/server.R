@@ -947,7 +947,8 @@ shinyServer(function(input, output, session) {
   EnKF_inputs_outputs <- reactiveValues(new_obs = NULL,
                                         updated_ic = NULL,
                                         second_forecast_date = NULL,
-                                        second_forecast_da = NULL)
+                                        second_forecast_da = NULL,
+                                        updated_ic_no_da = NULL)
   
   # Text output for new observation ----
   output$new_obs <- renderUI({
@@ -1126,6 +1127,68 @@ shinyServer(function(input, output, session) {
                        res = 200, units = "in")
       }
       ggsave(file, plot = plot.second.fc.da$main, device = device)
+    }
+  )
+  
+  #Initial condition no DA figure
+  plot.updated.ic.no.da <- reactiveValues(main=NULL)
+  
+  output$updated_ic_no_da_plot <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    
+    forecast_chla <- first_forecast$forecast_chla
+    ic_sd <- first_forecast$ic_sd
+    curr_chla = as.numeric(first_forecast$curr_chla)
+    start_date = first_forecast_dates$start_date
+    forecast_date = first_forecast_dates$forecast_date
+    ic_distribution = as.numeric(first_forecast$ic_distribution)
+    forecast_chla = as.numeric(first_forecast$forecast_chla)
+    n_members = as.numeric(first_forecast$n_members)
+    
+    if(input$view_ic_no_da > 0 & input$show_ic == TRUE){
+      previous_plot <- plot.fc1.viz$main
+      new_obs <- NA
+      chla_obs <- c(curr_chla, new_obs) #vector of observations to use for plotting
+      ic_update_no_da <- EnKF(forecast = forecast_chla, new_observation = new_obs, ic_sd = ic_sd)
+      EnKF_inputs_outputs$updated_ic_no_da <- ic_update_no_da
+      p1 <- plot_fc_update(chla_obs, start_date, forecast_date, ic_distribution, ic_update_no_da, forecast_chla, n_members)
+      plot.updated.ic.no.da$main <- p1
+      return(p1)
+    } else {
+      previous_plot <- plot.fc1.viz$main
+      plot.updated.ic.no.da$main <- previous_plot
+      return(previous_plot)
+    }
+    
+  })
+  
+  # Download plot
+  output$save_updated_ic_no_da_plot <- downloadHandler(
+    filename = function() {
+      paste("Q29-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.updated.ic.no.da$main, device = device)
     }
   )
   

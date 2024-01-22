@@ -33,7 +33,7 @@ q25,"Q25. Each one of the gray lines in the figure above represents an ensemble 
 q26,Q26. Briefly describe in your own words how an ensemble Kalman filter can be used to assimilate data into an ecological forecast.
 q27,Q27. Compare the difference between the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. How are these two distributions different?
 q28,Q28. What is the forecasted chlorophyll-a for 2020-09-27?
-q29,What are some characteristics of environmental data that would lead to the greatest improvement in forecast accuracy when those data are assimilated? Explain your reasoning.
+q29,Q29. Compare the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. What happened when there was no new observation to update the forecast?
 q30,Briefly explain your decision to purchase either Sensor A (cheap sensor) or Sensor B (expensive sensor).
 q31,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?"
 q32,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?"
