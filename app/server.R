@@ -1271,17 +1271,145 @@ shinyServer(function(input, output, session) {
   # Repeat plots for comparison at bottom of objective
   
   output$second_fc_da_plot2 <- renderPlot({
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$update_ic > 0,
+           message = "Please update the initial condition above.")
+    )
+    validate(
+      need(input$second_forecast_da > 0,
+           message = "Please generate a forecast with data assimilation above.")
+    )
+    
     p <- plot.second.fc.da$main
     return(p)
   })
   
   output$second_fc_no_da_plot2 <- renderPlot({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$view_ic_no_da > 0,
+           message = "Please click 'Run ensemble Kalman filter with missing observation' above.")
+    )
+    validate(
+      need(input$second_forecast_no_da > 0,
+           message = "Please generate a forecast with no data assimilation above.")
+    )
     p <- plot.second.fc.no.da$main
     return(p)
   })
   
+  #### Objective 6 ----
   
+  #repeat of original initial conditions plot
+  output$ic_distrib_plot2 <- renderPlotly({
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    
+    p <- plot.ic.uc.distrib$main +
+      ylim(c(0,1)) +
+      xlim(range(first_forecast$ic_distribution)) +
+      ggtitle("")
+    
+    return(ggplotly(p, dynamicTicks = FALSE))
+  })
   
+  # create reactive value to hold things for this objective
+  obs_uc <- reactiveValues(ic_distribution_low = NULL)
+  
+  # ic distribution with low obs uncertainty
+  plot.ic.distrib.low <- reactiveValues(main=NULL)
+  
+  output$ic_distrib_low_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$plot_low_ic > 0,
+           message = "Please click 'Generate distribution'.")
+    )
+    
+    # unpacking what we need
+    curr_chla = as.numeric(first_forecast$curr_chla)
+    n_members = as.numeric(first_forecast$n_members)
+    ic_sd_low = first_forecast$ic_sd/2
+    
+    # generate distribution
+    ic_distribution_low <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_low)
+    obs_uc$ic_distribution_low <- ic_distribution_low
+    
+    p <- plot_ic_dist(curr_chla, ic_distribution_low) +
+      ylim(c(0,1)) +
+      xlim(range(first_forecast$ic_distribution)) +
+      ggtitle("")
+    
+    plot.ic.distrib.low$main <- p
+    
+    return(ggplotly(p, dynamicTicks = FALSE))
+    
+  })
+  
+
   
   ##########OLD
 

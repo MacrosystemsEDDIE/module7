@@ -36,7 +36,7 @@ q28,Q28. What is the forecasted chlorophyll-a for 2020-09-27?
 q29,Q29. Compare the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. What happened when there was no new observation to update the forecast?
 q30,Q30. What is the forecasted chlorophyll-a for 2020-09-27?
 q31,"Q31. Compare the two-forecast plot with no data assimilation (missing observation) to the two-forecast plot with data assimilation. Specifically, how do the forecasts for 2020-09-27 on each plot compare?"
-q32,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?"
+q32,Q32. Make a prediction. How do you think a decrease in observation uncertainty will affect the forecasts?
 q33,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?"
 q34,How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor A (cheaper sensor)?
 q35,How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor B (expensive sensor)?

@@ -1043,7 +1043,7 @@ ui <- function(req) {
                         ),
                         tabsetPanel(id = "tabseries3",
                                     #* Objective 5 - Assimilate data ====
-                                    tabPanel(title = "Objective 5 - Assimilate Data", value = "stab7",
+                                    tabPanel(title = "Objective 5 - Assimilate data", value = "stab7",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -1242,135 +1242,57 @@ ui <- function(req) {
                                                )
                                              )
                                     ),
-                                    #* Objective 8 - Explore observation uncertainty ====
-                                    tabPanel(title = tab_names["stab8", 2], value = "stab8",
+                                    #* Objective 6 - Explore observation uncertainty ====
+                                    tabPanel(title = "Objective 6 - Explore observation uncertainty", value = "stab8",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab8", 2]),
-                                                                p(id = "txt_j", module_text["obj_08", ])
+                                                                h3("Objective 6 - Explore observation uncertainty"),
+                                                                p(id = "txt_j", module_text["obj_06", ])
                                                       )
                                                )
                                              ),
-                                             hr(),
-                                             #** Key terms ----
                                              fluidRow(
-                                               column(11, offset = 1,
-                                                      h3("Key terms")
-                                               ),
-                                               column(6, offset = 1,
-                                                      tags$ul(
-                                                        tags$li(tags$b("Observational uncertainty "), module_text["obs_uc", ]),
-                                                        tags$li("A ", tags$b("sensor "), module_text["sensor", ])
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             #** Chl-a Slides ----
-                                             fluidRow(
-                                               column(12,
-                                                      h1("How do we collect data measurements?"),
-                                                      h2(tags$b("Chlorophyll-a"))
-                                               ),
-                                               column(4,
-                                                      h3("Sensor"),
-                                                      p(data_collection_methods[7, 3], id = "txt_j"),
-                                                      p(data_collection_methods[7, 4], id = "txt_j"),
-                                                      h3("Lab Water Sample Measurement"),
-                                                      p(data_collection_methods[8, 3], id = "txt_j"),
-                                                      p(data_collection_methods[8, 4], id = "txt_j")
-                                               ),
-                                               column(8,
-                                                      wellPanel(
-                                                        slickROutput("chla_slides", width = "650px", height = "360px")
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             # #** Nitrate Slides ----
-                                             # fluidRow(
-                                             #   column(12,
-                                             #          h2(tags$b("Nitrate"))
-                                             #   ),
-                                             #   column(4,
-                                             #          h3("Sensor"),
-                                             #          p(data_collection_methods[5, 3], id = "txt_j"),
-                                             #          p(data_collection_methods[5, 4], id = "txt_j"),
-                                             #          h3("Lab Measurement"),
-                                             #          p(data_collection_methods[6, 3], id = "txt_j"),
-                                             #          p(data_collection_methods[6, 4], id = "txt_j")
-                                             #   ),
-                                             #   column(8,
-                                             #          wellPanel(
-                                             #            slickROutput("nitrate_slides", width = "650px", height = "360px")
-                                             #          )
-                                             #   )
-                                             # ),
-                                             # hr(),
-                                             #** Questions ----
-                                             fluidRow(
-                                               column(10, offset = 1,
-                                                      box(id = "box4", width = 12, status = "primary",
+                                               column(6,
+                                                      h3("Make a prediction"),
+                                                      p("We have explored the effect of data assimilation vs. no data assimilation on forecasts using an ensemble Kalman filter, which accounts for uncertainty in both model predictions and observations."),
+                                                      p("Now, imagine that we have purchased a new water quality sensor, which takes incredibly accurate chlorophyll-a measurements, thus decreasing our observation uncertainty. How might this decrease in observation uncertainty affect our forecasts?"),
+                                                      box(id = "box10", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[35], label = quest[qid[35], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[36], label = quest[qid[36], ], width = "90%")
+                                                                   p(tags$b(quest["q32", 1]))
                                                             )
                                                           )
                                                       )
-                                               )
-                                             ),
-                                             hr(),
-                                             #** Explore observation uncertainty ----
-                                             fluidRow(
-                                               column(12,
-                                                      h3("Explore observation uncertainty")
-                                               ),
-                                               column(4,
-                                                      p("Use the slider below to adjust the observation uncertainty and then generate a forecast that assimilates observations with the observation uncertainty you specified."),
-                                                      # checkboxGroupInput("obs_uc_da", label = "Data to assimilate:", 
-                                                      #                    choices = view_vars$lname[1:2]),
-                                                      sliderInput("obs_uc_chla", "Chl-a observation uncertainty",
-                                                                  min = 0, max = 5, step = 0.5, value = 0.5),
-                                                      # sliderInput("obs_uc_nitrate", "Nitrate observation uncertainty",
-                                                      #             min = 0, max = 5, step = 0.5, value = 0.5),
-                                                      actionButton("run_fc_obs_uc", label = div("Run Forecast", icon("running"))),
-                                                      h4("RMSE of forecast"),
-                                                      wellPanel(
-                                                        textOutput("rmse_obs_uc")
                                                       ),
-                                                      actionButton("save_rmse", "Save RMSE", icon = icon("save")),
-                                                      br(),
-                                                      DTOutput("obs_uc_rmse"),
-                                                      br(),
-                                                      p(tags$b("Note:"), " You can also select a row in the table BEFORE clicking 'Save RMSE' to overwrite a row in the table.")
-                                               ),
-                                               column(8,
-                                                      wellPanel(
-                                                        plotlyOutput("fc_obs_uc_plot"),
-                                                        sliderInput("nday_obs_uc", "N days", min = 1, max = 35, value = 1, step = 1,
-                                                                    animate = TRUE),
-                                                        checkboxInput("add_obs_obs_uc", "Add observations"),
-                                                        radioButtons("plot_type_obs_uc", "Plot type", c("Line", "Distribution"),
-                                                                     inline = TRUE)
+                                               column(6,
+                                                      img(src = "LSPA_buoy_and_friends.png", height = "90%", id = "bla_border",
+                                                          width = "90%", align = "center"),
+                                                      p(tags$em("Members of the Virginia Tech Reservoir Group and Lake Sunapee Protective Association with the Lake Sunapee buoy. Photo credit: "))
                                                       )
-                                               )
                                              ),
-                                             #** Questions ----
+                                             hr(),
                                              fluidRow(
-                                               column(10, offset = 1,
-                                                      box(id = "box4", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[37], label = quest[qid[37], ], width = "90%")
-                                                            )
-                                                          )
+                                               column(4,
+                                                      h3("Generate initial condition distribution with low observation uncertainty"),
+                                                      p("Let's plot an initial conditions distribution that reflects the lower uncertainty due to our new water quality sensor."),
+                                                      p("We will also plot the original initial condition you generated in Objective 4 for comparison."),
+                                                      actionButton("plot_low_ic","Generate distribution")
+                                                      ),
+                                               column(4,
+                                                      h4("Initial condition distribution with low observation uncertainty"),
+                                                      wellPanel(
+                                                        plotlyOutput("ic_distrib_low_plot")
                                                       )
-                                               )
+                                                      ),
+                                               column(4,
+                                                      h4("Original initial condition distribution generated in Objective 4"),
+                                                      wellPanel(
+                                                        plotlyOutput("ic_distrib_plot2")
+                                                      )
+                                                      )
                                              ),
                                              #*** Next step ----
                                              hr(),
