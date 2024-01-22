@@ -1294,6 +1294,29 @@ ui <- function(req) {
                                                       )
                                                       )
                                              ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      h3("Compare forecasts made with low observation uncertainty to previous forecasts"),
+                                                      p("Now, we will replicate the two-forecast plot with data assimilation that we created above, but this time with lower observation uncertainty."),
+                                                      actionButton("plot_fc_low_obs_uc","Plot forecasts with low observation uncertainty"),
+                                                      fluidRow(
+                                                        column(6,
+                                                               h4("Forecasts assimilating data with low observation uncertainty"),
+                                                               wellPanel(
+                                                                 plotOutput("second_fc_low_obs_uc")
+                                                               ),
+                                                               downloadButton("save_second_fc_low_obs_uc_plot", "Download plot", icon = icon("download"))
+                                                        ),
+                                                        column(6,
+                                                               h4("Previous forecasts with data assimilation"),
+                                                               wellPanel(
+                                                                 plotOutput("second_fc_da_plot3")
+                                                               )
+                                                        )
+                                                      )
+                                                      )
+                                             ),
                                              #*** Next step ----
                                              hr(),
                                              fluidRow(

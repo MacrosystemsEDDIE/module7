@@ -1361,7 +1361,8 @@ shinyServer(function(input, output, session) {
   })
   
   # create reactive value to hold things for this objective
-  obs_uc <- reactiveValues(ic_distribution_low = NULL)
+  obs_uc <- reactiveValues(ic_sd_low = NULL,
+                           ic_distribution_low = NULL)
   
   # ic distribution with low obs uncertainty
   plot.ic.distrib.low <- reactiveValues(main=NULL)
@@ -1393,6 +1394,7 @@ shinyServer(function(input, output, session) {
     curr_chla = as.numeric(first_forecast$curr_chla)
     n_members = as.numeric(first_forecast$n_members)
     ic_sd_low = first_forecast$ic_sd/2
+    obs_uc$ic_sd_low <- ic_sd_low
     
     # generate distribution
     ic_distribution_low <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_low)
@@ -1408,6 +1410,121 @@ shinyServer(function(input, output, session) {
     return(ggplotly(p, dynamicTicks = FALSE))
     
   })
+  
+  # repeat 2-forecast plot with data assimilation from obj 5
+  output$second_fc_da_plot3 <- renderPlot({
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.da$main),
+           message = "Please complete Objective 5.")
+    )
+    
+    p <- plot.second.fc.da$main +
+      ylim(c(range(EnKF_inputs_outputs$second_forecast_da)))
+    return(p)
+  })
+  
+  # 2 forecasts assimilating data with low uncertainty
+  # Second forecast figure
+  plot.second.fc.low.obs.uc <- reactiveValues(main=NULL)
+  
+  output$second_fc_low_obs_uc <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.da$main),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(input$plot_fc_low_obs_uc > 0,
+           message = "Please click 'Plot forecasts with low observation uncertainty'.")
+    )
+    
+    #unpacking values we will need
+    intercept = as.numeric(ar.model$intercept)
+    ar1 = as.numeric(ar.model$ar1)
+    chla_mean = as.numeric(ar.model$chla_mean)
+    ic_distribution_low = obs_uc$ic_distribution_low
+    process_distribution = as.numeric(first_forecast$process_distribution)
+    
+    #first forecast
+    first_forecast_low_obs_uc = intercept + ar1 * (ic_distribution_low - chla_mean) + chla_mean + process_distribution
+    
+    #more unpacking
+    ic_sd_low = obs_uc$ic_sd_low
+    new_obs = EnKF_inputs_outputs$new_obs
+    
+    #update ic
+    ic_update_low_obs_uc <- EnKF(forecast = first_forecast_low_obs_uc, 
+                                 new_observation = new_obs, ic_sd = ic_sd_low)
+    
+    #second forecast
+    second_forecast_low_obs_uc = intercept + ar1 * (ic_update_low_obs_uc - chla_mean) + chla_mean + process_distribution
+    
+    #assign dates
+    forecast_dates = EnKF_inputs_outputs$forecast_dates
+    
+    curr_chla = as.numeric(first_forecast$curr_chla)
+    chla_obs = c(curr_chla, new_obs) #vector of observations to use for plotting
+    start_date = first_forecast_dates$start_date
+    n_members = as.numeric(first_forecast$n_members)
+    
+    p <- plot_second_forecast(chla_obs, start_date, forecast_dates, 
+                              ic_distribution_low, ic_update_low_obs_uc, 
+                              first_forecast_low_obs_uc, second_forecast_low_obs_uc, 
+                              n_members) +
+      ylim(c(range(EnKF_inputs_outputs$second_forecast_da)))
+    
+    plot.second.fc.low.obs.uc$main <- p
+    
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_second_fc_low_obs_uc_plot <- downloadHandler(
+    filename = function() {
+      paste("Q33-Q34-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.second.fc.low.obs.uc$main, device = device)
+    }
+  )
   
 
   
