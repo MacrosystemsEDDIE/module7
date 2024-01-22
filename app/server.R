@@ -863,6 +863,8 @@ shinyServer(function(input, output, session) {
     chla_mean = as.numeric(ar.model$chla_mean)
     ic_distribution = as.numeric(first_forecast$ic_distribution)
     process_distribution = as.numeric(first_forecast$process_distribution)
+    forecast_date = "2020-09-26"
+    first_forecast_dates$forecast_date <- forecast_date
     
     forecast_chla = intercept + ar1 * (ic_distribution - chla_mean) + chla_mean + process_distribution
     first_forecast$forecast_chla <- forecast_chla
@@ -912,8 +914,7 @@ shinyServer(function(input, output, session) {
     
     curr_chla = as.numeric(first_forecast$curr_chla)
     start_date = first_forecast_dates$start_date
-    forecast_date = "2020-09-26"
-    first_forecast_dates$forecast_date <- forecast_date
+    forecast_date = first_forecast_dates$forecast_date
     ic_distribution = as.numeric(first_forecast$ic_distribution)
     forecast_chla = as.numeric(first_forecast$forecast_chla)
     n_members = as.numeric(first_forecast$n_members)
@@ -939,6 +940,115 @@ shinyServer(function(input, output, session) {
       ggsave(file, plot = plot.fc1.viz$main, device = device)
     }
   )
+  
+  ## Objective 5 ----
+  
+  # create reactive for EnKF inputs
+  EnKF_inputs_outputs <- reactiveValues(new_obs = NULL,
+                                        updated_ic = NULL)
+  
+  # Text output for new observation ----
+  output$new_obs <- renderUI({
+    
+    validate(
+      need(!is.null(autocorrelation_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$view_new_obs > 0,
+           message = "Click 'View new observation'")
+    )
+    
+    df <- lake_data$df
+    
+    new_obs <- df %>%
+      filter(datetime == first_forecast_dates$forecast_date) %>%
+      pull(chla)
+    
+    EnKF_inputs_outputs$new_obs <- new_obs
+    
+    new_obs_text <- paste("<b>","New observation: ",round(new_obs,2),"</b>", sep = "")
+    
+    HTML(paste(new_obs_text))
+  })
+  
+  #Updated initial condition figure
+  plot.updated.ic <- reactiveValues(main=NULL)
+  
+  output$updated_ic_plot <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    
+    forecast_chla <- first_forecast$forecast_chla
+    ic_sd <- first_forecast$ic_sd
+    curr_chla = as.numeric(first_forecast$curr_chla)
+    start_date = first_forecast_dates$start_date
+    forecast_date = first_forecast_dates$forecast_date
+    ic_distribution = as.numeric(first_forecast$ic_distribution)
+    forecast_chla = as.numeric(first_forecast$forecast_chla)
+    n_members = as.numeric(first_forecast$n_members)
+    
+    if(input$update_ic > 0 & input$view_new_obs > 0){
+      previous_plot <- plot.fc1.viz$main
+      new_obs <- EnKF_inputs_outputs$new_obs
+      chla_obs <- c(curr_chla, new_obs) #vector of observations to use for plotting
+      ic_update <- EnKF(forecast = forecast_chla, new_observation = new_obs, ic_sd = ic_sd)
+      EnKF_inputs_outputs$updated_ic <- ic_update
+      p1 <- plot_fc_update(chla_obs, start_date, forecast_date, ic_distribution, ic_update, forecast_chla, n_members)
+      plot.updated.ic$main <- p1
+      return(p1)
+    } else if(input$view_new_obs > 0) {
+      previous_plot <- plot.fc1.viz$main
+      new_obs <- EnKF_inputs_outputs$new_obs
+      p <- plot_fc_new_obs(previous_plot = previous_plot, new_obs = new_obs, forecast_date = forecast_date)
+      plot.updated.ic$main <- p
+      return(p)
+    } else {
+      previous_plot <- plot.fc1.viz$main
+      plot.updated.ic$main <- previous_plot
+      return(previous_plot)
+    }
+    
+  })
+  
+  # Download plot
+  output$save_updated_ic_plot <- downloadHandler(
+    filename = function() {
+      paste("Q27-Q28-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.updated.ic$main, device = device)
+    }
+  )
+  
+  
   
   
   

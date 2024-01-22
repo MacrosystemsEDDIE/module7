@@ -184,138 +184,138 @@ get_drivers = function(fc_conv, n_drivers, driver_colnames, model_dates, n_en){
 #' @param state_names character string vector of state names as specified in obs_file
 #' @param yini vector of initial conditions for states (chla, nitrate)
 
-EnKF = function(n_en = 30, 
-                start = '2020-09-25', # start date 
-                stop = '2020-10-29', 
-                time_step = 'days', 
-                obs_file = lake_data_no_assim,
-                driver_file = fc_conv,
-                n_states_est = 2, 
-                n_params_est = 1,
-                n_params_obs = 0, 
-                maxUptake_init = 0.1, 
-                obs_cv = c(0.2, 0.1),
-                param_cv = 0.1,
-                init_cond_cv = c(0.1, 0.1),
-                state_names = c("chla","nitrate"),
-                yini = c(7.21, 1.39)){
-  
-  
-  n_en = n_en
-  start = as.Date(start)
-  stop = as.Date(stop)
-  time_step = 'days' 
-  dates = get_model_dates(model_start = start, model_stop = stop, time_step = time_step)
-  n_step = length(dates)
-  
-  # get observation matrix
-  obs_df = obs_file %>% 
-    select(datetime, chla, nitrate) 
-  
-  n_states_est = n_states_est # number of states we're estimating 
-  
-  n_params_est = n_params_est # number of parameters we're calibrating
-  
-  n_params_obs = n_params_obs # number of parameters for which we have observations
-  
-  maxUptake_init = maxUptake_init # Initial estimate of DOC decay rate day^-1 
-  
-  yini <- c( #initial estimate of PHYTO and nitrate states, respectively
-    PHYTO = yini[1], #mmolN m-3 which is the same as mg chl b/c ratio set to 1
-    DIN = yini[2]) #mmolN m-3
-  
-  state_cv = obs_cv #coefficient of variation of chla and din observations, respectively 
-  state_sd = state_cv * yini
-  init_cond_sd = init_cond_cv * yini
-  
-  param_cv = param_cv #coefficient of variation of maxUptake 
-  param_sd = param_cv * maxUptake_init
-  
-  # setting up matrices
-  # observations as matrix
-  obs = get_obs_matrix(obs_df = obs_df,
-                       model_dates = dates,
-                       n_step = n_step,
-                       n_states = n_states_est,
-                       states = state_names)
-  
-  # Y vector for storing state / param estimates and updates
-  Y = get_Y_vector(n_states = n_states_est,
-                   n_params_est = n_params_est,
-                   n_step = n_step,
-                   n_en = n_en)
-  
-  # observation error matrix
-  R = get_obs_error_matrix(n_states = n_states_est,
-                           n_params_obs = n_params_obs,
-                           n_step = n_step,
-                           state_sd = state_sd,
-                           param_sd = param_sd)
-  
-  # observation identity matrix
-  H = get_obs_id_matrix(n_states = n_states_est,
-                        n_params_obs = n_params_obs,
-                        n_params_est = n_params_est,
-                        n_step = n_step,
-                        obs = obs)
-  
-  # initialize Y vector
-  Y = initialize_Y(Y = Y, obs = obs, init_params = maxUptake_init, n_states_est = n_states_est,
-                   n_params_est = n_params_est, n_params_obs = n_params_obs,
-                   n_step = n_step, n_en = n_en, state_sd = init_cond_sd, param_sd = param_sd, yini = yini)
-  
-  # get driver data with uncertainty - dim = c(n_step, driver, n_en) 
-  drivers = get_drivers(fc_conv = driver_file, 
-                        model_dates = dates,
-                        n_drivers = 2, 
-                        driver_colnames = c('wtemp', 'upar'), 
-                        n_en = n_en) 
-  
-  # start modeling
-  for(t in 2:n_step){
-    for(n in 1:n_en){
-      
-      # run model; 
-      model_output = NP_model(TEMP = drivers[t-1, 1, n], 
-                              PHYTO = Y[1, t-1, n], 
-                              DIN = Y[2, t-1, n], 
-                              PAR = drivers[t-1, 2, n],
-                              maxUptake = Y[3, t-1, n])
-      
-      ######quick hack to add in process error (ha!)########
-      
-      #specify Y_star (mean of multivariate normal)
-      Y_star = matrix(c(model_output$PHYTO_pred, model_output$DIN_pred, model_output$maxUptake))
-      
-      #specify sigma (covariance matrix of states and updating parameters)
-      residual_matrix <- matrix(NA, nrow = 4, ncol = 3)
-      residual_matrix[1,] <- c(0.5, 0.3, 0.01)
-      residual_matrix[2,] <- c(1, 0.2, 0.02)
-      residual_matrix[3,] <- c(0.25, 0.1, 0.03)
-      residual_matrix[4,] <- c(-0.30, -0.1, -0.03)
-      
-      sigma_proc <- cov(residual_matrix)
-      
-      #make a draw from Y_star
-      Y_draw = abs(mvtnorm::rmvnorm(1, mean = Y_star, sigma = sigma_proc))
-      Y[1 , t, n] = Y_draw[1] # store in Y vector
-      Y[2 , t, n] = Y_draw[2]
-      Y[3 , t, n] = Y_draw[3]
-      
-      #####end of hack######################################
-    }
-    # check if there are any observations to assimilate 
-    if(any(!is.na(obs[ , , t]))){
-      Y = kalman_filter(Y = Y,
-                        R = R,
-                        obs = obs,
-                        H = H,
-                        n_en = n_en,
-                        cur_step = t) # updating params / states if obs available
-    }
-  }
-  out = list(Y = Y, dates = dates, drivers = drivers, R = R, obs = obs, state_sd = state_sd)
-  
-  return(out)
-}
+# EnKF = function(n_en = 30, 
+#                 start = '2020-09-25', # start date 
+#                 stop = '2020-10-29', 
+#                 time_step = 'days', 
+#                 obs_file = lake_data_no_assim,
+#                 driver_file = fc_conv,
+#                 n_states_est = 2, 
+#                 n_params_est = 1,
+#                 n_params_obs = 0, 
+#                 maxUptake_init = 0.1, 
+#                 obs_cv = c(0.2, 0.1),
+#                 param_cv = 0.1,
+#                 init_cond_cv = c(0.1, 0.1),
+#                 state_names = c("chla","nitrate"),
+#                 yini = c(7.21, 1.39)){
+#   
+#   
+#   n_en = n_en
+#   start = as.Date(start)
+#   stop = as.Date(stop)
+#   time_step = 'days' 
+#   dates = get_model_dates(model_start = start, model_stop = stop, time_step = time_step)
+#   n_step = length(dates)
+#   
+#   # get observation matrix
+#   obs_df = obs_file %>% 
+#     select(datetime, chla, nitrate) 
+#   
+#   n_states_est = n_states_est # number of states we're estimating 
+#   
+#   n_params_est = n_params_est # number of parameters we're calibrating
+#   
+#   n_params_obs = n_params_obs # number of parameters for which we have observations
+#   
+#   maxUptake_init = maxUptake_init # Initial estimate of DOC decay rate day^-1 
+#   
+#   yini <- c( #initial estimate of PHYTO and nitrate states, respectively
+#     PHYTO = yini[1], #mmolN m-3 which is the same as mg chl b/c ratio set to 1
+#     DIN = yini[2]) #mmolN m-3
+#   
+#   state_cv = obs_cv #coefficient of variation of chla and din observations, respectively 
+#   state_sd = state_cv * yini
+#   init_cond_sd = init_cond_cv * yini
+#   
+#   param_cv = param_cv #coefficient of variation of maxUptake 
+#   param_sd = param_cv * maxUptake_init
+#   
+#   # setting up matrices
+#   # observations as matrix
+#   obs = get_obs_matrix(obs_df = obs_df,
+#                        model_dates = dates,
+#                        n_step = n_step,
+#                        n_states = n_states_est,
+#                        states = state_names)
+#   
+#   # Y vector for storing state / param estimates and updates
+#   Y = get_Y_vector(n_states = n_states_est,
+#                    n_params_est = n_params_est,
+#                    n_step = n_step,
+#                    n_en = n_en)
+#   
+#   # observation error matrix
+#   R = get_obs_error_matrix(n_states = n_states_est,
+#                            n_params_obs = n_params_obs,
+#                            n_step = n_step,
+#                            state_sd = state_sd,
+#                            param_sd = param_sd)
+#   
+#   # observation identity matrix
+#   H = get_obs_id_matrix(n_states = n_states_est,
+#                         n_params_obs = n_params_obs,
+#                         n_params_est = n_params_est,
+#                         n_step = n_step,
+#                         obs = obs)
+#   
+#   # initialize Y vector
+#   Y = initialize_Y(Y = Y, obs = obs, init_params = maxUptake_init, n_states_est = n_states_est,
+#                    n_params_est = n_params_est, n_params_obs = n_params_obs,
+#                    n_step = n_step, n_en = n_en, state_sd = init_cond_sd, param_sd = param_sd, yini = yini)
+#   
+#   # get driver data with uncertainty - dim = c(n_step, driver, n_en) 
+#   drivers = get_drivers(fc_conv = driver_file, 
+#                         model_dates = dates,
+#                         n_drivers = 2, 
+#                         driver_colnames = c('wtemp', 'upar'), 
+#                         n_en = n_en) 
+#   
+#   # start modeling
+#   for(t in 2:n_step){
+#     for(n in 1:n_en){
+#       
+#       # run model; 
+#       model_output = NP_model(TEMP = drivers[t-1, 1, n], 
+#                               PHYTO = Y[1, t-1, n], 
+#                               DIN = Y[2, t-1, n], 
+#                               PAR = drivers[t-1, 2, n],
+#                               maxUptake = Y[3, t-1, n])
+#       
+#       ######quick hack to add in process error (ha!)########
+#       
+#       #specify Y_star (mean of multivariate normal)
+#       Y_star = matrix(c(model_output$PHYTO_pred, model_output$DIN_pred, model_output$maxUptake))
+#       
+#       #specify sigma (covariance matrix of states and updating parameters)
+#       residual_matrix <- matrix(NA, nrow = 4, ncol = 3)
+#       residual_matrix[1,] <- c(0.5, 0.3, 0.01)
+#       residual_matrix[2,] <- c(1, 0.2, 0.02)
+#       residual_matrix[3,] <- c(0.25, 0.1, 0.03)
+#       residual_matrix[4,] <- c(-0.30, -0.1, -0.03)
+#       
+#       sigma_proc <- cov(residual_matrix)
+#       
+#       #make a draw from Y_star
+#       Y_draw = abs(mvtnorm::rmvnorm(1, mean = Y_star, sigma = sigma_proc))
+#       Y[1 , t, n] = Y_draw[1] # store in Y vector
+#       Y[2 , t, n] = Y_draw[2]
+#       Y[3 , t, n] = Y_draw[3]
+#       
+#       #####end of hack######################################
+#     }
+#     # check if there are any observations to assimilate 
+#     if(any(!is.na(obs[ , , t]))){
+#       Y = kalman_filter(Y = Y,
+#                         R = R,
+#                         obs = obs,
+#                         H = H,
+#                         n_en = n_en,
+#                         cur_step = t) # updating params / states if obs available
+#     }
+#   }
+#   out = list(Y = Y, dates = dates, drivers = drivers, R = R, obs = obs, state_sd = state_sd)
+#   
+#   return(out)
+# }
 

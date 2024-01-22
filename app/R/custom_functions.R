@@ -218,6 +218,16 @@ plot_fc_1day <- function(curr_chla, start_date, forecast_date, ic_distribution, 
   return(p)
 }
 
+#' One-day forecast plot with new observation
+#' 
+plot_fc_new_obs <- function(previous_plot, new_obs, forecast_date){
+  
+  obs <- tibble(date = forecast_date,
+                      obs = new_obs)
+  p <- previous_plot +
+    geom_point(data = obs, aes(x = date, y = obs, color = "Observation"), size = 3)
+}
+
 #' One-day forecast plot with updated initial condition
 #' 
 
@@ -245,7 +255,7 @@ plot_fc_update <- function(chla_obs, start_date, forecast_date, ic_distribution,
     geom_point(data = obs, aes(x = date, y = obs, color = "Observation"), size = 3)+
     ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+
     xlab("")+
-    theme_bw()+
+    theme_bw(18)+
     theme(panel.grid.major.x = element_line(colour = "black", linetype = "dashed"),
           panel.grid.major.y = element_blank(),
           panel.grid.minor.y = element_blank(),

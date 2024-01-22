@@ -1036,355 +1036,94 @@ ui <- function(req) {
                         fluidRow(
                           column(12,
                                  wellPanel(style = paste0("background: ", obj_bg),
-                                           h2("Activity B - Assimilate Data"),
+                                           h2("Activity B - Explore Data Assimilation"),
                                            p(module_text["act_B", ])
                                  )
                           )
                         ),
                         tabsetPanel(id = "tabseries3",
-                                    # #* Activity B - Overview ====
-                                    # tabPanel(title = tab_names["stab7", 2], value = "stab7",
-                                    #          fluidRow(
-                                    #            column(12,
-                                    #                   wellPanel(style = paste0("background: ", obj_bg),
-                                    #                             h3("Overview"),
-                                    #                             p(id = "txt_j", module_text["act_B_overview", ])
-                                    #                   )
-                                    #            )
-                                    #          )
-                                    # ),
-                                    #* Objective 7 - Assimilate data ====
-                                    tabPanel(title = tab_names["stab7", 2], value = "stab7",
+                                    #* Objective 5 - Assimilate data ====
+                                    tabPanel(title = "Objective 5 - Assimilate Data", value = "stab7",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab7", 2]),
-                                                                p(id = "txt_j", module_text["obj_07", ])
-                                                      )
-                                               )
-                                             ),
-                                             fluidRow(
-                                               column(4,
-                                                      h3("Ensemble Kalman filter"),
-                                                      p("Data assimilation can be done using a variety of methods. Today, we'll be using an approach called the ",tags$b("ensemble Kalman filter.")),
-                                                      p(module_text["enkf_filter2", ], id = "txt_j"),
-                                                      p(module_text["enkf_filter3", ], id = "txt_j")
-                                               ),
-                                               column(7, offset = 1,
-                                                      img(src = "EnKF_figure.png", height = "80%", id = "bla_border",
-                                                          width = "80%", align = "center"),
-                                                      p("Image adapted from: Reichle, R. H., Walker, J. P., Koster, R. D., & Houser, P. R. (2002). ", a("Extended versus Ensemble Kalman Filtering for Land Data Assimilation", href = "https://doi.org/10.1175/1525-7541(2002)003%3C0728:EVEKFF%3E2.0.CO;2", target = "_blank"), ", Journal of Hydrometeorology, 3(6).")
-                                               )
-                                             ),
-                                             hr(),
-                                             fluidRow(
-                                               column(4, offset = 1,
-                                                      h4("Today"),
-                                                      p("We will use your converted forecasts of water temperature and underwater PAR, as well as observations of chlorophyll-a from your selected lake, to generate forecasts of chlorophyll-a."),
-                                                      br(),
-                                                      p("We will use an ensemble Kalman filter to conduct data assimilation.")
-                                               ),
-                                               column(5, offset = 1,
-                                                      h4("Types of forecasts:"),
-                                                      tags$ol(
-                                                        tags$li(id = "txt_j", tags$b("No assimilation:"), module_text["obj7_no_assim", ]),
-                                                        tags$li(id = "txt_j", tags$b("Chl-a assimilation:"), module_text["obj7_chla_assim", ])
-                                                        #tags$li(id = "txt_j", tags$b("Nitrate assimilation:"), module_text["obj7_nitrate_assim", ]),
-                                                        #tags$li(id = "txt_j", tags$b("Chl-a and nitrate assimilation:"), module_text["obj7_chla_nitrate_assim", ])
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             fluidRow(
-                                               column(10, offset = 1,
-                                                      box(id = "box4", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Question"),
-                                                                   radioButtons(qid[29], quest[qid[29], 1], choices = assim_choices, inline = TRUE, selected = character(0)),
-                                                                   br()
-                                                            )
-                                                          )
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             #** No Data Assimilation ----
-                                             fluidRow(
-                                               column(4,
-                                                      h3("Forecast with no data assimilation"),
-                                                      p("Click the button below to generate and plot your first series of forecasts."),
-                                                      actionButton("run_fc_no_da", label = div("Run Forecast", icon("running"))),
-                                                      sliderInput("n_mem_no_da", "No. of members", min = 5, max = 100, value = 30, step = 5),
-                                                      p("You can use the slider underneath the plan to advance the forecasts each day OR you can click the play button on the right side of the slider to animate the forecast over time."),
-                                                      p(tags$b("Note:"), " The play button only works when the 'Plot type' is set to 'Line'.")
-                                               ),
-                                               column(8,
-                                                      h3("Forecast with NO DA"),
-                                                      wellPanel(
-                                                        plotlyOutput("chla_fc_no_da"),
-                                                        sliderInput("nday_no_da", "N days", min = 1, max = 35, value = 1, step = 1,
-                                                                    animate = TRUE),
-                                                        checkboxInput("add_obs_no_da", "Add observations"),
-                                                        radioButtons("plot_type_no_da", "Plot type", c("Line", "Distribution"),
-                                                                     inline = TRUE)
+                                                                h3("Objective 5 - Assimilate data"),
+                                                                p(id = "txt_j", module_text["obj_05", ])
                                                       )
                                                )
                                              ),
                                              fluidRow(
                                                column(6,
-                                                      h3("Assess the forecast"),
-                                                      p(module_text["fc_accur", ]),
+                                                      p("Now that we have generated a forecast with uncertainty, we are going to explore the effect of data assimilation on our forecast. Remember, ",tags$b("data assimilation")," is the process of using observed data to update our forecast model as the data become available."),
+                                               ),
+                                               column(6,
+                                                      p("Let's pretend that a day has passed since we made our first forecast, and we now have a new observation that we can use to update our forecast."),
+                                                      p("We will use this observation to update our forecast ",tags$b("initial condition.")," We will do this using a statistical technique called an ",tags$b("ensemble Kalman filter."))
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(5,
+                                                      h3("Understanding the ensemble Kalman filter"),
+                                                      h4(tags$em("What is an ensemble Kalman filter?")),
+                                                      p("An ",tags$b("ensemble Kalman filter")," is a statistical technique that updates model predictions to more closely match the most recently observed data, while accounting for uncertainty in both model predictions and observations. While there are many techniques that can be used to assimilate data in ecological forecasts, the benefits of an ensemble Kalman filter are:"),
                                                       tags$ol(
-                                                        tags$li(tags$b("Predicted vs. observed plots: "), module_text["pred_v_obs_plot", ]),
-                                                        tags$li(tags$b("Root mean square error (RMSE): "), module_text["rmse2", ])
-                                                        ),
-                                                      div("$$RMSE = \\sqrt{\\sum_{n}^{i=1}\\frac{(P_{i} - O_{i})^2 }n}$$"),
-                                                      p(tags$em("where P is equal to the predicted value and O is equal to the observed value and n is equal to the total number of data points.")),
-                                                      p("Click the button below to compare your forecast to observational data."),
-                                                      actionButton('assess_fc_no_da', label = div("Assess forecast",
-                                                                                                  icon("clipboard-check"))),
-                                                      br(),
-                                                      box(id = "box2", width = 12, status = "primary",
+                                                        tags$li("It is ",tags$b("designed to be used with model ensembles,")," and so is an ideal method for forecasts which include uncertainty."),
+                                                        tags$li("It ",tags$b("accounts for uncertainty in both model predictions and observations,")," rather than assuming that observations are 'true' and have no uncertainty. As a result, when a model is updated with an ensemble Kalman filter, the updated state of the model will not always perfectly match the new observations, because the ensemble Kalman filter integrates information from both the model predictions and the observations."),
+                                                        tags$li("It can be ",tags$b("used to update multiple variables and parameters")," within a model, even if not all of the variables and parameters are observed. For example, suppose you have a model that predicts both water temperature and air temperature, but you only have observations of water temperature. An ensemble Kalman filter can use the relationship between water and air temperature in the model to update both variables as well as relevant model parameters using just the water temperature observations.")
+                                                      ),
+                                                      p("For today, we will use a simplified version of the ensemble Kalman filter that just updates the initial condition of chlorophyll-a using new observations when they become available.")
+                                               ),
+                                               column(6, offset = 1,
+                                                      br(),br(),
+                                                      img(src = "EnKF_figure.png", height = "90%", id = "bla_border",
+                                                          width = "90%", align = "center"),
+                                                      p("Image adapted from: Reichle, R. H., Walker, J. P., Koster, R. D., & Houser, P. R. (2002). ", a("Extended versus Ensemble Kalman Filtering for Land Data Assimilation", href = "https://doi.org/10.1175/1525-7541(2002)003%3C0728:EVEKFF%3E2.0.CO;2", target = "_blank"), ", Journal of Hydrometeorology, 3(6).")
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      box(id = "box10", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[30], label = quest[qid[30], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[31], label = quest[qid[31], ], width = "90%"),
-                                                                   br()
+                                                                   p(tags$b(quest["q26", 1]))
                                                             )
                                                           )
                                                       )
-                                               ),
-                                               column(4, offset = 1,
-                                                      h3("Predicted vs. Observed"),
-                                                      wellPanel(
-                                                        plotOutput("chla_fc_assess_no_da")
-                                                        ),
-                                                      wellPanel(
-                                                        textOutput("rmse_no_da")
-                                                        )
                                                       )
-                                               ),
-                                             hr(),
-                                             #** Chl-a Assimilation ----
-                                             fluidRow(
-                                               column(4,
-                                                      h3("Forecast with chl-a data assimilation"),
-                                                      p("Now, we will generate a series of daily forecasts that assimilate chl-a data which is available once per week."),
-                                                      p("Click the button below to generate and plot your second forecast"),
-                                                      sliderInput("n_mem_chla_assim", "No. of members", min = 5, max = 100, 
-                                                                  value = 30, step = 5),
-                                                      actionButton("run_fc_chla_assim", label = div("Run Forecast", icon("running"))),
-                                                      br(),
-                                                      conditionalPanel("input.run_fc_chla_assim > 0",
-                                                                       selectInput("view_var_chla_assim", "Select variable", 
-                                                                                   choices = view_vars$lname),
-                                                                       p("Check the box under the plot to add observations to your forecast. Note that chl-a data points that are assimilated into the forecast are plotted in pink."),
-                                                                       p("For some lake sites, there are missing chl-a data! In these cases, you may not be able to assimilate chl-a data every week. We will revisit the importance of missing data in Objective 9 and Activity C.")
-                                                      )
-                                               ),
-                                               column(8,
-                                                      h3("Forecast with chl-a DA"),
-                                                      wellPanel(
-                                                        plotlyOutput("chla_fc_chla_assim"),
-                                                        sliderInput("nday_chla_assim", "N days", min = 1, max = 35, value = 1, step = 1,
-                                                                    animate = TRUE),
-                                                        checkboxInput("add_obs_chla_assim", "Add observations"),
-                                                        radioButtons("plot_type_chla_assim", "Plot type", c("Line", "Distribution"),
-                                                                     inline = TRUE)
-                                                      )
-                                               )
                                              ),
+                                             hr(),
                                              fluidRow(
-                                               column(4, offset = 1,
-                                                      h3("Assess the forecast"),
-                                                      p("Click the button below to compare your forecast to observational data."),
-                                                      actionButton('assess_fc_chla_assim', label = div("Assess forecast",
-                                                                                                       icon("clipboard-check"))),
-                                                      br(),
-                                                      box(id = "box2", width = 12, status = "primary",
+                                               column(6,
+                                                      h3("Assimilate data to update the forecast initial condition"),
+                                                      p(tags$b("We have recorded a new observation!"), "Click the button to view it on the plot to the right."),
+                                                      actionButton("view_new_obs","View new observation"),
+                                                      br(),br(),
+                                                      wellPanel(
+                                                        htmlOutput("new_obs")
+                                                      ),
+                                                      p("Now, click the button below to run the ensemble Kalman filter and use this new observation to update the forecast initial condition, which will appear on the plot to the right."),
+                                                      actionButton("update_ic","Update initial condition with ensemble Kalman filter"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[32], label = quest[qid[32], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[33], label = quest[qid[33], ], width = "90%"),
-                                                                   br()
-                                                                   )
-                                                            )
-                                                          )
-                                                      ),
-                                               column(4, offset = 2,
-                                                      h3("1:1 Plot with chl-a DA"),
-                                                      wellPanel(
-                                                        plotOutput("chla_fc_assess_chla_assim")
-                                                      ),
-                                                      h4("RMSE of forecast"),
-                                                      wellPanel(
-                                                        textOutput("rmse_chla_assim")
-                                                      )
-                                               )
-                                             ),
-                                             hr(),
-                                             # #** Nitrate Assimilation ----
-                                             # fluidRow(
-                                             #   column(4,
-                                             #          h3("Forecast with nitrate data assimilation"),
-                                             #          p("Now, we will generate a forecast that assimilates nitrate data at the weekly timestep."),
-                                             #          p("Click the button below to generate and plot your third forecast"),
-                                             #          sliderInput("n_mem_nitrate_assim", "No. of members", min = 5, max = 100, 
-                                             #                      value = 30, step = 5),
-                                             #          actionButton("run_fc_nitrate_assim", label = div("Run Forecast", icon("running"))),
-                                             #          br(),
-                                             #          conditionalPanel("input.run_fc_nitrate_assim > 0",
-                                             #                           selectInput("view_var_nitrate_assim", "Select variable", 
-                                             #                                       choices = view_vars$lname),
-                                             #                           p("Check the box under the plot to add observations to your forecast. Note that chl-a data points that are assimilated into the forecast are plotted in pink."),
-                                             #                           p("For some lake sites, there are missing chl-a data! In these cases, you may not be able to assimilate chl-a data every week. We will revisit the importance of missing data in Objective 9 and Activity C.")
-                                             #          )
-                                             #   ),
-                                             #   column(8,
-                                             #          h3("Forecast with nitrate DA"),
-                                             #          wellPanel(
-                                             #            plotlyOutput("chla_fc_nitrate_assim"),
-                                             #            sliderInput("nday_nitrate_assim", "N days", min = 1, max = 35, value = 1, step = 1,
-                                             #                        animate = TRUE),
-                                             #            checkboxInput("add_obs_nitrate_assim", "Add observations"),
-                                             #            radioButtons("plot_type_nitrate_assim", "Plot type", c("Line", "Distribution"),
-                                             #                         inline = TRUE)
-                                             #          )
-                                             #   )
-                                             # ),
-                                             # fluidRow(
-                                             #   column(4, offset = 1,
-                                             #          h3("Assess the forecast"),
-                                             #          p("Click the button below to compare your forecast to observational data."),
-                                             #          actionButton('assess_fc_nitrate_assim', label = div("Assess forecast",
-                                             #                                                              icon("clipboard-check"))),
-                                             #          br(),
-                                             #          box(id = "box2", width = 12, status = "primary",
-                                             #              solidHeader = TRUE,
-                                             #              fluidRow(
-                                             #                column(10, offset = 1,
-                                             #                       h3("Questions"),
-                                             #                       textAreaInput2(inputId = qid[35], label = quest[qid[35], ], width = "90%"),
-                                             #                       textAreaInput2(inputId = qid[36], label = quest[qid[36], ], width = "90%"),
-                                             #                       br()
-                                             #                       )
-                                             #                )
-                                             #              )
-                                             #          ),
-                                             #   column(4, offset = 2,
-                                             #          h3("1:1 Plot with nitrate DA"),
-                                             #          wellPanel(
-                                             #            plotOutput("chla_fc_assess_nitrate_assim")
-                                             #          ),
-                                             #          h4("RMSE of forecast"),
-                                             #          wellPanel(
-                                             #            textOutput("rmse_nitrate_assim")
-                                             #          )
-                                             #   )
-                                             # ),
-                                             # hr(),
-                                             # #** Chl-a & Nitrate Assimilation ----
-                                             # fluidRow(
-                                             #   column(4,
-                                             #          h3("Forecast with chl-a & nitrate data assimilation"),
-                                             #          p("Now, we will generate a forecast that assimilates both chlorphyll-a and nitrate data at the weekly timestep."),
-                                             #          p("Click the button below to generate and plot your fourth forecast"),
-                                             #          sliderInput("n_mem_both_assim", "No. of members", min = 5, max = 100, 
-                                             #                      value = 30, step = 5),
-                                             #          actionButton("run_fc_both_assim", label = div("Run Forecast", icon("running"))),
-                                             #          br(),
-                                             #          conditionalPanel("input.run_fc_both_assim > 0",
-                                             #                           selectInput("view_var_both_assim", "Select variable", 
-                                             #                                       choices = view_vars$lname),
-                                             #                           p("Check the box under the plot to add observations to your forecast. Note that chl-a data points that are assimilated into the forecast are plotted in pink."),
-                                             #                           p("For some lake sites, there are missing chl-a data! In these cases, you may not be able to assimilate chl-a data every week. We will revisit the importance of missing data in Objective 9 and Activity C.")
-                                             #          )
-                                             #   ),
-                                             #   column(8,
-                                             #          h3("Forecast with Chl-a & Nitrate DA"),
-                                             #          wellPanel(
-                                             #            plotlyOutput("chla_fc_both_assim"),
-                                             #            sliderInput("nday_both_assim", "N days", min = 1, max = 35, value = 1, step = 1,
-                                             #                        animate = TRUE),
-                                             #            checkboxInput("add_obs_both_assim", "Add observations"),
-                                             #            radioButtons("plot_type_both_assim", "Plot type", c("Line", "Distribution"),
-                                             #                         inline = TRUE)
-                                             #          )
-                                             #   )
-                                             # ),
-                                             # fluidRow(
-                                             #   column(4, offset = 1,
-                                             #          h3("Assess the forecast"),
-                                             #          p("Click the button below to compare your forecast to observational data."),
-                                             #          actionButton('assess_fc_both_assim', label = div("Assess forecast",
-                                             #                                                           icon("clipboard-check"))),
-                                             #          br(),
-                                             #          box(id = "box2", width = 12, status = "primary",
-                                             #              solidHeader = TRUE,
-                                             #              fluidRow(
-                                             #                column(10, offset = 1,
-                                             #                       h3("Questions"),
-                                             #                       textAreaInput2(inputId = qid[37], label = quest[qid[37], ], width = "90%"),
-                                             #                       textAreaInput2(inputId = qid[38], label = quest[qid[38], ], width = "90%"),
-                                             #                       br()
-                                             #                       )
-                                             #                )
-                                             #              )
-                                             #          ),
-                                             #   column(4, offset = 2,
-                                             #          h3("Assess Chl-a & Nitrate data assimilation"),
-                                             #          wellPanel(
-                                             #            plotOutput("chla_fc_assess_both_assim")
-                                             #          ),
-                                             #          h4("RMSE of forecast"),
-                                             #          wellPanel(
-                                             #            textOutput("rmse_both_assim")
-                                             #            )
-                                             #          )
-                                             #   ),
-                                             # hr(),
-                                             #** Compare all forecasts ----
-                                             fluidRow(
-                                               column(4,
-                                                      h3("Comparison of forecasts"),
-                                                      p("We have generated two sets of different forecasts with and without chlorophyll-a data assimilation. Now we want to compare our methods and see which method had the best skill."),
-                                                      actionButton("compare_da", "Compare methods"),
-                                                      # selectInput("view_var_da_method", "Select variable", 
-                                                      #             choices = view_vars$lname),
-                                                      h3("Table of RMSE"),
-                                                      DTOutput("da_method_tab")
-                                               ),
-                                               column(8,
-                                                      h3("Plot of forecasts with and without DA"),
-                                                      wellPanel(
-                                                        plotlyOutput("da_method_plot")
-                                                      )#,
-                                                      # wellPanel(
-                                                      #   plotOutput("all_assess_plot")
-                                                      # )
-                                               )
-                                               ),
-                                               hr(),
-                                               #** Revisit hypothesis ----
-                                             fluidRow(
-                                               column(10, offset = 1,
-                                                      box(id = "box4", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Question"),
-                                                                   radioButtons(qid[34], quest[qid[34], 1], choices = assim_choices, inline = TRUE, selected = character(0)),
-                                                                   br()
+                                                                   p(tags$b(quest["q27", 1]))
                                                             )
                                                           )
                                                       )
-                                               )
+                                                      ),
+                                               column(6,
+                                                      wellPanel(
+                                                        plotOutput("updated_ic_plot")
+                                                      ),
+                                                      downloadButton("save_updated_ic_plot", "Download plot", icon = icon("download"))
+                                                      )
                                              ),
                                              hr(),
                                              #*** Next step ----
