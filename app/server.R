@@ -945,7 +945,9 @@ shinyServer(function(input, output, session) {
   
   # create reactive for EnKF inputs
   EnKF_inputs_outputs <- reactiveValues(new_obs = NULL,
-                                        updated_ic = NULL)
+                                        updated_ic = NULL,
+                                        second_forecast_date = NULL,
+                                        second_forecast_da = NULL)
   
   # Text output for new observation ----
   output$new_obs <- renderUI({
@@ -1037,7 +1039,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_updated_ic_plot <- downloadHandler(
     filename = function() {
-      paste("Q27-Q28-plot-", Sys.Date(), ".png", sep="")
+      paste("Q27-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -1045,6 +1047,85 @@ shinyServer(function(input, output, session) {
                        res = 200, units = "in")
       }
       ggsave(file, plot = plot.updated.ic$main, device = device)
+    }
+  )
+  
+  # Second forecast figure
+  plot.second.fc.da <- reactiveValues(main=NULL)
+  
+  output$second_fc_da_plot <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$update_ic > 0,
+           message = "Please update the initial condition above.")
+    )
+    validate(
+      need(input$second_forecast_da > 0,
+           message = "Please click 'Generate forecast'.")
+    )
+    
+    #unpacking values we will need
+    intercept = as.numeric(ar.model$intercept)
+    ar1 = as.numeric(ar.model$ar1)
+    chla_mean = as.numeric(ar.model$chla_mean)
+    ic_update = EnKF_inputs_outputs$updated_ic
+    process_distribution = as.numeric(first_forecast$process_distribution)
+    
+    #generate second forecast
+    second_forecast = intercept + ar1 * (ic_update - chla_mean) + chla_mean + process_distribution
+    EnKF_inputs_outputs$second_forecast_da = second_forecast
+    
+    #add in new dates
+    second_forecast_date = "2020-09-27"
+    EnKF_inputs_outputs$second_forecast_date <- second_forecast_date
+    forecast_date = first_forecast_dates$forecast_date
+    forecast_dates = c(forecast_date, second_forecast_date)
+    EnKF_inputs_outputs$forecast_dates = forecast_dates
+    
+    curr_chla = as.numeric(first_forecast$curr_chla)
+    new_obs = EnKF_inputs_outputs$new_obs
+    chla_obs = c(curr_chla, new_obs) #vector of observations to use for plotting
+    start_date = first_forecast_dates$start_date
+    ic_distribution = as.numeric(first_forecast$ic_distribution)
+    forecast_chla = as.numeric(first_forecast$forecast_chla)
+    n_members = as.numeric(first_forecast$n_members)
+    
+    p <- plot_second_forecast(chla_obs, start_date, forecast_dates, ic_distribution, 
+                         ic_update, forecast_chla, second_forecast, n_members)
+    
+    plot.second.fc.da$main <- p
+    
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_second_fc_da_plot <- downloadHandler(
+    filename = function() {
+      paste("Q28-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.second.fc.da$main, device = device)
     }
   )
   

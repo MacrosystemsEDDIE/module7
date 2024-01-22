@@ -303,7 +303,7 @@ plot_second_forecast <- function(chla_obs, start_date, forecast_dates, ic_distri
     geom_point(data = obs, aes(x = date, y = obs, color = "Observation"), size = 3)+
     ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+
     xlab("")+
-    theme_bw()+
+    theme_bw(18)+
     theme(panel.grid.major.x = element_line(colour = "black", linetype = "dashed"),
           panel.grid.major.y = element_blank(),
           panel.grid.minor.y = element_blank(),

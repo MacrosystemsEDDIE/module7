@@ -1126,6 +1126,33 @@ ui <- function(req) {
                                                       )
                                              ),
                                              hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Make a second forecast after assimilating data"),
+                                                      p("Now we will make a second forecast for the next day using our updated initial conditions."),
+                                                      p("We will plot both of our forecasts together with the initial conditions for each forecast. We will also plot the observation for 2020-09-27 so we can visually assess the accuracy of our second forecast."),
+                                                      actionButton("second_forecast_da","Generate forecast"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q28", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      wellPanel(
+                                                        plotOutput("second_fc_da_plot")
+                                                      ),
+                                                      downloadButton("save_second_fc_da_plot", "Download plot", icon = icon("download"))
+                                                      )
+                                             ),
+                                             hr(),
+                                             fluidRow(),
+                                             hr(),
                                              #*** Next step ----
                                              fluidRow(
                                                column(5, offset = 1,
