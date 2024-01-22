@@ -1268,6 +1268,17 @@ shinyServer(function(input, output, session) {
     }
   )
   
+  # Repeat plots for comparison at bottom of objective
+  
+  output$second_fc_da_plot2 <- renderPlot({
+    p <- plot.second.fc.da$main
+    return(p)
+  })
+  
+  output$second_fc_no_da_plot2 <- renderPlot({
+    p <- plot.second.fc.no.da$main
+    return(p)
+  })
   
   
   

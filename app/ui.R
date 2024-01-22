@@ -1205,11 +1205,40 @@ ui <- function(req) {
                                                )
                                              ),
                                              hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      h3("Compare forecasts generated with and without data assimilation"),
+                                                      fluidRow(
+                                                        column(6,
+                                                               h4("Forecast with data assimilation"),
+                                                               wellPanel(
+                                                                 plotOutput("second_fc_da_plot2")
+                                                               )
+                                                               ),
+                                                        column(6,
+                                                               h4("Forecast without data assimilation"),
+                                                               wellPanel(
+                                                                 plotOutput("second_fc_no_da_plot2")
+                                                               )
+                                                               )
+                                                      ),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q31", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      )
+                                             ),
+                                             hr(),
                                              #*** Next step ----
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("Now we will explore how observation uncertainty affects data assimilation.")
+                                                      p("Now we will explore how observation uncertainty affects data assimilation and forecasts.")
                                                )
                                              )
                                     ),
