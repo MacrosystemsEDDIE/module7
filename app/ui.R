@@ -1543,6 +1543,34 @@ ui <- function(req) {
                                                )
                                              ),
                                              hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Forecasts with no data assimilation"),
+                                                      p("Click the button below to generate a series of 10, 1-day-ahead forecasts with no data available for assimilation during the forecast period."),
+                                                      actionButton("fc_series_no_da","Run forecasts with no data assimilation"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q41", 1])),
+                                                                   p(tags$b(quest["q42", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      wellPanel(
+                                                        plotOutput("fc_series_no_da_plot")
+                                                      ),
+                                                      downloadButton("save_fc_series_no_da_plot", "Download plot", icon = icon("download")),
+                                                      conditionalPanel("input.fc_series_no_da > 0",
+                                                                       checkboxInput("show_obs", "Click to show/remove the observations during the forecast period.", value = FALSE),
+                                                      )
+                                                      )
+                                             ),
+                                             hr(),
                                              #*** Next step ----
                                              fluidRow(
                                                column(5, offset = 1,

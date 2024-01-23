@@ -45,3 +45,5 @@ q37,Q37. Compare the two initial condition distributions. How does the distribut
 q38,Q38. Compare the initial conditions distributions (blue) in Figure C above with those in Figure D. Describe how they differ.
 q39,Q39. What is the effect of an increase in observation uncertainty on the forecasts? Does this match what you predicted in Q36?
 q40,"Q40. Make a prediction by filling in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.'"
+q41,Q41. Describe how the mean value of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q42,Q42. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when no data are assimilated.
