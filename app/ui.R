@@ -1521,6 +1521,28 @@ ui <- function(req) {
                                                )
                                              ),
                                              hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("How does the frequency of data assimilation affect forecast performance?"),
+                                                      p("We are going explore the effect of data assimilation on forecast accuracy - does going to the effort of collecting lots of data and assimilating it into our predictions really improve our forecasts?"),
+                                                      p("To answer this question, we will generate multiple series of one-day-ahead forecasts over a period of 10 days. For each series of forecasts, we will assimilate data at different time intervals (one series with no data assimilation, one series with weekly data assimilation, and one series with daily data assimilation) and compare the accuracy of the resulting forecasts."),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q40", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      img(src = "sampling.png", height = "90%", id = "bla_border",
+                                                          width = "90%", align = "center"),
+                                                      p(tags$em("Members of the Virginia Tech Reservoir Group sampling water quality. Photo credit: Cayelan Carey"))
+                                               )
+                                             ),
+                                             hr(),
                                              #*** Next step ----
                                              fluidRow(
                                                column(5, offset = 1,

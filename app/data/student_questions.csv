@@ -44,3 +44,4 @@ q36,"Q36. Make a prediction. Using your experience from the previous example, ho
 q37,Q37. Compare the two initial condition distributions. How does the distribution generated with high observation uncertainty differ from the original distribution generated in Objective 4?
 q38,Q38. Compare the initial conditions distributions (blue) in Figure C above with those in Figure D. Describe how they differ.
 q39,Q39. What is the effect of an increase in observation uncertainty on the forecasts? Does this match what you predicted in Q36?
+q40,"Q40. Make a prediction by filling in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.'"
