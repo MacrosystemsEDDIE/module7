@@ -1366,6 +1366,11 @@ shinyServer(function(input, output, session) {
   
   #### Objective 6 ----
   
+  #slickr slides
+  output$chla_obs_uc_slides <- renderSlickR({
+    slickR(chla_obs_uc_slides) + settings(dots = TRUE)
+  })
+  
   #repeat of original initial conditions plot
   output$ic_distrib_plot2 <- renderPlotly({
     
@@ -1764,6 +1769,12 @@ shinyServer(function(input, output, session) {
     }
   )
   
+  #### Objective 7 ----
+  
+  #slickr slides
+  output$chla_frequency_slides <- renderSlickR({
+    slickR(chla_frequency_slides) + settings(dots = TRUE)
+  })
 
   
   ##########OLD

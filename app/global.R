@@ -80,7 +80,8 @@ model_slides <- list.files("www/model_slides", full.names = TRUE)
 fc_uc_slides <- list.files("www/fc_uc_slides", full.names = TRUE)
 proc_uc_slides <- list.files("www/proc_uc_slides", full.names = TRUE)
 ic_uc_slides <- list.files("www/ic_uc_slides", full.names = TRUE)
-chla_slides <- list.files("www/chla_data_collection", full.names = TRUE)
+chla_obs_uc_slides <- list.files("www/chla_obs_uc", full.names = TRUE)
+chla_frequency_slides <- list.files("www/chla_frequency", full.names = TRUE)
 nitrate_slides <- list.files("www/nitrate_data_collection/", full.names = TRUE)
 
 # Selected neon sites 

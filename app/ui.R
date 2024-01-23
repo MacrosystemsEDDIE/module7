@@ -1253,10 +1253,45 @@ ui <- function(req) {
                                                )
                                              ),
                                              fluidRow(
+                                               column(12,
+                                                      h3("What is observation uncertainty?"),
+                                                      h4(tags$em("Key terms:")),
+                                                      tags$ul(
+                                                        tags$li(tags$b("Observation uncertainty")," is the error associated with measurement of a variable. Importantly, ",tags$b("observation uncertainty is different from initial conditions uncertainty,")," which is uncertainty regarding the starting conditions of a model. Greater observation uncertainty can lead to greater initial conditions uncertainty."),
+                                                        tags$li("A ",tags$b("sensor")," is a device that responds to a stimulus (such as heat, light, sound, pressure, magnetism, or motion) and transmits an electric impulse which is converted into a meaningful measurement for users.")
+                                                      )
+                                                      )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      h3("How much observation uncertainty is associatiated with chlorophyll-a measurements in lakes?"),
+                                                      h4(tags$em("Different methods of collecting data have varying levels of observation uncertainty. Read the text and scroll through the slides below to learn about observation uncertainty in chl-a measurements."))
+                                               ),
+                                               column(4,
+                                                      h4("In-Lake Sensor"),
+                                                      p(tags$b("How it works:")),
+                                                      p("Chlorophyll-a (chl-a) sensors send a beam of light into the water column and measure how much light is fluoresced back to the sensor by chlorophyll-a in phytoplankton cells. Fluorescence intensity is then converted to an estimate of chlorophyll-a concentration. Chlorophyll-a sensors can be deployed at a fixed depth in a lake or lowered through the water column on a cable."),
+                                                      p(tags$b("Observation uncertainty:")),
+                                                      p("Sensor accuracy may be affected by the presence of substances that alter water color, such as suspended sediment or dissolved organic matter. In addition, there is uncertainty associated with the equation that converts fluorescence to chlorophyll-a concentration."),
+                                                      h4("Lab Analysis of Water Sample"),
+                                                      p(tags$b("How it works:")),
+                                                      p("Water samples are collected, processed, and inserted into a spectrophotometer that uses the sample's light absorption at a wavelength of 665 nm to estimate the chlorophyll-a concentration."),
+                                                      p(tags$b("Observation uncertainty:")),
+                                                      p("Water samples must be processed (transported back to the lab, filtered, and extracted using ethanol) before they are inserted into the spectrophotometer. Errors in processing may increase uncertainty in observations. In addition, there is uncertainty associated with the equation used to estimate chl-a concentration based on absorption.")
+                                               ),
+                                               column(8,
+                                                      wellPanel(
+                                                        slickROutput("chla_obs_uc_slides", width = "800px", height = "450px")
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
                                                column(6,
                                                       h3("Make a prediction"),
                                                       p("We have explored the effect of data assimilation vs. no data assimilation on forecasts using an ensemble Kalman filter, which accounts for uncertainty in both model predictions and observations."),
-                                                      p("Now, imagine that we have purchased a new water quality sensor, which takes incredibly accurate chlorophyll-a measurements, thus decreasing our observation uncertainty. How might this decrease in observation uncertainty affect our forecasts?"),
+                                                      p("Now, imagine that we have purchased a new water quality sensor, which takes incredibly precise chlorophyll-a measurements, thus decreasing our observation uncertainty. How might this decrease in observation uncertainty affect our forecasts?"),
                                                       box(id = "box10", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
@@ -1437,150 +1472,54 @@ ui <- function(req) {
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("We will explore the effect of changes in data frequency on data assimilation and forecast output.")
+                                                      p("We will explore the effect of changes in data assimilation frequency on forecast output and forecast accuracy.")
                                                )
                                              )
                                     ),
-                                    #* Objective 9 - Explore data frequency ====
-                                    tabPanel(title = tab_names["stab9", 2], value = "stab9",
+                                    #* Objective 7 - Explore data assimilation frequency ====
+                                    tabPanel(title = "Objective 7 - Explore data assimilation frequency", value = "stab9",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab9", 2]),
-                                                                p(id = "txt_j", module_text["obj_09", ])
+                                                                h3("Objective 7 - Explore data assimilation frequency"),
+                                                                p(id = "txt_j", module_text["obj_07", ])
                                                       )
                                                )
                                              ),
-                                             #** Key terms ----
                                              fluidRow(
-                                               column(11, offset = 1,
-                                                      h3("Key terms")
-                                               ),
-                                               column(4, offset = 1,
+                                               column(12,
+                                                      h3("How often can we assimilate chlorophyll-a data into forecasts?"),
+                                                      h4(tags$em("The availability of data for assimilation into forecasts depends on both",tags$b("data frequency")," and ",tags$b("data latency."))),
                                                       tags$ul(
-                                                        tags$li(tags$b("Data frequency "), module_text["data_frequency", ]),
-                                                        tags$li(tags$b("Data latency "), module_text["data_latency", ])
+                                                        tags$li(tags$b("Data frequency")," is the amount of time that passes between measurements."),
+                                                        tags$li(tags$b("Data latency")," is the time between when a measurement is made and when it is available for assimilation into forecasts.")
                                                       )
                                                )
                                              ),
                                              hr(),
-                                             #** Chl-a Slides ----
                                              fluidRow(
                                                column(12,
-                                                      h1("How ", tags$em("frequently"), " do we collect data measurements?"),
-                                                      h2(tags$b("Chlorophyll-a"))
+                                                      h3(""),
+                                                      h4(tags$em("Different methods of collecting data have varying levels of data frequency and latency. Read the text and scroll through the slides below to learn about data frequency and latency of chl-a measurements."))
                                                ),
                                                column(4,
-                                                      h3("Sensor"),
-                                                      p(data_frequency_latency["Chl-a sensor", 2], id = "txt_j"),
-                                                      p(data_frequency_latency["Chl-a sensor", 3], id = "txt_j"),
-                                                      h3("Lab Water Sample Measurement"),
-                                                      p(data_frequency_latency["Laboratory analysis of water sample for chl-a", 2], id = "txt_j"),
-                                                      p(data_frequency_latency["Laboratory analysis of water sample for chl-a", 3], id = "txt_j")
+                                                      h4("In-Lake Sensor"),
+                                                      p(tags$b("Frequency:")),
+                                                      p("If deployed in a lake, chlorophyll-a sensor data can be collected at a ",tags$b("high data frequency")," (e.g., every minute or even more often). Otherwise, data are collected however frequently a human travels to the lake to collect data."),
+                                                      p(tags$b("Latency:")),
+                                                      p("Chlorophyll-a sensor data may be streamed wirelessly from the lake to a computer, resulting in ",tags$b("low data latency.")," Otherwise, a human must travel to the lake, download the sensor data, and upload it to a computer, increasing latency."),
+                                                      h4("Lab Analysis of Water Sample"),
+                                                      p(tags$b("Frequency:")),
+                                                      p("Typically, water samples are not collected every day as it requires a human to travel to the lake and take measurements. As a result, ",tags$b("the frequency of these data can be highly variable,")," ranging from multiple times a week to once a year."),
+                                                      p(tags$b("Latency:")),
+                                                      p("It usually takes at least a week to conduct laboratory analyses of water samples for chlorophyll-a, and the process can be much longer (e.g., several weeks or months) depending on the resources available to the researcher, resulting in ",tags$b("high data latency."))
                                                ),
                                                column(8,
                                                       wellPanel(
-                                                        slickROutput("chla_slides2")
+                                                        slickROutput("chla_frequency_slides", width = "800px", height = "450px")
                                                       )
                                                )
-                                               # column(3,
-                                               #        h3("Lab Measurement"),
-                                               #        p(data_frequency_latency["Laboratory analysis of water sample for chl-a", 2], id = "txt_j"),
-                                               #        p(data_frequency_latency["Laboratory analysis of water sample for chl-a", 3], id = "txt_j")
-                                               # )
                                              ),
-                                             hr(),
-                                             #** Nitrate Slides ----
-                                             # fluidRow(
-                                             #   column(12,
-                                             #          h2(tags$b("Nitrate"))
-                                             #   ),
-                                             #   column(3,
-                                             #          h3("Sensor"),
-                                             #          p(data_frequency_latency["Nitrate sensor", 2], id = "txt_j"),
-                                             #          p(data_frequency_latency["Nitrate sensor", 3], id = "txt_j")
-                                             #   ),
-                                             #   column(6,
-                                             #          wellPanel(
-                                             #            slickROutput("nitrate_slides2")
-                                             #          )
-                                             #   ),
-                                             #   column(3,
-                                             #          h3("Lab Measurement"),
-                                             #          p(data_frequency_latency["Laboratory analysis of water sample for nitrate", 2], id = "txt_j"),
-                                             #          p(data_frequency_latency["Laboratory analysis of water sample for nitrate", 3], id = "txt_j")
-                                             #   )
-                                             # ),
-                                             #** Questions ----
-                                             #hr(),
-                                             fluidRow(
-                                               column(10, offset = 1,
-                                                      box(id = "box4", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[38], label = quest[qid[38], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[39], label = quest[qid[39], ], width = "90%")
-                                                                   )
-                                                            )
-                                                          )
-                                                      )
-                                               ),
-                                             hr(),
-                                             #** Explore data assimilation frequency ----
-                                             fluidRow(
-                                               column(12,
-                                                      h3("Explore data assimilation frequency")
-                                               ),
-                                               column(4,
-                                                      p("Use the slider below to adjust the observation uncertainty and then generate a forecast that assimilates observations with the observation uncertainty you specified."),
-                                                      # checkboxGroupInput("da_freq_da", label = "Data to assimilate:", 
-                                                      #                    choices = view_vars$lname[1:2]),
-                                                      sliderInput("da_freq_chla", "Chl-a assimilation frequency (days)",
-                                                                  min = 1, max = 30, step = 1, value = 30),
-                                                      # sliderInput("da_freq_nitrate", "Nitrate assimilation frequency (days)",
-                                                      #             min = 1, max = 30, step = 1, value = 30),
-                                                      actionButton("run_fc_da_freq", label = div("Run Forecast", icon("running"))),
-                                                      h4("RMSE of forecast"),
-                                                      wellPanel(
-                                                        textOutput("rmse_da_freq")
-                                                      ),
-                                                      actionButton("save_rmse2", "Save RMSE", icon = icon("save")),
-                                                      br(),
-                                                      DTOutput("da_freq_rmse"),
-                                                      br(),
-                                                      p(tags$b("Note:"), " You can also select a row in the table BEFORE clicking 'Save RMSE' to overwrite a row in the table.")
-                                               ),
-                                               column(8,
-                                                      wellPanel(
-                                                        plotlyOutput("fc_da_freq_plot"),
-                                                        sliderInput("nday_da_freq", "N days", min = 1, max = 35, value = 1, step = 1,
-                                                                    animate = TRUE),
-                                                        checkboxInput("add_obs_da_freq", "Add observations"),
-                                                        radioButtons("plot_type_da_freq", "Plot type", c("Line", "Distribution"),
-                                                                     inline = TRUE)
-                                                        ),
-                                                      #** Questions ----
-                                                      hr(),
-                                                      fluidRow(
-                                                        column(10, offset = 1,
-                                                               box(id = "box4", width = 12, status = "primary",
-                                                                   solidHeader = TRUE,
-                                                                   fluidRow(
-                                                                     column(10, offset = 1,
-                                                                            h3("Questions"),
-                                                                            textAreaInput2(inputId = qid[40], label = quest[qid[40], ], width = "90%"),
-                                                                            textAreaInput2(inputId = qid[41], label = quest[qid[41], ], width = "90%"),
-                                                                            textAreaInput2(inputId = qid[42], label = quest[qid[42], ], width = "90%")
-                                                                     )
-                                                                   )
-                                                               )
-                                                        )
-                                                      ),
-                                                      hr()
-                                                      )
-                                               ),
                                              hr(),
                                              #*** Next step ----
                                              fluidRow(
