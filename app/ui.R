@@ -1394,6 +1394,44 @@ ui <- function(req) {
                                                       )
                                                )
                                              ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      h3("Compare forecasts made with high observation uncertainty to previous forecasts"),
+                                                      p("Now, we will replicate the two-forecast plot with data assimilation that we created above, but this time with higher observation uncertainty."),
+                                                      actionButton("plot_fc_high_obs_uc","Plot forecasts with high observation uncertainty"),
+                                                      fluidRow(
+                                                        column(6,
+                                                               h4("Figure C. Forecasts assimilating data with high observation uncertainty"),
+                                                               wellPanel(
+                                                                 plotOutput("second_fc_high_obs_uc")
+                                                               ),
+                                                               downloadButton("save_second_fc_high_obs_uc_plot", "Download plot", icon = icon("download"))
+                                                        ),
+                                                        column(6,
+                                                               h4("Figure D. Previous forecasts with data assimilation"),
+                                                               wellPanel(
+                                                                 plotOutput("second_fc_da_plot4")
+                                                               )
+                                                        )
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q38", 1])),
+                                                                   p(tags$b(quest["q39", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               )
+                                             ),
                                              #*** Next step ----
                                              hr(),
                                              fluidRow(

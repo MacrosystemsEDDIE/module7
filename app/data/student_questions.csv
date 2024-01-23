@@ -42,3 +42,5 @@ q34,Q34. Compare the initial conditions distributions (blue) in Figure A above w
 q35,Q35. What is the effect of a decrease in observation uncertainty on the forecasts? Does this match what you predicted in Q32?
 q36,"Q36. Make a prediction. Using your experience from the previous example, how do you think an increase in observation uncertainty will affect the forecasts?"
 q37,Q37. Compare the two initial condition distributions. How does the distribution generated with high observation uncertainty differ from the original distribution generated in Objective 4?
+q38,Q38. Compare the initial conditions distributions (blue) in Figure C above with those in Figure D. Describe how they differ.
+q39,Q39. What is the effect of an increase in observation uncertainty on the forecasts? Does this match what you predicted in Q36?

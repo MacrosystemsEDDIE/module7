@@ -1600,7 +1600,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_second_fc_low_obs_uc_plot <- downloadHandler(
     filename = function() {
-      paste("Q33-Q34-plot-", Sys.Date(), ".png", sep="")
+      paste("Q34-Q35-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -1684,6 +1684,85 @@ shinyServer(function(input, output, session) {
     return(ggplotly(p, dynamicTicks = TRUE))
     
   })
+  
+  # repeat of 2-forecast plot with DA from obj 5
+  output$second_fc_da_plot4 <- renderPlot({
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.da$main),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(input$plot_fc_high_obs_uc > 0,
+           message = "Please click 'Plot forecasts with high observation uncertainty'.")
+    )
+    
+    p <- plot.second.fc.obs.uc$main
+    return(p)
+    
+  })
+  
+  output$second_fc_high_obs_uc <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.da$main),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(input$plot_fc_high_obs_uc > 0,
+           message = "Please click 'Plot forecasts with high observation uncertainty'.")
+    )
+    
+    p <- plot.second.fc.obs.uc$high
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_second_fc_high_obs_uc_plot <- downloadHandler(
+    filename = function() {
+      paste("Q38-Q39-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.second.fc.obs.uc$high, device = device)
+    }
+  )
   
 
   
