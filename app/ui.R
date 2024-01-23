@@ -1279,7 +1279,17 @@ ui <- function(req) {
                                                       h3("Generate initial condition distribution with low observation uncertainty"),
                                                       p("Let's plot an initial conditions distribution that reflects the lower uncertainty due to our new water quality sensor."),
                                                       p("We will also plot the original initial condition you generated in Objective 4 for comparison."),
-                                                      actionButton("plot_low_ic","Generate distribution")
+                                                      actionButton("plot_low_ic","Generate distribution"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q33", 1]))
+                                                            )
+                                                          )
+                                                      )
                                                       ),
                                                column(4,
                                                       h4("Initial condition distribution with low observation uncertainty"),
@@ -1302,20 +1312,87 @@ ui <- function(req) {
                                                       actionButton("plot_fc_low_obs_uc","Plot forecasts with low observation uncertainty"),
                                                       fluidRow(
                                                         column(6,
-                                                               h4("Forecasts assimilating data with low observation uncertainty"),
+                                                               h4("Figure A. Forecasts assimilating data with low observation uncertainty"),
                                                                wellPanel(
                                                                  plotOutput("second_fc_low_obs_uc")
                                                                ),
                                                                downloadButton("save_second_fc_low_obs_uc_plot", "Download plot", icon = icon("download"))
                                                         ),
                                                         column(6,
-                                                               h4("Previous forecasts with data assimilation"),
+                                                               h4("Figure B. Previous forecasts with data assimilation"),
                                                                wellPanel(
                                                                  plotOutput("second_fc_da_plot3")
                                                                )
                                                         )
                                                       )
                                                       )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q34", 1])),
+                                                                   p(tags$b(quest["q35", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(6,
+                                                      h3("Make a second prediction"),
+                                                      p("Now, imagine that our water quality sensor has malfunctioned (oh no!) leading to higher-than-normal observation uncertainty in our chlorophyll-a observations."),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q36", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               column(6,
+                                                      img(src = "fouled_EXO.png", height = "90%", id = "bla_border",
+                                                          width = "90%", align = "center"),
+                                                      p(tags$em("A fouled EXO water quality sensor. Photo credit: Adrienne Breef-Pilz"))
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(4,
+                                                      h3("Generate initial condition distribution with high observation uncertainty"),
+                                                      p("Let's plot an initial conditions distribution with high uncertainty."),
+                                                      p("We will also plot the original initial condition you generated in Objective 4 for comparison."),
+                                                      actionButton("plot_high_ic","Generate distribution"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q37", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               column(4,
+                                                      h4("Initial condition distribution with high observation uncertainty"),
+                                                      wellPanel(
+                                                        plotlyOutput("ic_distrib_high_plot")
+                                                      )
+                                               ),
+                                               column(4,
+                                                      h4("Original initial condition distribution generated in Objective 4"),
+                                                      wellPanel(
+                                                        plotlyOutput("ic_distrib_plot3")
+                                                      )
+                                               )
                                              ),
                                              #*** Next step ----
                                              hr(),

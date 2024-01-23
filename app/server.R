@@ -582,7 +582,17 @@ shinyServer(function(input, output, session) {
                                   n_members = NULL,
                                   forecast_chla = NULL,
                                   sigma = NULL,
-                                  ic_sd = NULL)
+                                  ic_sd = NULL,
+                                  ic_distrib_x_lim = NULL,
+                                  ic_distrib_y_lim = NULL)
+  
+  # create reactive value to hold things for objective 6 later
+  obs_uc <- reactiveValues(ic_sd_low = NULL,
+                           ic_distribution_low = NULL,
+                           ic_sd_high = NULL,
+                           ic_distribution_high = NULL,
+                           ic_distrib_low_y_lim=NULL,
+                           ic_distrib_high_x_lim=NULL)
   
   # Text output for proc uc sd ----
   output$proc_uc_sd <- renderUI({
@@ -765,7 +775,9 @@ shinyServer(function(input, output, session) {
   #IC distribution plot
   first_forecast_dates <- reactiveValues(start_date = NULL,
                                          forecast_date = NULL)
-  plot.ic.uc.distrib <- reactiveValues(main=NULL)
+  plot.ic.uc.distrib <- reactiveValues(main=NULL,
+                                       low=NULL,
+                                       high=NULL)
   
   output$ic_distrib_plot <- renderPlotly({ 
     
@@ -801,14 +813,33 @@ shinyServer(function(input, output, session) {
     first_forecast$curr_chla <- curr_chla
     
     n_members <- as.numeric(first_forecast$n_members)
+    
     ic_sd <- as.numeric(first_forecast$ic_sd)
+    ic_sd_low = ic_sd/2
+    obs_uc$ic_sd_low <- ic_sd_low
+    ic_sd_high = ic_sd*2
+    obs_uc$ic_sd_high <- ic_sd_high
     
     ic_distribution <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd)
     first_forecast$ic_distribution <- ic_distribution
+    ic_distribution_low <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_low)
+    obs_uc$ic_distribution_low <- ic_distribution_low
+    ic_distribution_high <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_high)
+    obs_uc$ic_distribution_high <- ic_distribution_high
     
     p <- plot_ic_dist(curr_chla = curr_chla, ic_uc = ic_distribution)
+    first_forecast$ic_distrib_x_lim = lim <- range(c(layer_scales(p)$x$range$range))
+    first_forecast$ic_distrib_y_lim = lim <- range(c(layer_scales(p)$y$range$range))
     
+    p1 <- plot_ic_dist(curr_chla = curr_chla, ic_uc = ic_distribution_low)
+    obs_uc$ic_distrib_low_y_lim = lim <- range(c(layer_scales(p1)$y$range$range))
+    
+    p2 <- plot_ic_dist(curr_chla = curr_chla, ic_uc = ic_distribution_high)
+    obs_uc$ic_distrib_high_x_lim = lim <- range(c(layer_scales(p2)$x$range$range))
+
     plot.ic.uc.distrib$main <- p
+    plot.ic.uc.distrib$low <- p1
+    plot.ic.uc.distrib$high <- p2
     
     return(ggplotly(p, dynamicTicks = FALSE))
     
@@ -1053,7 +1084,8 @@ shinyServer(function(input, output, session) {
   )
   
   # Second forecast figure
-  plot.second.fc.da <- reactiveValues(main=NULL)
+  plot.second.fc.da <- reactiveValues(main=NULL,
+                                      ylim=NULL)
   
   output$second_fc_da_plot <- renderPlot({ 
     
@@ -1110,8 +1142,10 @@ shinyServer(function(input, output, session) {
     
     p <- plot_second_forecast(chla_obs, start_date, forecast_dates, ic_distribution, 
                          ic_update, forecast_chla, second_forecast, n_members)
+    ylim <- range(c(layer_scales(p)$y$range$range))
     
     plot.second.fc.da$main <- p
+    plot.second.fc.da$ylim <- ylim
     
     return(p)
     
@@ -1351,21 +1385,25 @@ shinyServer(function(input, output, session) {
       need(!is.null(plot.fc1.viz$main),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
+    validate(
+      need(input$plot_low_ic > 0,
+           message = "Please click 'Generate distribution'.")
+    )
+    
+    x.lim <- range(obs_uc$ic_distrib_high_x_lim)
+    y.lim <- range(obs_uc$ic_distrib_low_y_lim)
     
     p <- plot.ic.uc.distrib$main +
-      ylim(c(0,1)) +
-      xlim(range(first_forecast$ic_distribution)) +
+      ylim(y.lim) +
+      xlim(x.lim) +
       ggtitle("")
     
-    return(ggplotly(p, dynamicTicks = FALSE))
+    return(ggplotly(p, dynamicTicks = TRUE))
   })
   
-  # create reactive value to hold things for this objective
-  obs_uc <- reactiveValues(ic_sd_low = NULL,
-                           ic_distribution_low = NULL)
-  
   # ic distribution with low obs uncertainty
-  plot.ic.distrib.low <- reactiveValues(main=NULL)
+  plot.ic.distrib.low <- reactiveValues(main=NULL,
+                                        og=NULL)
   
   output$ic_distrib_low_plot <- renderPlotly({ 
     
@@ -1390,28 +1428,111 @@ shinyServer(function(input, output, session) {
            message = "Please click 'Generate distribution'.")
     )
     
-    # unpacking what we need
-    curr_chla = as.numeric(first_forecast$curr_chla)
-    n_members = as.numeric(first_forecast$n_members)
-    ic_sd_low = first_forecast$ic_sd/2
-    obs_uc$ic_sd_low <- ic_sd_low
+
+    x.lim <- range(obs_uc$ic_distrib_high_x_lim)
+    y.lim <- range(obs_uc$ic_distrib_low_y_lim)
     
-    # generate distribution
-    ic_distribution_low <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_low)
-    obs_uc$ic_distribution_low <- ic_distribution_low
-    
-    p <- plot_ic_dist(curr_chla, ic_distribution_low) +
-      ylim(c(0,1)) +
-      xlim(range(first_forecast$ic_distribution)) +
+    p <- plot.ic.uc.distrib$low +
+      ylim(y.lim) +
+      xlim(x.lim) +
       ggtitle("")
     
-    plot.ic.distrib.low$main <- p
-    
-    return(ggplotly(p, dynamicTicks = FALSE))
+    return(ggplotly(p, dynamicTicks = TRUE))
     
   })
   
-  # repeat 2-forecast plot with data assimilation from obj 5
+  # 2 forecasts assimilating data with low uncertainty
+  plot.second.fc.obs.uc <- reactiveValues(main=NULL,
+                                          low=NULL,
+                                          high=NULL)
+  
+  observe({
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.da$main),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(input$plot_low_ic > 0,
+           message = "Please click 'Generate distributions'.")
+    )
+    
+    #unpacking values we will need
+    intercept = as.numeric(ar.model$intercept)
+    ar1 = as.numeric(ar.model$ar1)
+    chla_mean = as.numeric(ar.model$chla_mean)
+    ic_distribution_low = obs_uc$ic_distribution_low
+    ic_distribution_high = obs_uc$ic_distribution_high
+    process_distribution = as.numeric(first_forecast$process_distribution)
+    
+    #first forecast
+    first_forecast_low_obs_uc = intercept + ar1 * (ic_distribution_low - chla_mean) + chla_mean + process_distribution
+    first_forecast_high_obs_uc = intercept + ar1 * (ic_distribution_high - chla_mean) + chla_mean + process_distribution
+    
+    #more unpacking
+    ic_sd_low = obs_uc$ic_sd_low
+    ic_sd_high = obs_uc$ic_sd_high
+    new_obs = EnKF_inputs_outputs$new_obs
+    
+    #update ic
+    ic_update_low_obs_uc <- EnKF(forecast = first_forecast_low_obs_uc, 
+                                 new_observation = new_obs, ic_sd = ic_sd_low)
+    ic_update_high_obs_uc <- EnKF(forecast = first_forecast_high_obs_uc, 
+                                 new_observation = new_obs, ic_sd = ic_sd_high)
+    
+    #second forecast
+    second_forecast_low_obs_uc = intercept + ar1 * (ic_update_low_obs_uc - chla_mean) + chla_mean + process_distribution
+    second_forecast_high_obs_uc = intercept + ar1 * (ic_update_high_obs_uc - chla_mean) + chla_mean + process_distribution
+    
+    #assign dates
+    forecast_dates = EnKF_inputs_outputs$forecast_dates
+    
+    curr_chla = as.numeric(first_forecast$curr_chla)
+    chla_obs = c(curr_chla, new_obs) #vector of observations to use for plotting
+    start_date = first_forecast_dates$start_date
+    n_members = as.numeric(first_forecast$n_members)
+    
+    p1 <- plot_second_forecast(chla_obs, start_date, forecast_dates, 
+                              ic_distribution_low, ic_update_low_obs_uc, 
+                              first_forecast_low_obs_uc, second_forecast_low_obs_uc, 
+                              n_members)
+    low_ylim <- range(c(layer_scales(p1)$y$range$range))
+    p2 <- plot_second_forecast(chla_obs, start_date, forecast_dates, 
+                              ic_distribution_high, ic_update_high_obs_uc, 
+                              first_forecast_high_obs_uc, second_forecast_high_obs_uc, 
+                              n_members)
+    high_ylim <- range(c(layer_scales(p2)$y$range$range))
+    
+    final_ylim <- range(c(plot.second.fc.da$ylim, low_ylim, high_ylim))
+    
+    p <- plot.second.fc.da$main +
+      ylim(final_ylim)
+    p1 <- p1 + ylim(final_ylim)
+    p2 <- p2 + ylim(final_ylim)
+    
+    plot.second.fc.obs.uc$main <- p
+    plot.second.fc.obs.uc$low <- p1
+    plot.second.fc.obs.uc$high <- p2
+    
+  })
+  
+  # repeat of 2-forecast plot with DA from obj 5
   output$second_fc_da_plot3 <- renderPlot({
     
     validate(
@@ -1434,15 +1555,15 @@ shinyServer(function(input, output, session) {
       need(!is.null(plot.second.fc.da$main),
            message = "Please complete Objective 5.")
     )
+    validate(
+      need(input$plot_fc_low_obs_uc > 0,
+           message = "Please click 'Plot forecasts with low observation uncertainty'.")
+    )
     
-    p <- plot.second.fc.da$main +
-      ylim(c(range(EnKF_inputs_outputs$second_forecast_da)))
+    p <- plot.second.fc.obs.uc$main
     return(p)
+    
   })
-  
-  # 2 forecasts assimilating data with low uncertainty
-  # Second forecast figure
-  plot.second.fc.low.obs.uc <- reactiveValues(main=NULL)
   
   output$second_fc_low_obs_uc <- renderPlot({ 
     
@@ -1471,43 +1592,7 @@ shinyServer(function(input, output, session) {
            message = "Please click 'Plot forecasts with low observation uncertainty'.")
     )
     
-    #unpacking values we will need
-    intercept = as.numeric(ar.model$intercept)
-    ar1 = as.numeric(ar.model$ar1)
-    chla_mean = as.numeric(ar.model$chla_mean)
-    ic_distribution_low = obs_uc$ic_distribution_low
-    process_distribution = as.numeric(first_forecast$process_distribution)
-    
-    #first forecast
-    first_forecast_low_obs_uc = intercept + ar1 * (ic_distribution_low - chla_mean) + chla_mean + process_distribution
-    
-    #more unpacking
-    ic_sd_low = obs_uc$ic_sd_low
-    new_obs = EnKF_inputs_outputs$new_obs
-    
-    #update ic
-    ic_update_low_obs_uc <- EnKF(forecast = first_forecast_low_obs_uc, 
-                                 new_observation = new_obs, ic_sd = ic_sd_low)
-    
-    #second forecast
-    second_forecast_low_obs_uc = intercept + ar1 * (ic_update_low_obs_uc - chla_mean) + chla_mean + process_distribution
-    
-    #assign dates
-    forecast_dates = EnKF_inputs_outputs$forecast_dates
-    
-    curr_chla = as.numeric(first_forecast$curr_chla)
-    chla_obs = c(curr_chla, new_obs) #vector of observations to use for plotting
-    start_date = first_forecast_dates$start_date
-    n_members = as.numeric(first_forecast$n_members)
-    
-    p <- plot_second_forecast(chla_obs, start_date, forecast_dates, 
-                              ic_distribution_low, ic_update_low_obs_uc, 
-                              first_forecast_low_obs_uc, second_forecast_low_obs_uc, 
-                              n_members) +
-      ylim(c(range(EnKF_inputs_outputs$second_forecast_da)))
-    
-    plot.second.fc.low.obs.uc$main <- p
-    
+    p <- plot.second.fc.obs.uc$low
     return(p)
     
   })
@@ -1522,9 +1607,83 @@ shinyServer(function(input, output, session) {
         grDevices::png(..., width = 8, height = 4,
                        res = 200, units = "in")
       }
-      ggsave(file, plot = plot.second.fc.low.obs.uc$main, device = device)
+      ggsave(file, plot = plot.second.fc.obs.uc$low, device = device)
     }
   )
+  
+  #another repeat of original initial conditions plot
+  output$ic_distrib_plot3 <- renderPlotly({
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$plot_high_ic > 0,
+           message = "Please click 'Generate distribution'.")
+    )
+    
+    x.lim <- range(obs_uc$ic_distrib_high_x_lim)
+    y.lim <- range(obs_uc$ic_distrib_low_y_lim)
+    
+    p <- plot.ic.uc.distrib$main +
+      ylim(y.lim) +
+      xlim(x.lim) +
+      ggtitle("")
+    
+    return(ggplotly(p, dynamicTicks = TRUE))
+  })
+  
+  # ic distribution with low obs uncertainty
+  plot.ic.distrib.high <- reactiveValues(main=NULL)
+  
+  output$ic_distrib_high_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$plot_high_ic > 0,
+           message = "Please click 'Generate distribution'.")
+    )
+    
+    
+    x.lim <- range(obs_uc$ic_distrib_high_x_lim)
+    y.lim <- range(obs_uc$ic_distrib_low_y_lim)
+    
+    p <- plot.ic.uc.distrib$high +
+      ylim(y.lim) +
+      xlim(x.lim) +
+      ggtitle("")
+    
+    return(ggplotly(p, dynamicTicks = TRUE))
+    
+  })
   
 
   
