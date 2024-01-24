@@ -348,7 +348,7 @@ plot_many_forecasts <- function(forecast_data, forecast_series){
     geom_point(data = obs, aes(x = datefactor, y = obs, color = "Observations"), size = 3)+
     ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+
     xlab("")+
-    theme_bw()+
+    theme_bw(18)+
     theme(panel.grid.major.x = element_line(colour = "black", linetype = "dashed"),
           panel.grid.major.y = element_blank(),
           panel.grid.minor.y = element_blank(),
@@ -392,17 +392,17 @@ plot_many_forecasts_with_obs <- function(forecast_data, forecast_series, observa
     geom_violinhalf(data = fc, aes(x = datefactor, y = chla, fill = "Forecast"), color = "black",
                     scale = "width", width = 0.7)+
     geom_violinhalf(data = ic, aes(x = datefactor, y = chla, fill = "Initial condition"), color = "cornflowerblue", alpha = 0.4, scale = "width", width = 0.7)+
-    geom_point(data = obs_not_assim, aes(x = datefactor, y = chla, color = "Obs. - not assimilated"), size = 3, shape = 21)+
+    geom_point(data = obs_not_assim, aes(x = datefactor, y = chla, color = "Obs. - not assimilated"), size = 3, shape = 21, stroke = 2)+
     geom_point(data = obs_assim, aes(x = datefactor, y = obs, color = "Obs. - assimilated"), size = 3)+
     ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+
     xlab("")+
-    theme_bw()+
+    theme_bw(18)+
     theme(panel.grid.major.x = element_line(colour = "black", linetype = "dashed"),
           panel.grid.major.y = element_blank(),
           panel.grid.minor.y = element_blank(),
           axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
     scale_color_manual(values = c("Ensemble members" = "lightgray",
-                                  "Obs. - not assimilated" = "black",
+                                  "Obs. - not assimilated" = "orange",
                                   "Obs. - assimilated" = "orange"), 
                        name = "",
                        guide = guide_legend(override.aes = list(

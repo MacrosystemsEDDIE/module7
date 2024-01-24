@@ -1195,6 +1195,18 @@ ui <- function(req) {
                                                                    p(tags$b(quest["q30", 1]))
                                                             )
                                                           )
+                                                      ),
+                                                      box(id = "box2", width = 12, status = "warning",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h4("Important note!"),
+                                                                   p("Depending on the lake you chose, you may see a plot that looks like this, where the lower end of the forecast distribution appears truncated:"),
+                                                                   img(src = "zero_truncation_example.png", height = "100%", id = "bla_border",
+                                                                       width = "100%", align = "center"),
+                                                                   p("This is because our very simple forecast model may sometimes predict negative chlorophyll-a, which is not physically possible. If such a prediction is generated, it is set to 0. Alternative approaches could include choosing a different forecast model or log-transforming chlorophyll-a data before fitting a model. However, for our learning purposes today, we will continue with this simple approach.")
+                                                            )
+                                                          )
                                                       )
                                                ),
                                                column(6,
@@ -1544,7 +1556,7 @@ ui <- function(req) {
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(6,
+                                               column(4,
                                                       h3("Forecasts with no data assimilation"),
                                                       p("Click the button below to generate a series of 10, 1-day-ahead forecasts with no data available for assimilation during the forecast period."),
                                                       actionButton("fc_series_no_da","Run forecasts with no data assimilation"),
@@ -1560,7 +1572,7 @@ ui <- function(req) {
                                                           )
                                                       )
                                                       ),
-                                               column(6,
+                                               column(8,
                                                       wellPanel(
                                                         plotOutput("fc_series_no_da_plot")
                                                       ),

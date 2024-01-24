@@ -429,7 +429,8 @@ shinyServer(function(input, output, session) {
   ar.model <- reactiveValues(fit = NULL, intercept = NULL,
                              ar1 = NULL, chla_mean = NULL, eqn = NULL)
   
-  output$ar_model <- renderUI({
+  observe({
+    
     validate(
       need(input$table01_rows_selected != "",
            message = "Please select a site in Objective 1.")
@@ -444,12 +445,24 @@ shinyServer(function(input, output, session) {
     
     #fit model
     ar.model$fit <- ar.ols(df$chla, order.max = 1, aic = FALSE,
-                       intercept = TRUE, demean = TRUE)
+                           intercept = TRUE, demean = TRUE)
     
     #extract parameters
     ar.model$intercept = round(c(ar.model$fit$x.intercept),2) #beta_0
     ar.model$ar1 = round(c(ar.model$fit$ar),2) #beta_1
     ar.model$chla_mean = round(c(ar.model$fit$x.mean),2) #mean chla
+    
+  })
+  
+  output$ar_model <- renderUI({
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(input$fit_model > 0,
+           message = "Click 'Fit model'")
+    )
     
     #make equation
     ar.model$eqn <- paste0("$$Chla_{t} = ",ar.model$intercept," + ",ar.model$ar1," * (Chla_{t-1} - ",ar.model$chla_mean,") + ",ar.model$chla_mean,"$$")
@@ -594,8 +607,8 @@ shinyServer(function(input, output, session) {
                            ic_distrib_low_y_lim=NULL,
                            ic_distrib_high_x_lim=NULL)
   
-  # Text output for proc uc sd ----
-  output$proc_uc_sd <- renderUI({
+  # process distribution
+  observe({
     
     validate(
       need(!is.null(autocorrelation_data$df),
@@ -613,6 +626,29 @@ shinyServer(function(input, output, session) {
     df <- model_fit_data$df
     
     first_forecast$sigma <- sd(df$residuals, na.rm = TRUE)
+    
+    first_forecast$n_members <- 500
+    
+    first_forecast$process_distribution <- rnorm(n = first_forecast$n_members, mean = 0, sd = first_forecast$sigma)
+    
+  })
+  
+  
+  # Text output for proc uc sd ----
+  output$proc_uc_sd <- renderUI({
+    
+    validate(
+      need(!is.null(autocorrelation_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(input$calc_proc_distrib > 0,
+           message = "Click 'Calculate process uncertainty distribution'")
+    )
     
     proc_uc_sd <- paste("<b>","Process uncertainty standard deviation: ",round(first_forecast$sigma,2),"</b>", sep = "")
     
@@ -641,10 +677,6 @@ shinyServer(function(input, output, session) {
            message = "Click 'Calculate process uncertainty distribution'")
     )
     
-    first_forecast$n_members <- 500
-    
-    first_forecast$process_distribution <- rnorm(n = first_forecast$n_members, mean = 0, sd = first_forecast$sigma)
-    
     p <- plot_process_dist(proc_uc = first_forecast$process_distribution)
     
     plot.proc.uc.distrib$main <- p
@@ -672,11 +704,8 @@ shinyServer(function(input, output, session) {
     slickR(ic_uc_slides) + settings(dots = TRUE)
   })
   
-  # High frequency data plot ----
-  high_frequency_data <- reactiveValues(df=NULL)
-  plot.high.freq <- reactiveValues(main=NULL)
-  
-  output$high_freq_plot <- renderPlotly({ 
+  # wrangle high frequency data
+  observe({
     
     validate(
       need(input$table01_rows_selected != "",
@@ -706,11 +735,36 @@ shinyServer(function(input, output, session) {
                time = hms::as_hms(datetime)) %>%
         filter(site_id == siteID$lab & date >= "2019-10-08" & date <= "2019-10-11")
     } else {
-    high_frequency_data$df <- read_csv("data/chla_microgramsPerLiter_highFrequency.csv", show_col_types = FALSE) %>%
-      mutate(date = date(datetime),
-             time = hms::as_hms(datetime)) %>%
-      filter(site_id == siteID$lab & date >= "2019-10-09" & date <= "2019-10-12")
+      high_frequency_data$df <- read_csv("data/chla_microgramsPerLiter_highFrequency.csv", show_col_types = FALSE) %>%
+        mutate(date = date(datetime),
+               time = hms::as_hms(datetime)) %>%
+        filter(site_id == siteID$lab & date >= "2019-10-09" & date <= "2019-10-12")
     }
+    
+  })
+  
+  # High frequency data plot ----
+  high_frequency_data <- reactiveValues(df=NULL)
+  plot.high.freq <- reactiveValues(main=NULL)
+  
+  output$high_freq_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(input$plot_high_freq > 0,
+           message = "Click 'Plot high-frequency data'")
+    )
     
     p <- ggplot(data = high_frequency_data$df)+
       geom_line(aes(x = time, y = chla, group = date, color = as.factor(date)))+
@@ -739,8 +793,8 @@ shinyServer(function(input, output, session) {
     }
   )
   
-  # Text output for ic uc sd ----
-  output$ic_uc_sd <- renderUI({
+  # calculate ic distribution
+  observe({
     
     validate(
       need(!is.null(autocorrelation_data$df),
@@ -766,6 +820,53 @@ shinyServer(function(input, output, session) {
       summarize(daily_sd_chla = sd(chla, na.rm = TRUE))
     
     first_forecast$ic_sd <- mean(ic_sd_dataframe$daily_sd_chla, na.rm = TRUE)
+    
+    df <- lake_data$df
+    
+    start_date <- "2020-09-25"
+    first_forecast_dates$start_date <- "2020-09-25"
+    
+    curr_chla <- df %>%
+      filter(abs(difftime(datetime,start_date)) == min(abs(difftime(datetime,start_date)))) %>%
+      pull(chla)
+    first_forecast$curr_chla <- curr_chla
+    
+    n_members <- as.numeric(first_forecast$n_members)
+    
+    ic_sd <- as.numeric(first_forecast$ic_sd)
+    ic_sd_low = ic_sd/2
+    obs_uc$ic_sd_low <- ic_sd_low
+    ic_sd_high = ic_sd*2
+    obs_uc$ic_sd_high <- ic_sd_high
+    
+    ic_distribution <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd)
+    first_forecast$ic_distribution <- ic_distribution
+    ic_distribution_low <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_low)
+    obs_uc$ic_distribution_low <- ic_distribution_low
+    ic_distribution_high <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_high)
+    obs_uc$ic_distribution_high <- ic_distribution_high
+    
+  })
+  
+  # Text output for ic uc sd ----
+  output$ic_uc_sd <- renderUI({
+    
+    validate(
+      need(!is.null(autocorrelation_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(high_frequency_data$df),
+           message = "Please load and plot the high-frequency data above.")
+    )
+    validate(
+      need(input$calc_ic_uc > 0,
+           message = "Click 'Calculate initial conditions uncertainty'")
+    )
     
     ic_uc_sd <- paste("<b>","Initial condition uncertainty standard deviation: ",round(first_forecast$ic_sd,2),"</b>", sep = "")
     
@@ -802,39 +903,14 @@ shinyServer(function(input, output, session) {
            message = "Click 'Calculate initial conditions uncertainty'")
     )
     
-    df <- lake_data$df
-    
-    start_date <- "2020-09-25"
-    first_forecast_dates$start_date <- "2020-09-25"
-    
-    curr_chla <- df %>%
-      filter(abs(difftime(datetime,start_date)) == min(abs(difftime(datetime,start_date)))) %>%
-      pull(chla)
-    first_forecast$curr_chla <- curr_chla
-    
-    n_members <- as.numeric(first_forecast$n_members)
-    
-    ic_sd <- as.numeric(first_forecast$ic_sd)
-    ic_sd_low = ic_sd/2
-    obs_uc$ic_sd_low <- ic_sd_low
-    ic_sd_high = ic_sd*2
-    obs_uc$ic_sd_high <- ic_sd_high
-    
-    ic_distribution <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd)
-    first_forecast$ic_distribution <- ic_distribution
-    ic_distribution_low <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_low)
-    obs_uc$ic_distribution_low <- ic_distribution_low
-    ic_distribution_high <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_high)
-    obs_uc$ic_distribution_high <- ic_distribution_high
-    
-    p <- plot_ic_dist(curr_chla = curr_chla, ic_uc = ic_distribution)
+    p <- plot_ic_dist(curr_chla = first_forecast$curr_chla, ic_uc = first_forecast$ic_distribution)
     first_forecast$ic_distrib_x_lim = lim <- range(c(layer_scales(p)$x$range$range))
     first_forecast$ic_distrib_y_lim = lim <- range(c(layer_scales(p)$y$range$range))
     
-    p1 <- plot_ic_dist(curr_chla = curr_chla, ic_uc = ic_distribution_low)
+    p1 <- plot_ic_dist(curr_chla = first_forecast$curr_chla, ic_uc = obs_uc$ic_distribution_low)
     obs_uc$ic_distrib_low_y_lim = lim <- range(c(layer_scales(p1)$y$range$range))
     
-    p2 <- plot_ic_dist(curr_chla = curr_chla, ic_uc = ic_distribution_high)
+    p2 <- plot_ic_dist(curr_chla = first_forecast$curr_chla, ic_uc = obs_uc$ic_distribution_high)
     obs_uc$ic_distrib_high_x_lim = lim <- range(c(layer_scales(p2)$x$range$range))
 
     plot.ic.uc.distrib$main <- p
@@ -862,7 +938,8 @@ shinyServer(function(input, output, session) {
   #First forecast plot
   plot.fc1 <- reactiveValues(main=NULL)
   
-  output$fc1_plot <- renderPlotly({ 
+  #generate first forecast
+  observe({
     
     validate(
       need(input$table01_rows_selected != "",
@@ -898,9 +975,39 @@ shinyServer(function(input, output, session) {
     first_forecast_dates$forecast_date <- forecast_date
     
     forecast_chla = intercept + ar1 * (ic_distribution - chla_mean) + chla_mean + process_distribution
+    forecast_chla = ifelse(forecast_chla < 0, 0, forecast_chla)
     first_forecast$forecast_chla <- forecast_chla
     
-    p <- plot_fc_dist(forecast_dist = forecast_chla)
+  })
+  
+  output$fc1_plot <- renderPlotly({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(first_forecast$process_distribution),
+           message = "Please generate a process uncertainty distribution above.")
+    )
+    validate(
+      need(!is.null(first_forecast$ic_distribution),
+           message = "Please generate an initial conditions distribution above.")
+    )
+    validate(
+      need(input$fc1 > 0,
+           message = "Click 'Generate forecast'")
+    )
+    
+    p <- plot_fc_dist(forecast_dist = first_forecast$forecast_chla)
     
     plot.fc1$main <- p
     
@@ -982,6 +1089,70 @@ shinyServer(function(input, output, session) {
                                         updated_ic_no_da = NULL,
                                         second_forecast_no_da = NULL)
   
+  # update ic
+  observe({
+    
+    validate(
+      need(!is.null(autocorrelation_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$view_new_obs > 0,
+           message = "Click 'View new observation'")
+    )
+    
+    #unpacking values we will need
+    intercept = as.numeric(ar.model$intercept)
+    ar1 = as.numeric(ar.model$ar1)
+    chla_mean = as.numeric(ar.model$chla_mean)
+    process_distribution = as.numeric(first_forecast$process_distribution)
+    
+    df <- lake_data$df
+    
+    new_obs <- df %>%
+      filter(datetime == first_forecast_dates$forecast_date) %>%
+      pull(chla)
+    
+    EnKF_inputs_outputs$new_obs <- new_obs
+    
+    forecast_chla <- first_forecast$forecast_chla
+    ic_sd <- first_forecast$ic_sd
+    
+    ic_update <- EnKF(forecast = forecast_chla, new_observation = new_obs, ic_sd = ic_sd)
+    EnKF_inputs_outputs$updated_ic <- ic_update
+    
+    #generate second forecast
+    second_forecast_da = intercept + ar1 * (ic_update - chla_mean) + chla_mean + process_distribution
+    second_forecast_da = ifelse(second_forecast_da < 0, 0, second_forecast_da)
+    EnKF_inputs_outputs$second_forecast_da = second_forecast_da
+    
+    #add in new dates
+    second_forecast_date = "2020-09-27"
+    EnKF_inputs_outputs$second_forecast_date <- second_forecast_date
+    forecast_date = first_forecast_dates$forecast_date
+    forecast_dates = c(forecast_date, second_forecast_date)
+    EnKF_inputs_outputs$forecast_dates = forecast_dates
+    
+    #updated ic no da
+    ic_update_no_da <- EnKF(forecast = forecast_chla, new_observation = NA, ic_sd = ic_sd)
+    EnKF_inputs_outputs$updated_ic_no_da <- ic_update_no_da
+    
+    #generate second forecast with no da
+    second_forecast_no_da = intercept + ar1 * (ic_update_no_da - chla_mean) + chla_mean + process_distribution
+    second_forecast_no_da = ifelse(second_forecast_no_da < 0, 0, second_forecast_no_da)
+    EnKF_inputs_outputs$second_forecast_no_da = second_forecast_no_da
+    
+    
+  })
+  
   # Text output for new observation ----
   output$new_obs <- renderUI({
     
@@ -1002,15 +1173,7 @@ shinyServer(function(input, output, session) {
            message = "Click 'View new observation'")
     )
     
-    df <- lake_data$df
-    
-    new_obs <- df %>%
-      filter(datetime == first_forecast_dates$forecast_date) %>%
-      pull(chla)
-    
-    EnKF_inputs_outputs$new_obs <- new_obs
-    
-    new_obs_text <- paste("<b>","New observation: ",round(new_obs,2),"</b>", sep = "")
+    new_obs_text <- paste("<b>","New observation: ",round(EnKF_inputs_outputs$new_obs,2),"</b>", sep = "")
     
     HTML(paste(new_obs_text))
   })
@@ -1050,8 +1213,7 @@ shinyServer(function(input, output, session) {
       previous_plot <- plot.fc1.viz$main
       new_obs <- EnKF_inputs_outputs$new_obs
       chla_obs <- c(curr_chla, new_obs) #vector of observations to use for plotting
-      ic_update <- EnKF(forecast = forecast_chla, new_observation = new_obs, ic_sd = ic_sd)
-      EnKF_inputs_outputs$updated_ic <- ic_update
+      ic_update = EnKF_inputs_outputs$updated_ic 
       p1 <- plot_fc_update(chla_obs, start_date, forecast_date, ic_distribution, ic_update, forecast_chla, n_members)
       plot.updated.ic$main <- p1
       return(p1)
@@ -1106,6 +1268,10 @@ shinyServer(function(input, output, session) {
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
+      need(input$view_new_obs > 0,
+           message = "Please view the new observation above.")
+    )
+    validate(
       need(input$update_ic > 0,
            message = "Please update the initial condition above.")
     )
@@ -1120,18 +1286,8 @@ shinyServer(function(input, output, session) {
     chla_mean = as.numeric(ar.model$chla_mean)
     ic_update = EnKF_inputs_outputs$updated_ic
     process_distribution = as.numeric(first_forecast$process_distribution)
-    
-    #generate second forecast
-    second_forecast = intercept + ar1 * (ic_update - chla_mean) + chla_mean + process_distribution
-    EnKF_inputs_outputs$second_forecast_da = second_forecast
-    
-    #add in new dates
-    second_forecast_date = "2020-09-27"
-    EnKF_inputs_outputs$second_forecast_date <- second_forecast_date
-    forecast_date = first_forecast_dates$forecast_date
-    forecast_dates = c(forecast_date, second_forecast_date)
-    EnKF_inputs_outputs$forecast_dates = forecast_dates
-    
+    second_forecast = EnKF_inputs_outputs$second_forecast_da
+    forecast_dates = EnKF_inputs_outputs$forecast_dates
     curr_chla = as.numeric(first_forecast$curr_chla)
     new_obs = EnKF_inputs_outputs$new_obs
     chla_obs = c(curr_chla, new_obs) #vector of observations to use for plotting
@@ -1200,8 +1356,7 @@ shinyServer(function(input, output, session) {
       previous_plot <- plot.fc1.viz$main
       new_obs <- NA
       chla_obs <- c(curr_chla, new_obs) #vector of observations to use for plotting
-      ic_update_no_da <- EnKF(forecast = forecast_chla, new_observation = new_obs, ic_sd = ic_sd)
-      EnKF_inputs_outputs$updated_ic_no_da <- ic_update_no_da
+      ic_update_no_da = EnKF_inputs_outputs$updated_ic_no_da
       p1 <- plot_fc_update(chla_obs, start_date, forecast_date, ic_distribution, ic_update_no_da, forecast_chla, n_members)
       plot.updated.ic.no.da$main <- p1
       return(p1)
@@ -1263,10 +1418,7 @@ shinyServer(function(input, output, session) {
     chla_mean = as.numeric(ar.model$chla_mean)
     ic_update_no_da = EnKF_inputs_outputs$updated_ic_no_da
     process_distribution = as.numeric(first_forecast$process_distribution)
-    
-    #generate second forecast
-    second_forecast_no_da = intercept + ar1 * (ic_update_no_da - chla_mean) + chla_mean + process_distribution
-    EnKF_inputs_outputs$second_forecast_no_da = second_forecast_no_da
+    second_forecast_no_da = EnKF_inputs_outputs$second_forecast_no_da
     
     #assign dates
     forecast_dates = EnKF_inputs_outputs$forecast_dates
@@ -1488,7 +1640,10 @@ shinyServer(function(input, output, session) {
     
     #first forecast
     first_forecast_low_obs_uc = intercept + ar1 * (ic_distribution_low - chla_mean) + chla_mean + process_distribution
+    first_forecast_low_obs_uc = ifelse(first_forecast_low_obs_uc < 0, 0, first_forecast_low_obs_uc)
+    
     first_forecast_high_obs_uc = intercept + ar1 * (ic_distribution_high - chla_mean) + chla_mean + process_distribution
+    first_forecast_high_obs_uc = ifelse(first_forecast_high_obs_uc < 0, 0, first_forecast_high_obs_uc)
     
     #more unpacking
     ic_sd_low = obs_uc$ic_sd_low
@@ -1503,7 +1658,10 @@ shinyServer(function(input, output, session) {
     
     #second forecast
     second_forecast_low_obs_uc = intercept + ar1 * (ic_update_low_obs_uc - chla_mean) + chla_mean + process_distribution
+    second_forecast_low_obs_uc = ifelse(second_forecast_low_obs_uc < 0, 0, second_forecast_low_obs_uc)
+    
     second_forecast_high_obs_uc = intercept + ar1 * (ic_update_high_obs_uc - chla_mean) + chla_mean + process_distribution
+    second_forecast_high_obs_uc = ifelse(second_forecast_high_obs_uc < 0, 0, second_forecast_high_obs_uc)
     
     #assign dates
     forecast_dates = EnKF_inputs_outputs$forecast_dates
@@ -1775,6 +1933,216 @@ shinyServer(function(input, output, session) {
   output$chla_frequency_slides <- renderSlickR({
     slickR(chla_frequency_slides) + settings(dots = TRUE)
   })
+  
+  #create reactive for forecast series plots
+  forecast.series.data <- reactiveValues(none=NULL,
+                                    weekly=NULL,
+                                    daily=NULL)
+  forecast.series <- reactiveValues(none=NULL,
+                                    weekly=NULL,
+                                    daily=NULL)
+  forecast.means <- reactiveValues(none=NULL,
+                                    weekly=NULL,
+                                    daily=NULL)
+  plot.forecast.series <- reactiveValues(none=NULL,
+                                          weekly=NULL,
+                                          daily=NULL)
+  plot.forecast.series.w.obs <- reactiveValues(none=NULL,
+                                         weekly=NULL,
+                                         daily=NULL)
+  
+  observe({
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.da$main),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(input$fc_series_no_da > 0,
+           message = "Please click 'Run forecasts with no data assimilation'.")
+    )
+    
+    progress <- shiny::Progress$new()
+    progress_value = 0.2
+    progress$set(message = "Running forecasts",
+                 detail = "This may take a while. This window will disappear
+                     when forecasts are complete.", value = progress_value)
+    
+    intercept = as.numeric(ar.model$intercept)
+    ar1 = as.numeric(ar.model$ar1)
+    chla_mean = as.numeric(ar.model$chla_mean)
+    n_members = first_forecast$n_members
+    process_distribution = first_forecast$process_distribution
+    ic_sd = first_forecast$ic_sd
+    
+    days_to_forecast = 10
+    
+    forecast_dates <- seq.Date(from = as.Date(first_forecast_dates$start_date), to = as.Date(first_forecast_dates$start_date) + days_to_forecast, by = 'days')
+    
+    chla_observations <- lake_data$df %>%
+      filter(datetime %in% forecast_dates)
+    
+    chla_assimilation_frequencies <- c(11,7,1)
+    
+    for(j in 1:length(chla_assimilation_frequencies)){
+      
+      chla_assimilation_dates <- forecast_dates[seq(1, length(forecast_dates), chla_assimilation_frequencies[j])]
+      
+      forecast_data <- lake_data$df %>%
+        select(datetime, chla) %>%
+        mutate(datetime = as.Date(datetime)) %>%
+        filter(datetime %in% forecast_dates) %>%
+        mutate(chla = ifelse(datetime %in% chla_assimilation_dates,chla,NA)) 
+      
+      forecast_series <- tibble(date = rep(forecast_dates, each = n_members*2),
+                                      chla = NA_real_,
+                                      ensemble_member = rep(1:n_members, times = length(forecast_dates)*2),
+                                      data_type = rep(c("fc","ic"), each = n_members, times = length(forecast_dates)))
+      
+      ic_distribution = first_forecast$ic_distribution
+      
+      temp_ic <- tibble(date = rep(forecast_dates[1], each = n_members),
+                        chla = ic_distribution,
+                        ensemble_member = c(1:n_members),
+                        data_type = rep("ic", times = n_members))
+      
+      forecast_series <- forecast_series %>%
+        rows_update(temp_ic, by = c("date","ensemble_member","data_type"))
+      
+      for(i in 2:length(forecast_dates)){
+        
+        #Generate forecast
+        forecast_chla = intercept + ar1 * (ic_distribution - chla_mean) + chla_mean + process_distribution
+        forecast_chla = ifelse(forecast_chla < 0, 0, forecast_chla)
+        
+        #Select current row of forecast_data to see if there is data to use for updating
+        new_obs <- forecast_data$chla[i] #Observed chl-a
+        
+        #Update the initial condition
+        ic_update <- EnKF(forecast = forecast_chla, new_observation = new_obs, ic_sd = ic_sd)
+        
+        #Assign the updated initial condition to be used for the next day's forecast
+        ic_distribution <- ic_update
+        
+        #Build temporary data frame to hold current initial condition and forecast
+        temp <- tibble(date = rep(forecast_dates[i], times = n_members*2),
+                       chla = c(forecast_chla, ic_update),
+                       ensemble_member = rep(1:n_members, times = 2),
+                       data_type = rep(c("fc","ic"), each = n_members))
+        
+        #Update rows of forecast series output data frame
+        forecast_series <- forecast_series %>%
+          rows_update(temp, by = c("date","ensemble_member","data_type"))
+      }
+      
+      forecast_means <- forecast_series %>%
+        filter(data_type == "fc") %>%
+        group_by(date) %>%
+        summarize(forecast_mean = mean(chla, na.rm = TRUE))
+      
+      if(chla_assimilation_frequencies[j] == 11){
+        forecast.series$none <- forecast_series
+        forecast.series.data$none <- forecast_data
+        forecast.means$none <- forecast_means
+      } else if (chla_assimilation_frequencies[j] == 7){
+        forecast.series$weekly <- forecast_series
+        forecast.series.data$weekly <- forecast_data
+        forecast.means$weekly <- forecast_means
+      } else {
+        forecast.series$daily <- forecast_series
+        forecast.series.data$daily <- forecast_data
+        forecast.means$daily <- forecast_means
+      }
+      
+      progress$inc(message = "Running forecasts",
+                   detail = "This may take a while. This window will disappear
+                     when forecasts are complete.", amount = 0.2)
+      
+    }
+    
+    plot.forecast.series$none <- plot_many_forecasts(forecast_data = forecast.series.data$none, forecast_series = forecast.series$none)
+    plot.forecast.series$weekly <- plot_many_forecasts(forecast_data = forecast.series.data$weekly, forecast_series = forecast.series$weekly)
+    plot.forecast.series$daily <- plot_many_forecasts(forecast_data = forecast.series.data$daily, forecast_series = forecast.series$daily)
+    
+    progress$inc(message = "Running forecasts",
+                 detail = "This may take a while. This window will disappear
+                     when forecasts are complete.", amount = 0.1)
+    
+    plot.forecast.series.w.obs$none <- plot_many_forecasts_with_obs(forecast_data = forecast.series.data$none, forecast_series = forecast.series$none, observations = chla_observations)
+    plot.forecast.series.w.obs$weekly <- plot_many_forecasts_with_obs(forecast_data = forecast.series.data$weekly, forecast_series = forecast.series$weekly, observations = chla_observations)
+    plot.forecast.series.w.obs$daily <- plot_many_forecasts_with_obs(forecast_data = forecast.series.data$daily, forecast_series = forecast.series$daily, observations = chla_observations)
+    
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+  })
+  
+  output$fc_series_no_da_plot <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.da$main),
+           message = "Please complete Objective 5.")
+    )
+    validate(
+      need(input$fc_series_no_da > 0,
+           message = "Please click 'Run forecasts with no data assimilation'.")
+    )
+    
+    if(input$show_obs == TRUE){
+      p <- plot.forecast.series.w.obs$none
+    } else {
+      p <- plot.forecast.series$none
+    }
+    
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_fc_series_no_da_plot <- downloadHandler(
+    filename = function() {
+      paste("Q41-Q44-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.forecast.series.w.obs$none, device = device)
+    }
+  )
+  
 
   
   ##########OLD
