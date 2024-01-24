@@ -160,6 +160,8 @@ shinyServer(function(input, output, session) {
   # Plot chlorophyll-a
   plot.chla <- reactiveValues(main=NULL)
   
+  observe({
+  
   output$chla_plot <- renderPlotly({ 
     
     validate(
@@ -190,6 +192,8 @@ shinyServer(function(input, output, session) {
     
   })
   
+  })
+  
   # Download plot of air and water temperature
   output$save_chla_plot <- downloadHandler(
     filename = function() {
@@ -209,6 +213,8 @@ shinyServer(function(input, output, session) {
   # Plot lagged chlorophyll-a time series
   plot.lag1 <- reactiveValues(main=NULL)
   
+  observe({
+    
   output$lag_plot1 <- renderPlotly({ 
     
     validate(
@@ -237,6 +243,8 @@ shinyServer(function(input, output, session) {
     
   })
   
+  })
+  
   # Download timeseries of lagged chl-a
   output$save_lag_plot1 <- downloadHandler(
     filename = function() {
@@ -253,6 +261,8 @@ shinyServer(function(input, output, session) {
   
   # Plot lagged chlorophyll-a scatterplot
   plot.lag2 <- reactiveValues(main=NULL)
+  
+  observe({
   
   output$lag_plot2 <- renderPlotly({ 
     
@@ -284,6 +294,8 @@ shinyServer(function(input, output, session) {
     
   })
   
+  })
+  
   # Download scatterplot of lagged chl-a
   output$save_lag_plot2 <- downloadHandler(
     filename = function() {
@@ -299,6 +311,9 @@ shinyServer(function(input, output, session) {
   )
   
   # Autocorrelation calculation ----
+  
+  observe({
+    
   output$out_ac <- renderUI({
     
     validate(
@@ -321,8 +336,12 @@ shinyServer(function(input, output, session) {
     HTML(paste(out_ac))
   })
   
+  })
+  
   # Autocorrelation plot many lags ----
   plot.ac <- reactiveValues(main=NULL)
+  
+  observe({
   
   output$ac_plot <- renderPlotly({ 
     
@@ -358,6 +377,8 @@ shinyServer(function(input, output, session) {
     
   })
   
+  })
+  
   # Download ac plot
   output$save_ac_plot <- downloadHandler(
     filename = function() {
@@ -374,6 +395,8 @@ shinyServer(function(input, output, session) {
   
   # PACF plot ----
   plot.pacf <- reactiveValues(main=NULL)
+  
+  observe({
   
   output$pacf_plot <- renderPlotly({ 
     
@@ -409,6 +432,8 @@ shinyServer(function(input, output, session) {
     
   })
   
+  })
+  
   # Download scatterplot of pacf
   output$save_pacf_plot <- downloadHandler(
     filename = function() {
@@ -435,10 +460,10 @@ shinyServer(function(input, output, session) {
       need(input$table01_rows_selected != "",
            message = "Please select a site in Objective 1.")
     )
-    validate(
-      need(input$fit_model > 0,
-           message = "Click 'Fit model'")
-    )
+    # validate(
+    #   need(input$fit_model > 0,
+    #        message = "Click 'Fit model'")
+    # )
     
     #assign dataframe
     df <- autocorrelation_data$df
@@ -452,8 +477,17 @@ shinyServer(function(input, output, session) {
     ar.model$ar1 = round(c(ar.model$fit$ar),2) #beta_1
     ar.model$chla_mean = round(c(ar.model$fit$x.mean),2) #mean chla
     
+    #get predictions
+    mod <- ar.model$intercept + ar.model$ar1 * (df$chla - ar.model$chla_mean) + ar.model$chla_mean
+    
+    model_fit_data$df <- tibble(date = df$datetime,
+                                chla = df$chla,
+                                model = mod,
+                                residuals = (mod - df$chla))
+    
   })
   
+  observe({
   output$ar_model <- renderUI({
     validate(
       need(input$table01_rows_selected != "",
@@ -471,10 +505,13 @@ shinyServer(function(input, output, session) {
       tags$p(ar.model$eqn)
     ))
   })
+  })
   
   # Model fit plot ----
   model_fit_data <- reactiveValues(df = NULL)
   plot.arfit <- reactiveValues(main=NULL)
+  
+  observe({
   
   output$arfit_plot <- renderPlotly({ 
     
@@ -491,21 +528,14 @@ shinyServer(function(input, output, session) {
            message = "Click 'Fit model'")
     )
     
-    df <- autocorrelation_data$df
-    
-    mod <- ar.model$intercept + ar.model$ar1 * (df$chla - ar.model$chla_mean) + ar.model$chla_mean
-    
-    model_fit_data$df <- tibble(date = df$datetime,
-                                chla = df$chla,
-                                model = mod,
-                                residuals = (mod - df$chla))
-    
     p <- plot_mod_predictions(model_fit_plot_data = model_fit_data$df, variable_name = "Chlorophyll-a (ug/L)")
     
     plot.arfit$main <- p
     
     return(ggplotly(p, dynamicTicks = TRUE))
     
+  })
+  
   })
   
   # Download scatterplot of pacf
@@ -523,6 +553,9 @@ shinyServer(function(input, output, session) {
   )
   
   # Text output for bias ----
+  
+  observe({
+    
   output$out_bias <- renderUI({
     
     validate(
@@ -547,7 +580,10 @@ shinyServer(function(input, output, session) {
     HTML(paste(out_bias))
   })
   
+  })
+  
   # Text output for RMSE ----
+  observe({
   output$out_rmse <- renderUI({
     
     validate(
@@ -570,6 +606,7 @@ shinyServer(function(input, output, session) {
     out_rmse <- paste("<b>","RMSE: ",rmse,"</b>", sep = "")
     
     HTML(paste(out_rmse))
+  })
   })
   
   ## Objective 4 ----
@@ -635,6 +672,7 @@ shinyServer(function(input, output, session) {
   
   
   # Text output for proc uc sd ----
+  observe({
   output$proc_uc_sd <- renderUI({
     
     validate(
@@ -654,10 +692,12 @@ shinyServer(function(input, output, session) {
     
     HTML(paste(proc_uc_sd))
   })
+  })
   
   # Process uncertainty distribution plot ----
   plot.proc.uc.distrib <- reactiveValues(main=NULL)
   
+  observe({
   output$proc_uc_distrib <- renderPlotly({ 
     
     validate(
@@ -683,6 +723,7 @@ shinyServer(function(input, output, session) {
     
     return(ggplotly(p, dynamicTicks = TRUE))
     
+  })
   })
   
   # Download scatterplot of pacf
