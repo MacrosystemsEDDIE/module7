@@ -1902,7 +1902,41 @@ ui <- function(req) {
                                                )
                                              ),
                                              br(),
-                                             fluidRow()
+                                             fluidRow(
+                                               column(12,
+                                                      h4("Visually assess forecasts"),
+                                                      p("Finally, you assess both series of forecasts using an observation of chlorophyll-a made on Saturday, October 11. Let's plot the results."),
+                                                      actionButton("fc_compare","Compare forecasts made with and without high-frequency sensor")
+                                                      )
+                                             ),
+                                             fluidRow(
+                                               column(6,
+                                                      h4("Forecasts without high-frequency sensor"),
+                                                      wellPanel(
+                                                        plotOutput("fc_scenario_weekly_plot2")
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      h4("Forecasts with high-frequency sensor"),
+                                                      wellPanel(
+                                                        plotOutput("fc_scenario_daily_plot2")
+                                                      )
+                                                      )
+                                             ),
+                                             fluidRow(
+                                               column(12,
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q57", 1])),
+                                                                   p(tags$b(quest["q58", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      )
+                                             )
                                              ) #end tab panel
                         )
                )

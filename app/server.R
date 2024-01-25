@@ -2754,6 +2754,36 @@ shinyServer(function(input, output, session) {
       ggsave(file, plot = plot.forecast.scenario$daily, device = device)
     }
   )
+  
+  #compare forecast results
+  #plot with weekly data assimilation
+  output$fc_scenario_weekly_plot2 <- renderPlot({ 
+    
+    validate(
+      need(input$fc_compare > 0,
+           message = "Please click 'Compare forecasts made with and without high-frequency sensor'.")
+    )
+    
+    p <- plot.forecast.scenario.w.obs$weekly
+    
+    return(p)
+    
+  })
+  
+  output$fc_scenario_daily_plot2 <- renderPlot({ 
+    
+    validate(
+      need(input$fc_compare > 0,
+           message = "Please click 'Compare forecasts made with and without high-frequency sensor'.")
+    )
+    
+    p <- plot.forecast.scenario.w.obs$daily
+    
+    return(p)
+    
+  })
+  
+  
 
   
   ##########OLD
