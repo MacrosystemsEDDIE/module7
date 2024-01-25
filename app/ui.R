@@ -1582,6 +1582,179 @@ ui <- function(req) {
                                                       )
                                                       )
                                              ),
+                                             br(),
+                                             fluidRow(
+                                               column(6,
+                                                      h4(tags$em("Assess series of 1-day-ahead forecasts with no data assimilation")),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q43", 1])),
+                                                                   p(tags$b(quest["q44", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      br(),br(),
+                                                      fluidRow(
+                                                        column(6,
+                                                               actionButton("calc_bias2",label = "Calculate bias")
+                                                        ),
+                                                        column(6,
+                                                               wellPanel(
+                                                                 htmlOutput("out_bias2")
+                                                               )
+                                                        )
+                                                      ),
+                                                      fluidRow(
+                                                        column(6,
+                                                               actionButton("calc_rmse2",label = "Calculate RMSE")
+                                                        ),
+                                                        column(6,
+                                                               wellPanel(
+                                                                 htmlOutput("out_rmse2")
+                                                               )
+                                                        )
+                                                      )
+                                                      )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(4,
+                                                      h3("Forecasts with weekly data assimilation"),
+                                                      p("Click the button below to generate a series of 10, 1-day-ahead forecasts with weekly data available for assimilation during the forecast period."),
+                                                      actionButton("fc_series_weekly","Run forecasts with weekly data assimilation"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q45", 1])),
+                                                                   p(tags$b(quest["q46", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               column(8,
+                                                      wellPanel(
+                                                        plotOutput("fc_series_weekly_plot")
+                                                      ),
+                                                      downloadButton("save_fc_series_weekly_plot", "Download plot", icon = icon("download")),
+                                                      conditionalPanel("input.fc_series_weekly > 0",
+                                                                       checkboxInput("show_obs2", "Click to show/remove the observations during the forecast period.", value = FALSE),
+                                                      )
+                                               )
+                                             ),
+                                             br(),
+                                             fluidRow(
+                                               column(6,
+                                                      h4(tags$em("Assess series of 1-day-ahead forecasts with weekly data assimilation")),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q47", 1])),
+                                                                   p(tags$b(quest["q48", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               column(6,
+                                                      br(),br(),
+                                                      fluidRow(
+                                                        column(6,
+                                                               actionButton("calc_bias3",label = "Calculate bias")
+                                                        ),
+                                                        column(6,
+                                                               wellPanel(
+                                                                 htmlOutput("out_bias3")
+                                                               )
+                                                        )
+                                                      ),
+                                                      fluidRow(
+                                                        column(6,
+                                                               actionButton("calc_rmse3",label = "Calculate RMSE")
+                                                        ),
+                                                        column(6,
+                                                               wellPanel(
+                                                                 htmlOutput("out_rmse3")
+                                                               )
+                                                        )
+                                                      )
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(4,
+                                                      h3("Forecasts with daily data assimilation"),
+                                                      p("Click the button below to generate a series of 10, 1-day-ahead forecasts with daily data available for assimilation during the forecast period."),
+                                                      actionButton("fc_series_daily","Run forecasts with daily data assimilation"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q49", 1])),
+                                                                   p(tags$b(quest["q50", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               column(8,
+                                                      wellPanel(
+                                                        plotOutput("fc_series_daily_plot")
+                                                      ),
+                                                      downloadButton("save_fc_series_daily_plot", "Download plot", icon = icon("download")),
+                                                      conditionalPanel("input.fc_series_daily > 0",
+                                                                       checkboxInput("show_obs3", "Click to show/remove the observations during the forecast period.", value = FALSE),
+                                                      )
+                                               )
+                                             ),
+                                             br(),
+                                             fluidRow(
+                                               column(6,
+                                                      h4(tags$em("Assess series of 1-day-ahead forecasts with daily data assimilation")),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q51", 1])),
+                                                                   p(tags$b(quest["q52", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               column(6,
+                                                      br(),br(),
+                                                      fluidRow(
+                                                        column(6,
+                                                               actionButton("calc_bias4",label = "Calculate bias")
+                                                        ),
+                                                        column(6,
+                                                               wellPanel(
+                                                                 htmlOutput("out_bias4")
+                                                               )
+                                                        )
+                                                      ),
+                                                      fluidRow(
+                                                        column(6,
+                                                               actionButton("calc_rmse4",label = "Calculate RMSE")
+                                                        ),
+                                                        column(6,
+                                                               wellPanel(
+                                                                 htmlOutput("out_rmse4")
+                                                               )
+                                                        )
+                                                      )
+                                               )
+                                             ),
                                              hr(),
                                              #*** Next step ----
                                              fluidRow(

@@ -47,3 +47,13 @@ q39,Q39. What is the effect of an increase in observation uncertainty on the for
 q40,"Q40. Make a prediction by filling in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.'"
 q41,Q41. Describe how the mean value of the 1-day-ahead forecasts changes over time when no data are assimilated.
 q42,Q42. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q43,"Q43. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
+q44,Q44. Use the values of bias and RMSE to assess the forecasts with no data assimilation. How well do you think the forecasts are performing?
+q45,Q45. Describe how the mean value of the 1-day-ahead forecasts changes over time when weekly data are assimilated.
+q46,Q46. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when weekly data are assimilated.
+q47,"Q47. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
+q48,Q48. Use the values of bias and RMSE to assess the forecasts with weekly data assimilation. How well do you think the forecasts are performing?
+q49,Q49. Describe how the mean value of the 1-day-ahead forecasts changes over time when daily data are assimilated.
+q50,Q50. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when daily data are assimilated.
+q51,"Q51. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
+q52,Q52. Use the values of bias and RMSE to assess the forecasts with daily data assimilation. How well do you think the forecasts are performing?

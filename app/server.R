@@ -1992,32 +1992,40 @@ shinyServer(function(input, output, session) {
                                          weekly=NULL,
                                          daily=NULL)
   
+  #high priority observer : if user selects a new site, this waits
+  #until all upstream things are re-run before re-running forecasts
+  #because they take awhile
+  values <- reactiveValues(waitForColumns = FALSE)
+  observe(priority = 10, {
+    lake_data$df
+    values$waitForColumns <- TRUE
+  })
+  observe({
+    first_forecast$forecast_chla
+    values$waitForColumns <- FALSE
+  })
+  
+  #run all the forecasts
   observe({
     
-    validate(
-      need(input$table01_rows_selected != "",
-           message = "Please select a site in Objective 1.")
-    )
     validate(
       need(!is.null(lake_data$df),
            message = "Please select a site in Objective 1.")
     )
     validate(
-      need(!is.null(model_fit_data$df),
+      need(!is.null(ar.model$chla_mean),
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
-           message = "Please generate and visualize the forecast in Objective 4.")
-    )
-    validate(
-      need(!is.null(plot.second.fc.da$main),
-           message = "Please complete Objective 5.")
+      need(!is.null(first_forecast$forecast_chla),
+           message = "Please generate the forecast in Objective 4.")
     )
     validate(
       need(input$fc_series_no_da > 0,
            message = "Please click 'Run forecasts with no data assimilation'.")
     )
+    
+    validate(need(!values$waitForColumns, FALSE))
     
     progress <- shiny::Progress$new()
     progress_value = 0.2
@@ -2152,10 +2160,6 @@ shinyServer(function(input, output, session) {
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
-      need(!is.null(plot.second.fc.da$main),
-           message = "Please complete Objective 5.")
-    )
-    validate(
       need(input$fc_series_no_da > 0,
            message = "Please click 'Run forecasts with no data assimilation'.")
     )
@@ -2183,6 +2187,350 @@ shinyServer(function(input, output, session) {
       ggsave(file, plot = plot.forecast.series.w.obs$none, device = device)
     }
   )
+  
+  # calculate bias and rmse for no da 
+  observe({
+    
+    output$out_bias2 <- renderUI({
+      
+      validate(
+        need(!is.null(autocorrelation_data$df),
+             message = "Please select a site in Objective 1.")
+      )
+      validate(
+        need(!is.null(model_fit_data$df),
+             message = "Please fit an AR model in Objective 3.")
+      )
+      validate(
+        need(!is.null(first_forecast$forecast_chla),
+             message = "Please generate the forecast in Objective 4.")
+      )
+      validate(
+        need(!is.null(forecast.means$none),
+             message = "Please click 'Run forecasts with no data assimilation'.")
+      )
+      validate(
+        need(input$calc_bias2 > 0,
+             message = "Please click 'Calculate bias'.")
+      )
+      
+      days_to_forecast = 10
+      
+      forecast_dates <- seq.Date(from = as.Date(first_forecast_dates$start_date), to = as.Date(first_forecast_dates$start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data$df %>%
+        filter(datetime %in% forecast_dates)
+      
+      bias <- round(mean(forecast.means$none$forecast_mean - chla_observations$chla, na.rm = TRUE),4) 
+
+      out_bias <- paste("<b>","Bias: ",bias,"</b>", sep = "")
+      
+      HTML(paste(out_bias))
+    })
+    
+  })
+  
+  # Text output for RMSE ----
+  observe({
+    output$out_rmse2 <- renderUI({
+      
+      validate(
+        need(!is.null(autocorrelation_data$df),
+             message = "Please select a site in Objective 1.")
+      )
+      validate(
+        need(!is.null(model_fit_data$df),
+             message = "Please fit an AR model above.")
+      )
+      validate(
+        need(!is.null(first_forecast$forecast_chla),
+             message = "Please generate the forecast in Objective 4.")
+      )
+      validate(
+        need(!is.null(forecast.means$none),
+             message = "Please click 'Run forecasts with no data assimilation'.")
+      )
+      validate(
+        need(input$calc_rmse2 > 0,
+             message = "Please click 'Calculate RMSE'.")
+      )
+      
+      days_to_forecast = 10
+      
+      forecast_dates <- seq.Date(from = as.Date(first_forecast_dates$start_date), to = as.Date(first_forecast_dates$start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data$df %>%
+        filter(datetime %in% forecast_dates)
+      
+      rmse <- round(sqrt(mean((forecast.means$none$forecast_mean - chla_observations$chla)^2, na.rm = TRUE)), 2)
+      
+      out_rmse <- paste("<b>","RMSE: ",rmse,"</b>", sep = "")
+      
+      HTML(paste(out_rmse))
+    })
+  })
+  
+  #### weekly data assimilation ----
+  
+  output$fc_series_weekly_plot <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$fc_series_weekly > 0,
+           message = "Please click 'Run forecasts with weekly data assimilation'.")
+    )
+    
+    if(input$show_obs2 == TRUE){
+      p <- plot.forecast.series.w.obs$weekly
+    } else {
+      p <- plot.forecast.series$weekly
+    }
+    
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_fc_series_weekly_plot <- downloadHandler(
+    filename = function() {
+      paste("Q45-Q48-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.forecast.series.w.obs$weekly, device = device)
+    }
+  )
+  
+  # calculate bias and rmse for weekly da
+  observe({
+    
+    output$out_bias3 <- renderUI({
+      
+      validate(
+        need(!is.null(autocorrelation_data$df),
+             message = "Please select a site in Objective 1.")
+      )
+      validate(
+        need(!is.null(model_fit_data$df),
+             message = "Please fit an AR model in Objective 3.")
+      )
+      validate(
+        need(!is.null(first_forecast$forecast_chla),
+             message = "Please generate the forecast in Objective 4.")
+      )
+      validate(
+        need(!is.null(forecast.means$weekly),
+             message = "Please click 'Run forecasts with no data assimilation' above.")
+      )
+      validate(
+        need(input$calc_bias3 > 0,
+             message = "Please click 'Calculate bias'.")
+      )
+      
+      days_to_forecast = 10
+      
+      forecast_dates <- seq.Date(from = as.Date(first_forecast_dates$start_date), to = as.Date(first_forecast_dates$start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data$df %>%
+        filter(datetime %in% forecast_dates)
+      
+      bias <- round(mean(forecast.means$weekly$forecast_mean - chla_observations$chla, na.rm = TRUE),4) 
+      
+      out_bias <- paste("<b>","Bias: ",bias,"</b>", sep = "")
+      
+      HTML(paste(out_bias))
+    })
+    
+  })
+  
+  # Text output for RMSE ----
+  observe({
+    output$out_rmse3 <- renderUI({
+      
+      validate(
+        need(!is.null(autocorrelation_data$df),
+             message = "Please select a site in Objective 1.")
+      )
+      validate(
+        need(!is.null(model_fit_data$df),
+             message = "Please fit an AR model above.")
+      )
+      validate(
+        need(!is.null(first_forecast$forecast_chla),
+             message = "Please generate the forecast in Objective 4.")
+      )
+      validate(
+        need(!is.null(forecast.means$weekly),
+             message = "Please click 'Run forecasts with no data assimilation' above.")
+      )
+      validate(
+        need(input$calc_rmse3 > 0,
+             message = "Please click 'Calculate RMSE'.")
+      )
+      
+      days_to_forecast = 10
+      
+      forecast_dates <- seq.Date(from = as.Date(first_forecast_dates$start_date), to = as.Date(first_forecast_dates$start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data$df %>%
+        filter(datetime %in% forecast_dates)
+      
+      rmse <- round(sqrt(mean((forecast.means$weekly$forecast_mean - chla_observations$chla)^2, na.rm = TRUE)), 2)
+      
+      out_rmse <- paste("<b>","RMSE: ",rmse,"</b>", sep = "")
+      
+      HTML(paste(out_rmse))
+    })
+  })
+  
+  #### daily data assimilation ----
+  
+  output$fc_series_daily_plot <- renderPlot({ 
+    
+    validate(
+      need(input$table01_rows_selected != "",
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(lake_data$df),
+           message = "Please select a site in Objective 1.")
+    )
+    validate(
+      need(!is.null(model_fit_data$df),
+           message = "Please fit an AR model in Objective 3.")
+    )
+    validate(
+      need(!is.null(plot.fc1.viz$main),
+           message = "Please generate and visualize the forecast in Objective 4.")
+    )
+    validate(
+      need(input$fc_series_daily > 0,
+           message = "Please click 'Run forecasts with daily data assimilation'.")
+    )
+    
+    if(input$show_obs3 == TRUE){
+      p <- plot.forecast.series.w.obs$daily
+    } else {
+      p <- plot.forecast.series$daily
+    }
+    
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_fc_series_daily_plot <- downloadHandler(
+    filename = function() {
+      paste("Q49-Q52-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.forecast.series.w.obs$daily, device = device)
+    }
+  )
+  
+  # calculate bias and rmse for no da
+  observe({
+    
+    output$out_bias4 <- renderUI({
+      
+      validate(
+        need(!is.null(autocorrelation_data$df),
+             message = "Please select a site in Objective 1.")
+      )
+      validate(
+        need(!is.null(model_fit_data$df),
+             message = "Please fit an AR model in Objective 3.")
+      )
+      validate(
+        need(!is.null(first_forecast$forecast_chla),
+             message = "Please generate the forecast in Objective 4.")
+      )
+      validate(
+        need(!is.null(forecast.means$daily),
+             message = "Please click 'Run forecasts with no data assimilation' above.")
+      )
+      validate(
+        need(input$calc_bias4 > 0,
+             message = "Please click 'Calculate bias'.")
+      )
+      
+      days_to_forecast = 10
+      
+      forecast_dates <- seq.Date(from = as.Date(first_forecast_dates$start_date), to = as.Date(first_forecast_dates$start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data$df %>%
+        filter(datetime %in% forecast_dates)
+      
+      bias <- round(mean(forecast.means$daily$forecast_mean - chla_observations$chla, na.rm = TRUE),4) 
+      
+      out_bias <- paste("<b>","Bias: ",bias,"</b>", sep = "")
+      
+      HTML(paste(out_bias))
+    })
+    
+  })
+  
+  # Text output for RMSE ----
+  observe({
+    output$out_rmse4 <- renderUI({
+      
+      validate(
+        need(!is.null(autocorrelation_data$df),
+             message = "Please select a site in Objective 1.")
+      )
+      validate(
+        need(!is.null(model_fit_data$df),
+             message = "Please fit an AR model above.")
+      )
+      validate(
+        need(!is.null(first_forecast$forecast_chla),
+             message = "Please generate the forecast in Objective 4.")
+      )
+      validate(
+        need(!is.null(forecast.means$daily),
+             message = "Please click 'Run forecasts with no data assimilation' above.")
+      )
+      validate(
+        need(input$calc_rmse4 > 0,
+             message = "Please click 'Calculate RMSE'.")
+      )
+      
+      days_to_forecast = 10
+      
+      forecast_dates <- seq.Date(from = as.Date(first_forecast_dates$start_date), to = as.Date(first_forecast_dates$start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data$df %>%
+        filter(datetime %in% forecast_dates)
+      
+      rmse <- round(sqrt(mean((forecast.means$daily$forecast_mean - chla_observations$chla)^2, na.rm = TRUE)), 2)
+      
+      out_rmse <- paste("<b>","RMSE: ",rmse,"</b>", sep = "")
+      
+      HTML(paste(out_rmse))
+    })
+  })
   
 
   

@@ -345,7 +345,7 @@ plot_many_forecasts <- function(forecast_data, forecast_series){
     geom_violinhalf(data = fc, aes(x = datefactor, y = chla, fill = "Forecast"), color = "black",
                     scale = "width", width = 0.7)+
     geom_violinhalf(data = ic, aes(x = datefactor, y = chla, fill = "Initial condition"), color = "cornflowerblue", alpha = 0.4, scale = "width", width = 0.7)+
-    geom_point(data = obs, aes(x = datefactor, y = obs, color = "Observations"), size = 3)+
+    geom_point(data = obs, aes(x = datefactor, y = obs, color = "Observations"), size = 3, stroke = 2)+
     ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+
     xlab("")+
     theme_bw(18)+
@@ -393,7 +393,7 @@ plot_many_forecasts_with_obs <- function(forecast_data, forecast_series, observa
                     scale = "width", width = 0.7)+
     geom_violinhalf(data = ic, aes(x = datefactor, y = chla, fill = "Initial condition"), color = "cornflowerblue", alpha = 0.4, scale = "width", width = 0.7)+
     geom_point(data = obs_not_assim, aes(x = datefactor, y = chla, color = "Obs. - not assimilated"), size = 3, shape = 21, stroke = 2)+
-    geom_point(data = obs_assim, aes(x = datefactor, y = obs, color = "Obs. - assimilated"), size = 3)+
+    geom_point(data = obs_assim, aes(x = datefactor, y = obs, color = "Obs. - assimilated"), size = 3, stroke = 2)+
     ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+
     xlab("")+
     theme_bw(18)+
