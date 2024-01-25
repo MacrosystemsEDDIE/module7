@@ -1911,13 +1911,13 @@ ui <- function(req) {
                                              ),
                                              fluidRow(
                                                column(6,
-                                                      h4("Forecasts without high-frequency sensor"),
+                                                      h4(tags$em("Forecasts without high-frequency sensor")),
                                                       wellPanel(
                                                         plotOutput("fc_scenario_weekly_plot2")
                                                       )
                                                       ),
                                                column(6,
-                                                      h4("Forecasts with high-frequency sensor"),
+                                                      h4(tags$em("Forecasts with high-frequency sensor")),
                                                       wellPanel(
                                                         plotOutput("fc_scenario_daily_plot2")
                                                       )
@@ -1932,6 +1932,67 @@ ui <- function(req) {
                                                                    h3("Questions"),
                                                                    p(tags$b(quest["q57", 1])),
                                                                    p(tags$b(quest["q58", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      )
+                                             ),
+                                             br(),
+                                             fluidRow(
+                                               column(12,
+                                                      h4("Calculate forecast assessment metrics"),
+                                                      p("In addition to visual inspection of the forecast for Saturday, Oct. 11, you also calculate bias and RMSE for both series of forecasts for all the days from Oct. 4 to Oct. 11."),
+                                                      p("Click the buttons below to calculate bias and RMSE for forecasts generated with and without data from the high-frequency sensor.")
+                                                      )
+                                             ),
+                                             fluidRow(
+                                               column(6,
+                                                      h4(tags$em("Assessment metrics for forecasts without high-frequency sensor")),
+                                                      wellPanel(
+                                                        fluidRow(
+                                                          column(6,
+                                                                 actionButton("calc_bias5","Calculate bias"),
+                                                                 br(),br(),
+                                                                 actionButton("calc_rmse5","Calculate RMSE")
+                                                                 ),
+                                                          column(6,
+                                                                 htmlOutput("out_bias5"),
+                                                                 br(),br(),
+                                                                 htmlOutput("out_rmse5")
+                                                                 )
+                                                        )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      h4(tags$em("Assessment metrics for forecasts without high-frequency sensor")),
+                                                      wellPanel(
+                                                        fluidRow(
+                                                          column(6,
+                                                                 actionButton("calc_bias6","Calculate bias"),
+                                                                 br(),br(),
+                                                                 actionButton("calc_rmse6","Calculate RMSE")
+                                                          ),
+                                                          column(6,
+                                                                 htmlOutput("out_bias6"),
+                                                                 br(),br(),
+                                                                 htmlOutput("out_rmse6")
+                                                          )
+                                                        )
+                                                      )
+                                                      )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      h3("Make a final recommendation"),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q59", 1])),
+                                                                   p(tags$b(quest["q60", 1])),
+                                                                   p(tags$b(quest["q61", 1]))
                                                             )
                                                           )
                                                       )

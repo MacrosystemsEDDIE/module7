@@ -2783,6 +2783,127 @@ shinyServer(function(input, output, session) {
     
   })
   
+  #calculate forecast assessment metrics
+  # calculate bias and rmse for weekly da
+    
+    output$out_bias5 <- renderUI({
+      
+      validate(
+        need(input$calc_bias5 > 0,
+             message = "Please click 'Calculate bias'.")
+      )
+      
+      #get data
+      lake_data <- read_csv("./data/neon/BARC_chla_microgramsPerLiter.csv", show_col_types = FALSE) %>%
+        rename(datetime = Date, chla = V1) %>%
+        filter(cumsum(!is.na(chla)) > 0) %>%
+        mutate(chla = ifelse(chla < 0, 0, chla))
+      
+      days_to_forecast = 7
+      forecast_scenario_start_date <- "2018-10-04"
+      
+      forecast_dates <- seq.Date(from = as.Date(forecast_scenario_start_date), to = as.Date(forecast_scenario_start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data %>%
+        filter(datetime %in% forecast_dates)
+      
+      bias <- round(mean(forecast.scenario.means$weekly$forecast_mean - chla_observations$chla, na.rm = TRUE),4) 
+      
+      out_bias <- paste("<b>","Bias: ",bias,"</b>", sep = "")
+      
+      HTML(paste(out_bias))
+    })
+  
+  
+  # Text output for RMSE ----
+    output$out_rmse5 <- renderUI({
+      
+      validate(
+        need(input$calc_rmse5 > 0,
+             message = "Please click 'Calculate RMSE'.")
+      )
+      
+      #get data
+      lake_data <- read_csv("./data/neon/BARC_chla_microgramsPerLiter.csv", show_col_types = FALSE) %>%
+        rename(datetime = Date, chla = V1) %>%
+        filter(cumsum(!is.na(chla)) > 0) %>%
+        mutate(chla = ifelse(chla < 0, 0, chla))
+      
+      days_to_forecast = 7
+      forecast_scenario_start_date <- "2018-10-04"
+      
+      forecast_dates <- seq.Date(from = as.Date(forecast_scenario_start_date), to = as.Date(forecast_scenario_start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data %>%
+        filter(datetime %in% forecast_dates)
+      
+      rmse <- round(sqrt(mean((forecast.scenario.means$weekly$forecast_mean - chla_observations$chla)^2, na.rm = TRUE)), 2)
+      
+      out_rmse <- paste("<b>","RMSE: ",rmse,"</b>", sep = "")
+      
+      HTML(paste(out_rmse))
+    })
+    
+    # calculate bias and rmse for daily da
+    
+    output$out_bias6 <- renderUI({
+      
+      validate(
+        need(input$calc_bias6 > 0,
+             message = "Please click 'Calculate bias'.")
+      )
+      
+      #get data
+      lake_data <- read_csv("./data/neon/BARC_chla_microgramsPerLiter.csv", show_col_types = FALSE) %>%
+        rename(datetime = Date, chla = V1) %>%
+        filter(cumsum(!is.na(chla)) > 0) %>%
+        mutate(chla = ifelse(chla < 0, 0, chla))
+      
+      days_to_forecast = 7
+      forecast_scenario_start_date <- "2018-10-04"
+      
+      forecast_dates <- seq.Date(from = as.Date(forecast_scenario_start_date), to = as.Date(forecast_scenario_start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data %>%
+        filter(datetime %in% forecast_dates)
+      
+      bias <- round(mean(forecast.scenario.means$daily$forecast_mean - chla_observations$chla, na.rm = TRUE),4) 
+      
+      out_bias <- paste("<b>","Bias: ",bias,"</b>", sep = "")
+      
+      HTML(paste(out_bias))
+    })
+    
+    
+    # Text output for RMSE ----
+    output$out_rmse6 <- renderUI({
+      
+      validate(
+        need(input$calc_rmse6 > 0,
+             message = "Please click 'Calculate RMSE'.")
+      )
+      
+      #get data
+      lake_data <- read_csv("./data/neon/BARC_chla_microgramsPerLiter.csv", show_col_types = FALSE) %>%
+        rename(datetime = Date, chla = V1) %>%
+        filter(cumsum(!is.na(chla)) > 0) %>%
+        mutate(chla = ifelse(chla < 0, 0, chla))
+      
+      days_to_forecast = 7
+      forecast_scenario_start_date <- "2018-10-04"
+      
+      forecast_dates <- seq.Date(from = as.Date(forecast_scenario_start_date), to = as.Date(forecast_scenario_start_date) + days_to_forecast, by = 'days')
+      
+      chla_observations <- lake_data %>%
+        filter(datetime %in% forecast_dates)
+      
+      rmse <- round(sqrt(mean((forecast.scenario.means$daily$forecast_mean - chla_observations$chla)^2, na.rm = TRUE)), 2)
+      
+      out_rmse <- paste("<b>","RMSE: ",rmse,"</b>", sep = "")
+      
+      HTML(paste(out_rmse))
+    })
+  
   
 
   

@@ -63,3 +63,6 @@ q55,"Q55. Based on the forecasts presented here, as a manager, would you recomme
 q56,"Q56. Based on the forecasts presented here, as a manager, would you recommend a beach closure for Saturday, October 11?"
 q57,"Q57. Which forecast series - the one with weekly or daily data assimilation - provided a more accurate forecast for Saturday, Oct. 11?"
 q58,"Q58. How did your lake closure decision made using the forecast series with weekly, manual data assimilation compare to the decision made using the forecast series with daily sensor data assimilation?"
+q59,"Q59. Compare the values of bias and RMSE for the forecast series with data assimilation of weekly manual data vs. the forecast series with data assimilation of daily sensor data. Overall, which forecast series produces more accurate forecasts?"
+q60,"Q60. Make a final recommendation. Based on what you have learned from your forecast trials with the high-frequency sensor, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
+q61,Q61. Briefly explain the reasoning behind your final recommendation in Q.60. Did it change from the preliminary recommendation that you made in Q.54?
