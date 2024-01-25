@@ -1997,7 +1997,70 @@ ui <- function(req) {
                                                           )
                                                       )
                                                       )
-                                             )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(4, offset = 1,
+                                                      h2("Data & Forecasts"),
+                                                      p("We have now explored how data assimilation can be used to improve the accuracy of ecological forecasts. As you can see, the effect of assimilating data depends on the frequency of data assimilation and the observation uncertainty of the available data. In addition, while having high-frequency data for assimilation often improves forecast accuracy, having more data does not guarantee that forecasts will be accurate enough to guide management decision-making. Other factors, such as the quality of the forecast model or the intrinsic predictability of the forecasted variable, are equally important to providing actionable forecasts.")
+                                               ),
+                                               column(5, offset = 1,
+                                                      br(), br(), br(),
+                                                      img(src = "mod7_conceptual_figure.png", height = "80%",
+                                                          width = "80%", align = "left", alt = "A conceptual figure showing data from a lake buoy being used to update a forecast.")
+                                               )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      h2("Completed Module!"),
+                                                      p("You have completed the module! Congratulations! Please check through the answers in your final report and be sure you have copy-pasted in all the required plots before you submit your report to your instructor."),
+                                                      p("Your instructor may ask you to prepare a short presentation of your forecasts with assimilated data (Objective 7) to share with other students in the class. This will enable you to compare the effects of data assimilation on forecasts among lakes in different eco-regions."),
+                                                      p("You’ve now made forecasts informed with data - well done! If you are interested in learning more about how forecasts are generated, forecast uncertainty, and use of forecasts for decision-making, we encourage you to visit other Macrosystems EDDIE modules:"),
+                                                      fluidRow(
+                                                        column(10, align = "left",
+                                                               box(id = "box15", width = 12, status = "primary",
+                                                                   solidHeader = TRUE,
+                                                                   fluidRow(
+                                                                     column(10, offset = 1,
+                                                                            h3("Additional Macrosystems EDDIE Ecological Forecasting Modules")
+                                                                     )
+                                                                   ),
+                                                                   fluidRow(
+                                                                     column(3, offset = 1,
+                                                                            img(src = "mod5_viz_v2.png", height = "100%",
+                                                                                width = "100%", align = "left", alt = "A conceptual figure of the steps in the forecast cycle.")
+                                                                     ),
+                                                                     column(7, offset = 0,
+                                                                            p(style="text-align: justify;", tags$a(href = "https://macrosystemseddie.shinyapps.io/module5/", "Macrosystems EDDIE Module 5: Introduction to Ecological Forecasting:"),"This module will introduce students to the basic components of an ecological forecast; how a simple forecasting model is constructed; how changes to model inputs affect forecast uncertainty; and how productivity forecasts vary across ecoclimatic regions.")
+                                                                     )
+                                                                   ),
+                                                                   hr(),
+                                                                   fluidRow(
+                                                                     column(3, offset = 1,
+                                                                            img(src = "mod6_conceptual_fig.png", height = "100%",
+                                                                                width = "100%", align = "left", alt = "A diagram showing a forecast with uncertainty.")
+                                                                     ),
+                                                                     column(7, offset = 0,
+                                                                            p(style="text-align: justify;", tags$a(href = "https://macrosystemseddie.shinyapps.io/module6/", "Macrosystems EDDIE Module 6: Understanding Uncertainty in Ecological Forecasts:"),"This module will introduce students to the concept of uncertainty within an ecological forecast; where uncertainty in a forecast comes from; how uncertainty can be quantified within a forecast; and how uncertainty can be managed.")
+                                                                     )
+                                                                   ),
+                                                                   hr(),
+                                                                   fluidRow(
+                                                                     column(3, offset = 1,
+                                                                            img(src = "Mod8_conceptual_fig.png", height = "100%",
+                                                                                width = "100%", align = "left", alt = "A conceptual figure showing how forecasts can be visualized, communicated, and used for decision-making.")
+                                                                     ),
+                                                                     column(7, offset = 0,
+                                                                            p(style="text-align: justify;", tags$a(href = "https://macrosystemseddie.shinyapps.io/module8/", "Macrosystems EDDIE Module 8: Using Ecological Forecasts to Guide Decision Making:"),"This module will teach students the basic components of an ecological forecast; how to connect forecast visualizations to forecast user needs for aiding decision-making; and to create their own visualizations of probabilistic forecasts of ecological variables for a specific forecast user.")
+                                                                     )
+                                                                   ),
+                                                                   hr()
+                                                                   )
+                                                               )
+                                                        )
+                                                      )
+                                               )
                                              ) #end tab panel
                         )
                )
