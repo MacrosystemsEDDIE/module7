@@ -2532,6 +2532,228 @@ shinyServer(function(input, output, session) {
     })
   })
   
+  #### Objective 8 ----
+  
+  #create reactive for forecast series plots
+  forecast.scenario.data <- reactiveValues(weekly=NULL,
+                                         daily=NULL)
+  forecast.scenario <- reactiveValues(weekly=NULL,
+                                    daily=NULL)
+  forecast.scenario.means <- reactiveValues(weekly=NULL,
+                                   daily=NULL)
+  plot.forecast.scenario <- reactiveValues(weekly=NULL,
+                                         daily=NULL)
+  plot.forecast.scenario.w.obs <- reactiveValues(weekly=NULL,
+                                               daily=NULL)
+  
+  #run all the forecasts
+  observe({
+
+    validate(
+      need(input$fc_scenario_weekly > 0,
+           message = "Please click 'Run forecasts with weekly data assimilation'.")
+    )
+    
+    progress <- shiny::Progress$new()
+    progress_value = 0.2
+    progress$set(message = "Running forecasts",
+                 detail = "This may take a while. This window will disappear
+                     when forecasts are complete.", value = progress_value)
+    
+    #get data
+    lake_data <- read_csv("./data/neon/BARC_chla_microgramsPerLiter.csv", show_col_types = FALSE) %>%
+      rename(datetime = Date, chla = V1) %>%
+      filter(cumsum(!is.na(chla)) > 0) %>%
+      mutate(chla = ifelse(chla < 0, 0, chla))
+    
+    forecast_start_date <- "2020-09-25"
+    forecast_scenario_start_date <- "2018-10-04"
+    
+    model_data <- lake_data %>%
+      filter(datetime < forecast_start_date) %>%
+      mutate(chla = na.approx(chla, na.rm = F)) %>% 
+      mutate(chla_lag = lag(chla)) %>%
+      filter(complete.cases(.))
+    
+    #fit model
+    ar_model <- ar.ols(model_data$chla, order.max = 1, aic = FALSE,
+                       intercept = TRUE, demean = TRUE)
+    intercept = c(ar_model$x.intercept)
+    ar1 = c(ar_model$ar)
+    chla_mean = c(ar_model$x.mean)
+    mod <- intercept + ar1 * (model_data$chla - chla_mean) + chla_mean
+    residuals <- mod - model_data$chla
+    n_members = 500
+    
+    #get ic uncertainty
+    high_frequency_data <- read_csv("./data/BARC_chla_microgramsPerLiter_highFrequency.csv", show_col_types = FALSE) %>%
+      mutate(date = date(datetime),
+             time = hms::as_hms(datetime)) %>%
+      filter(date >= "2019-10-09" & date <= "2019-10-12")
+    ic_sd_dataframe <- high_frequency_data %>%
+      group_by(date) %>%
+      summarize(daily_sd_chla = sd(chla, na.rm = TRUE))
+    ic_sd <- mean(ic_sd_dataframe$daily_sd_chla, na.rm = TRUE)
+    curr_chla <- lake_data %>%
+      filter(datetime == forecast_scenario_start_date) %>%
+      pull(chla)
+    ic_distribution_og <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd)
+    
+    #get process uncertainty
+    sigma <- sd(residuals, na.rm = TRUE) 
+    process_distribution <- rnorm(n = 500, mean = 0, sd = sigma)
+    
+    #forecast set-up
+    days_to_forecast = 7
+    
+    forecast_dates <- seq.Date(from = as.Date(forecast_scenario_start_date), to = as.Date(forecast_scenario_start_date) + days_to_forecast, by = 'days')    
+    
+    chla_observations <- lake_data %>%
+      filter(datetime %in% forecast_dates)
+    
+    chla_assimilation_frequencies <- c(7,1)
+    
+    for(j in 1:length(chla_assimilation_frequencies)){
+      
+      chla_assimilation_dates <- forecast_dates[seq(1, length(forecast_dates), chla_assimilation_frequencies[j])]
+      
+      forecast_data <- lake_data %>%
+        select(datetime, chla) %>%
+        mutate(datetime = as.Date(datetime)) %>%
+        filter(datetime %in% forecast_dates) %>%
+        mutate(chla = ifelse(datetime %in% chla_assimilation_dates,chla,NA)) 
+      
+      forecast_series <- tibble(date = rep(forecast_dates, each = n_members*2),
+                                chla = NA_real_,
+                                ensemble_member = rep(1:n_members, times = length(forecast_dates)*2),
+                                data_type = rep(c("fc","ic"), each = n_members, times = length(forecast_dates)))
+      
+      ic_distribution = ic_distribution_og
+      
+      temp_ic <- tibble(date = rep(forecast_dates[1], each = n_members),
+                        chla = ic_distribution,
+                        ensemble_member = c(1:n_members),
+                        data_type = rep("ic", times = n_members))
+      
+      forecast_series <- forecast_series %>%
+        rows_update(temp_ic, by = c("date","ensemble_member","data_type"))
+      
+      for(i in 2:length(forecast_dates)){
+        
+        #Generate forecast
+        forecast_chla = intercept + ar1 * (ic_distribution - chla_mean) + chla_mean + process_distribution
+        forecast_chla = ifelse(forecast_chla < 0, 0, forecast_chla)
+        
+        #Select current row of forecast_data to see if there is data to use for updating
+        new_obs <- forecast_data$chla[i] #Observed chl-a
+        
+        #Update the initial condition
+        ic_update <- EnKF(forecast = forecast_chla, new_observation = new_obs, ic_sd = ic_sd)
+        
+        #Assign the updated initial condition to be used for the next day's forecast
+        ic_distribution <- ic_update
+        
+        #Build temporary data frame to hold current initial condition and forecast
+        temp <- tibble(date = rep(forecast_dates[i], times = n_members*2),
+                       chla = c(forecast_chla, ic_update),
+                       ensemble_member = rep(1:n_members, times = 2),
+                       data_type = rep(c("fc","ic"), each = n_members))
+        
+        #Update rows of forecast series output data frame
+        forecast_series <- forecast_series %>%
+          rows_update(temp, by = c("date","ensemble_member","data_type"))
+      }
+      
+      forecast_means <- forecast_series %>%
+        filter(data_type == "fc") %>%
+        group_by(date) %>%
+        summarize(forecast_mean = mean(chla, na.rm = TRUE))
+      
+      if (chla_assimilation_frequencies[j] == 7){
+        forecast.scenario$weekly <- forecast_series
+        forecast.scenario.data$weekly <- forecast_data
+        forecast.scenario.means$weekly <- forecast_means
+      } else {
+        forecast.scenario$daily <- forecast_series
+        forecast.scenario.data$daily <- forecast_data
+        forecast.scenario.means$daily <- forecast_means
+      }
+      
+      progress$inc(message = "Running forecasts",
+                   detail = "This may take a while. This window will disappear
+                     when forecasts are complete.", amount = 0.2)
+      
+    }
+    
+    plot.forecast.scenario$weekly <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$weekly, forecast_series = forecast.scenario$weekly)
+    plot.forecast.scenario$daily <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$daily, forecast_series = forecast.scenario$daily)
+    
+    progress$inc(message = "Running forecasts",
+                 detail = "This may take a while. This window will disappear
+                     when forecasts are complete.", amount = 0.1)
+    
+    plot.forecast.scenario.w.obs$weekly <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$weekly, forecast_series = forecast.scenario$weekly, show_final_obs = TRUE)
+    plot.forecast.scenario.w.obs$daily <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$daily, forecast_series = forecast.scenario$daily, show_final_obs = TRUE)
+    
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+  })
+  
+  #plot with weekly data assimilation
+  output$fc_scenario_weekly_plot <- renderPlot({ 
+    
+    validate(
+      need(input$fc_scenario_weekly > 0,
+           message = "Please click 'Run forecasts with weekly data assimilation'.")
+    )
+    
+    p <- plot.forecast.scenario$weekly
+    
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_fc_scenario_weekly_plot <- downloadHandler(
+    filename = function() {
+      paste("Q55-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.forecast.scenario$weekly, device = device)
+    }
+  )
+  
+  #plot with daily data assimilation
+  output$fc_scenario_daily_plot <- renderPlot({ 
+    
+    validate(
+      need(input$fc_scenario_daily > 0,
+           message = "Please click 'Run forecasts with daily data assimilation'.")
+    )
+    
+    p <- plot.forecast.scenario$daily
+    
+    return(p)
+    
+  })
+  
+  # Download plot
+  output$save_fc_scenario_daily_plot <- downloadHandler(
+    filename = function() {
+      paste("Q56-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.forecast.scenario$daily, device = device)
+    }
+  )
 
   
   ##########OLD

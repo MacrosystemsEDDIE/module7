@@ -59,3 +59,5 @@ q51,"Q51. Click the ""show observations"" checkbox under the plot above, and the
 q52,Q52. Use the values of bias and RMSE to assess the forecasts with daily data assimilation. How well do you think the forecasts are performing?
 q53,"Q53. Fill in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.' How does your answer now compare to what your answer in Q40?"
 q54,"Q54. Make a preliminary recommendation. Based on what you have learned in Activities A and B, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
+q55,"Q55. Based on the forecasts presented here, as a manager, would you recommend a beach closure for Saturday, October 11?"
+q56,"Q56. Based on the forecasts presented here, as a manager, would you recommend a beach closure for Saturday, October 11?"

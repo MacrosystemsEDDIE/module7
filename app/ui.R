@@ -1833,7 +1833,76 @@ ui <- function(req) {
                                                           )
                                                       )
                                                       )
-                                             )
+                                             ),
+                                             hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      h3("Trial the high-frequency sensor"),
+                                                      p("Before making your final recommendation to the Green Reservoir management authority, you decide to run some trials with the high-frequency sensor that the authority has on loan. You deploy the high-frequency sensor in Green Reservoir for one week, and then compare forecasts made using the management authority's current system with forecasts made using the high-frequency sensor.")
+                                                      )
+                                             ),
+                                             fluidRow(
+                                               column(6,
+                                                      h4("Forecasts using the current data collection method"),
+                                                      p("First, you explore the current forecasting system operated by the management authority. You generate a series of seven, 1-day-ahead forecasts that are only informed by a single, weekly observation from Oct. 4, which was collected manually by water authority personnel. This is the only observation that will be assimilated during the forecast period. Because Saturdays are the most popular day for recreation at the lake, ",tags$b("you will focus on the forecast generated for Saturday, October 11")," as you assess your series of forecasts."),
+                                                      p("Click the button below to generate forecasts informed by a single observation on Oct. 4."),
+                                                      actionButton("fc_scenario_weekly","Run forecasts with weekly data assimilation"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q55", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      ),
+                                               column(6,
+                                                      br(),br(),
+                                                      wellPanel(
+                                                        plotOutput("fc_scenario_weekly_plot")
+                                                      ),
+                                                      downloadButton("save_fc_scenario_weekly_plot", "Download plot", icon = icon("download"))
+                                                      )
+                                             ),
+                                             br(),
+                                             fluidRow(
+                                               column(6,
+                                                      h4("Forecasts using the borrowed high-frequency sensor"),
+                                                      p("For comparison, you then generate the same series of forecasts using data collected by the high-frequency sensor you deployed on a trial basis in Green Reservoir."),
+                                                      p("Click the button below to generate forecasts informed by a daily observations from the high-frequency sensor."),
+                                                      actionButton("fc_scenario_daily","Run forecasts with daily data assimilation"),
+                                                      br(),br(),
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q56", 1]))
+                                                            )
+                                                          )
+                                                      ),
+                                                      box(id = "box2", width = 12, status = "warning",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   br(),
+                                                                   p(tags$b("Note: you may be wondering why the forecast and initial conditions distributions do not line up at all with some of the observations on this plot. In fact, this is a great illustration of one of the weaknesses of the ensemble Kalman filter - if the observation for a particular day falls completely outside the forecast distribution for that day, it is not always possible for the ensemble Kalman filter to adjust the initial condition distribution enough to match the observation!"))
+                                                            )
+                                                          )
+                                                      )
+                                               ),
+                                               column(6,
+                                                      br(),br(),
+                                                      wellPanel(
+                                                        plotOutput("fc_scenario_daily_plot")
+                                                      ),
+                                                      downloadButton("save_fc_scenario_daily_plot", "Download plot", icon = icon("download"))
+                                               )
+                                             ),
+                                             br(),
+                                             fluidRow()
                                              ) #end tab panel
                         )
                )

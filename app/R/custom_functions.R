@@ -443,11 +443,11 @@ plot_scenario_forecasts <- function(forecast_data, forecast_series, show_final_o
     geom_violinhalf(data = fc, aes(x = datefactor, y = chla, fill = "Forecast"), color = "black",
                     scale = "width", width = 0.7)+
     geom_violinhalf(data = ic, aes(x = datefactor, y = chla, fill = "Initial condition"), color = "cornflowerblue", alpha = 0.4, scale = "width", width = 0.7)+
-    geom_point(data = obs, aes(x = datefactor, y = obs, color = "Observations"), size = 3)+
+    geom_point(data = obs, aes(x = datefactor, y = obs, color = "Observations"), size = 3, stroke = 2)+
     geom_hline(aes(yintercept = 10, color = "Water quality threshold"))+
     ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+
     xlab("")+
-    theme_bw()+
+    theme_bw(18)+
     theme(panel.grid.major.x = element_line(colour = "black", linetype = "dashed"),
           panel.grid.major.y = element_blank(),
           panel.grid.minor.y = element_blank(),
