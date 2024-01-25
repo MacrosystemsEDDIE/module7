@@ -7,7 +7,7 @@ act_A,"Explore chlorophyll-a data at a NEON site of your choice, then fit a mode
 act_B,"Now we will explore the effect of data assimilation on forecasts. First, we will compare forecasts generated with and without data assimilation. Then, we will investigate how the frequency of data assimilation (e.g., daily vs. weekly) and the amount of uncertainty associated with observations affects data assimilation and forecasts."
 act_B_overview,Generate multiple forecasts while assimilating data at different temporal frequencies and with different amounts of observation uncertainty.
 act_B_summ,"Inform your instructor that you have completed Activity B. If you have time, think of some answers for the discussion questions below."
-act_C,Explore the effect of assimilating sensors with different levels of observation error on forecast accuracy and make management decisions using an ecological forecast.
+act_C,Make management decisions using ecological forecasts generated with different levels of observation uncertainty and different frequencies of data assimilation.
 what_forecast,A forecast is a prediction of future conditions with uncertainty.
 why_forecast,We forecast because it help us to make decisions and the information is used to plan for the future.
 how_forecast,This module will guide you through the key steps within the forecast cycle and explain how we create ecological forecasts.

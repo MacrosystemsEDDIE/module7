@@ -1777,40 +1777,11 @@ ui <- function(req) {
                                                       p("You will complete a scenario exercise to make management decisions using forecasts generated with different frequencies of data assimilation.")
                                                       )
                                                )
-                                             ),
-                                    # * Activity B - Summary ====
-                                    tabPanel(title = tab_names["stab10", 2], value = "stab10",
-                                             fluidRow(
-                                               column(12,
-                                                      wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab10", 2]),
-                                                                p(id = "txt_j", module_text["act_B_summ", ]),
-                                                                p("Remember, the Shiny app will disconnect if you leave it idle for 10 minutes, so make sure to download your '.eddie' file at the bottom of the page to checkpoint your progress.")
-                                                      )
-                                               )
-                                             ),
-                                             #** Questions ----
-                                             hr(),
-                                             fluidRow(
-                                               column(10, offset = 1,
-                                                      box(id = "box4", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[43], label = quest[qid[43], ], width = "90%"),
-                                                                   textAreaInput2(inputId = qid[44], label = quest[qid[44], ], width = "90%")
-                                                            )
-                                                          )
-                                                      )
-                                               )
-                                             ),
-                                             hr()
-                                    )
+                                             )
                         )
                ),
                # 7. Activity C ----
-               tabPanel(title = tab_names["mtab7", 2], value = "mtab7",
+               tabPanel(title = "Activity C", value = "mtab7",
                         img(src = "project-eddie-banner-2020_green.png", height = 100,
                             width = 1544, top = 5),
                         fluidRow(
@@ -1822,25 +1793,23 @@ ui <- function(req) {
                           )
                         ),
                         tabsetPanel(id = "tabseries4",
-                                    #* Objective 10 - Management Scenario ====
-                                    tabPanel(title = tab_names["stab11", 2], value = "stab11",
+                                    #* Objective 8 - Management Scenario ====
+                                    tabPanel(title = "Objective 8 - Management scenario", value = "stab11",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab11", 2]),
-                                                                p(id = "txt_j", "Now that you have explored the effect of observation uncertainty and data collection frequency on data assimilation, you will apply your knowledge to a lake management scenario.")
-                                                      )
+                                                                h3("Objective 8 - Management scenario"),
+                                                                p(id = "txt_j", "Make management decisions using ecological forecasts generated with different levels of observation uncertainty and different frequencies of data assimilation."))
                                                )
                                              ),
                                              hr(),
                                              fluidRow(
                                                column(6,
-                                                      h3("Scenario"),
-                                                      p("Green Reservoir, one of several drinking water supply reservoirs for a city of about 100,000 people, suffers from algal blooms which sometimes release toxins that could threaten the health of water consumers. Forecasts of chl-a allow Green Reservoir managers to plan ahead to source water from other reservoirs and/or pre-emptively issue drinking water warnings."),
-                                                      p("The water authority that manages Green Reservoir has developed a forecast system that assimilates monthly chlorophyll-a observations which are collected manually at the beginning of each month by water authority personnel. But managers are interested in exploring whether they can increase the accuracy of their forecasts by investing in a high-frequency chlorophyll-a sensor."),
-                                                      p("The water authority of Green Reservoir has budgeted $15,000 for new forecast sensors. After doing some market research, the forecast development team at the water authority has identified two options for chl-a sensors: "),
-                                                      p("Sensor A costs $15,000, including the cost of the technology needed to wirelessly transmit data from this sensor to computers that will run the forecast model as well as personnel to install and maintain the sensor."),
-                                                      p("Sensor B costs $20,000, including the cost of the technology and personnel. Sensor B is more expensive because it is able to make more precise observations (less observation error) and is somewhat more reliable than Sensor A (less likely to experience sensor malfunction).")
+                                                      h3("Scenario: Mitigating toxin exposure risk at Green Reservoir"),
+                                                      p("Green Reservoir is a popular recreational reservoir for fishing, swimming, and boating. Periodically, the lake experiences harmful algal blooms that may pose a threat to lake users due to algal toxin exposure."),
+                                                      p("The management authority for Green Reservoir has a ",tags$b("water quality threshold of 10 ug/L for chlorophyll-a.")," If chlorophyll-a surpasses this threshold, the lake must be closed for recreation. If the lake is closed unnecessarily, lake users become frustrated and make complaints to the management authority. But if the lake is not closed and chlorophyll-a levels surpass the water quality threshold, the management authority is putting lake users at risk of exposure to algal toxins."),
+                                                      p("Currently, managers at Green Reservoir issue a daily, 1-day-ahead forecast of lake chlorophyll-a levels, which are informed by weekly observations of chlorophyll-a that are obtained by managers manually collecting a water sample and analyzing it in the water quality lab."),
+                                                      p("The Green Reservoir management authority is exploring the idea of purchasing a new water quality sensor that will automatically collect daily chlorophyll-a measurements to inform their forecasting system. Chlorophyll-a sensors are expensive (~15K USD), and the authority wants to know if this substantial investment will result in improvements in forecast accuracy."),
                                                       ),
                                                column(6,
                                                       img(src = "Objective10_Scenario1.jpg", height = "80%", id = "bla_border",
@@ -1851,455 +1820,21 @@ ui <- function(req) {
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(6,
-                                                      p("As a forecasting expert, you have been brought in as a consultant to help the water authority’s forecasting team decide whether to ask the water authority for an additional $5,000 to cover the costs of Sensor B."),
-                                                      br(),
-                                                      wellPanel(
-                                                        h4("Make a decision"),
-                                                        radioButtons("data_collec1", "Based on what you have learned in Activities A and B, which sensor do you recommend?", choices = data_collect_options$text, selected = character(0)
-                                                                     )
-                                                        ),
-                                                      box(id = "box4", width = 12, status = "primary",
+                                               column(12,
+                                                      h3("Make a preliminary recommendation"),
+                                                      p("As a forecasting expert, you have been brought in as a consultant to help the Green Reservoir management authority forecasting team decide whether to invest in a new high-frequency sensor. Luckily, the management authority has been able to temporarily borrow a high-frequency sensor - similar to the one they wish to purchase - from a neighboring locality that you may use on a trial basis to help make your recommendation."),
+                                                      box(id = "box10", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   textAreaInput2(inputId = qid[45], label = quest[qid[45], ], width = "90%")
-                                                            )
+                                                                   p(tags$b(quest["q54", 1]))
                                                             )
                                                           )
-                                                      ),
-                                               column(6,
-                                                      img(src = "mgmt_tradeoff.png", height = "80%", id = "bla_border",
-                                                          width = "80%", tags$style("border: solid 2px black;")),
-                                                      p("Tradeoffs for management.")
                                                       )
-                                             ),
-                                             #** Expensive sensor ----
-                                             hr(),
-                                             conditionalPanel("input.data_collec1 != ''", #chose expensive sensor
-                                               fluidRow(
-                                                 column(4,
-                                                        h3("Run forecast with no sensor"),
-                                                        p("For comparison, click the button below to generate the forecast that managers are using now, without a sensor. In this case, the most recent observation occurred on Oct. 2, 2020, when water authority personnel traveled to Green Reservoir and collected a manual chlorophyll-a sample."),
-                                                        p("Managers of Green Reservoir know that concentrations of over 25 ug/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 25 ug/L as a trigger for issuing a drinking water warning to the public."),
-                                                        actionButton("run_fc_dec3a", "Run forecast"),
-                                                        conditionalPanel("input.run_fc_dec3a > 0",
-                                                                         box(id = "box4", width = 12, status = "primary",
-                                                                             solidHeader = TRUE,
-                                                                             fluidRow(
-                                                                               column(10, offset = 1,
-                                                                                      h3("Questions"),
-                                                                                      textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%")
-                                                                               )
-                                                                             )
-                                                                         )
-                                                        ),
-                                                        p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
-                                                        checkboxInput("add_obs_actc3a", "Add observations")
-                                                 ),
-                                                 column(8,
-                                                        wellPanel(
-                                                          plotlyOutput("fc_dec3a")
-                                                        )
-                                                 )
-                            
-                                               ),
-                                               
-                                               #run forecast with chosen sensor (expensive)
-                                               hr(),
-                                               fluidRow(
-                                                 column(4,
-                                                        h3("Run forecast with Sensor B (expensive sensor)"),
-                                                        actionButton("run_fc_dec1a", "Run forecast"),
-                                                        conditionalPanel("input.run_fc_dec1a > 0",
-                                                                         box(id = "box4", width = 12, status = "primary",
-                                                                             solidHeader = TRUE,
-                                                                             fluidRow(
-                                                                               column(10, offset = 1,
-                                                                                      h3("Questions"),
-                                                                                      textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
-                                                                               )
-                                                                             )
-                                                                         )
-                                                        ),
-                                                        p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
-                                                        checkboxInput("add_obs_actc1a", "Add observations")
-                                                 ),
-                                                 column(8,
-                                                        wellPanel(
-                                                          plotlyOutput("fc_dec1a")
-                                                        )
-                                                 )
-                                               ),
-                                               
-                                               #run forecast with non-chosen sensor (cheap)
-                                               hr(),
-                                               fluidRow(
-                                                 column(4,
-                                                        h3("Run forecast with Sensor A (cheaper sensor)"),
-                                                        actionButton("run_fc_dec2a", "Run forecast"),
-                                                        conditionalPanel("input.run_fc_dec2a > 0",
-                                                                         box(id = "box4", width = 12, status = "primary",
-                                                                             solidHeader = TRUE,
-                                                                             fluidRow(
-                                                                               column(10, offset = 1,
-                                                                                      h3("Questions"),
-                                                                                      textAreaInput2(inputId = qid[48], label = quest[qid[48], ], width = "90%")
-                                                                               )
-                                                                             )
-                                                                         )
-                                                        ),
-                                                        p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
-                                                        checkboxInput("add_obs_actc2a", "Add observations")
-                                                 ),
-                                                 column(8,
-                                                        wellPanel(
-                                                          plotlyOutput("fc_dec2a")
-                                                        )
-                                                 )
-                                               ),
-                                               #** Questions ----
-                                               fluidRow(
-                                                 column(10, offset = 1,
-                                                        box(id = "box4", width = 12, status = "primary",
-                                                            solidHeader = TRUE,
-                                                            fluidRow(
-                                                              column(10, offset = 1,
-                                                                     h3("Questions"),
-                                                                     textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%"),
-                                                                     textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%"),
-                                                                     textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%"),
-                                                                     textAreaInput2(inputId = qid[52], label = quest[qid[52], ], width = "90%")
-                                                              )
-                                                            )
-                                                        )
-                                                 )
-                                               )
-                                             )#,
-                                             
-                                             
-                                             # #** Cheap sensor ----
-                                             # 
-                                             # conditionalPanel("input.data_collec1 == 'Sensor A'",
-                                             #                  #run forecast with no sensor
-                                             #                  fluidRow(
-                                             #                    column(4,
-                                             #                           h3("Run forecast with no sensor"),
-                                             #                           p("For comparison, click the button below to generate the forecast that managers are using now, without a sensor. In this case, the most recent observation occurred on Oct. 2, 2020, when water authority personnel traveled to Green Reservoir and collected a manual chlorophyll-a sample."),
-                                             #                           p("Managers of Green Reservoir know that concentrations of over 25 ug/L of chl-a can lead to water quality concerns in drinking water. So they will use a threshold of 25 ug/L as a trigger for issuing a drinking water warning to the public."),
-                                             #                           actionButton("run_fc_dec3b", "Run forecast"),
-                                             #                           conditionalPanel("input.run_fc_dec3b > 0",
-                                             #                                            box(id = "box4", width = 12, status = "primary",
-                                             #                                                solidHeader = TRUE,
-                                             #                                                fluidRow(
-                                             #                                                  column(10, offset = 1,
-                                             #                                                         h3("Questions"),
-                                             #                                                         textAreaInput2(inputId = qid[46], label = quest[qid[46], ], width = "90%")
-                                             #                                                  )
-                                             #                                                )
-                                             #                                            ),
-                                             #                           ),
-                                             #                           p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
-                                             #                           checkboxInput("add_obs_actc3b", "Add observations")
-                                             #                    ),
-                                             #                    column(8,
-                                             #                           wellPanel(
-                                             #                             plotlyOutput("fc_dec3b")
-                                             #                           )
-                                             #                    )
-                                             #        
-                                             #                  ),
-                                             #                  #run forecast with chosen sensor (cheap)
-                                             #                  hr(),
-                                             #                  fluidRow(
-                                             #                    column(4,
-                                             #                           h3("Run forecast with Sensor A (cheaper sensor)"),
-                                             #                           p("Click the button below to see a daily forecast for the next 30 days generated using data from the cheaper sensor."),
-                                             #                           actionButton("run_fc_dec2b", "Run forecast"),
-                                             #                           conditionalPanel("input.run_fc_dec2b > 0",
-                                             #                                            box(id = "box4", width = 12, status = "primary",
-                                             #                                                solidHeader = TRUE,
-                                             #                                                fluidRow(
-                                             #                                                  column(10, offset = 1,
-                                             #                                                         h3("Questions"),
-                                             #                                                         textAreaInput2(inputId = qid[47], label = quest[qid[47], ], width = "90%")
-                                             #                                                  )
-                                             #                                                )
-                                             #                                            ),
-                                             #                           ),
-                                             #                           p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
-                                             #                           checkboxInput("add_obs_actc2b", "Add observations")
-                                             #                    ),
-                                             #                    column(8,
-                                             #                           wellPanel(
-                                             #                             plotlyOutput("fc_dec2b")
-                                             #                           )
-                                             #                    )
-                                             #                    
-                                             #                  ),
-                                             #                  #run forecast with non-chosen sensor (expensive)
-                                             #                  hr(),
-                                             #                  fluidRow(
-                                             #                    column(4,
-                                             #                           h3("Run forecast with Sensor B (expensive sensor)"),
-                                             #                           actionButton("run_fc_dec1b", "Run forecast"),
-                                             #                           conditionalPanel("input.run_fc_dec1b > 0",
-                                             #                                            box(id = "box4", width = 12, status = "primary",
-                                             #                                                solidHeader = TRUE,
-                                             #                                                fluidRow(
-                                             #                                                  column(10, offset = 1,
-                                             #                                                         h3("Questions"),
-                                             #                                                         textAreaInput2(inputId = qid[48], label = quest[qid[48], ], width = "90%")
-                                             #                                                  )
-                                             #                                                )
-                                             #                                            ),
-                                             #                           ),
-                                             #                           p("Check the box below to see the observations on the day the forecast was issued and on Oct. 27."),
-                                             #                           checkboxInput("add_obs_actc1b", "Add observations")
-                                             #                    ),
-                                             #                    column(8,
-                                             #                           wellPanel(
-                                             #                             plotlyOutput("fc_dec1b")
-                                             #                           )
-                                             #                    )
-                                             #                  ),
-                                             #                  #** Questions ----
-                                             #                  fluidRow(
-                                             #                    column(10, offset = 1,
-                                             #                           box(id = "box4", width = 12, status = "primary",
-                                             #                               solidHeader = TRUE,
-                                             #                               fluidRow(
-                                             #                                 column(10, offset = 1,
-                                             #                                        h3("Questions"),
-                                             #                                        textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%"),
-                                             #                                        textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%"),
-                                             #                                        textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%"),
-                                             #                                        textAreaInput2(inputId = qid[52], label = quest[qid[52], ], width = "90%")
-                                             #                                 )
-                                             #                               )
-                                             #                           )
-                                             #                    )
-                                             #                  ),
-                                             # )
-                                             # hr(),
-                                             # fluidRow(
-                                             #   column(6,
-                                             #          h3("Validate forecast"),
-                                             #          actionButton("valid_fc_dec1", "Valid forecast")
-                                             #   ),
-                                             #   column(6,
-                                             #          wellPanel(
-                                             #            h3("VALIDATE PLOT"),
-                                             #            plotlyOutput("valid_plot1")
-                                             #          )
-                                             #   )
-                                             # ),
-                                             
-                                             # # Old version
-                                             # hr(),
-                                             # fluidRow(
-                                             #   column(12,
-                                             #          wellPanel(style = paste0("background: ", obj_bg),
-                                             #                    h3(tab_names["stab12", 2], " - Old version"),
-                                             #                    p(id = "txt_j", module_text["obj_10", ])
-                                             #          )
-                                             #   )
-                                             # ),
-                                             # hr(),
-                                             # fluidRow(
-                                             #   column(3, offset = 2,
-                                             #     h3(quest[qid[48], ]),
-                                             #     radioButtons("scen_select", label = "", choices = reservoir_sites, selected = character(0))
-                                             #   )
-                                             # ),
-                                             # hr(),
-                                             # conditionalPanel("input.scen_select == null",
-                                             #                  wellPanel(
-                                             #                    p(tags$em("Select a scenario above."))
-                                             #                  )
-                                             # ),
-                                             # conditionalPanel("input.scen_select == 'Green Reservoir'",
-                                             #                  fluidRow(
-                                             #                    column(4, offset = 1,
-                                             #                           h3("Scenario"),
-                                             #                           p(id = "txt_j", module_text["scenario1", ]),
-                                             #                           img(src = "Objective10_Scenario1.jpg", height = "80%", id = "bla_border",
-                                             #                               width = "80%", tags$style("border: solid 2px black;")),
-                                             #                           p("Algal Bloom - Kelly's Island, Lake Erie by NOAA Great Lakes Environmental Research Laboratory")
-                                             #                           ),
-                                             #                    column(6, offset = 1,
-                                             #                           h3("Chlorophyll-a Data Collection"),
-                                             #                           wellPanel(
-                                             #                             slickROutput("chla_slides3")
-                                             #                             )
-                                             #                           )
-                                             #                    ),
-                                             #                  ),
-                                             # conditionalPanel("input.scen_select == 'Brown Reservoir'",
-                                             #                  fluidRow(
-                                             #                    column(4, offset = 1,
-                                             #                           h3("Scenario"),
-                                             #                           p(id = "txt_j", module_text["scenario2", ]),
-                                             #                           img(src = "Objective10_Scenario2.jpg", height = "80%", id = "bla_border",
-                                             #                               width = "80%", tags$style("border: solid 2px black;")),
-                                             #                           p("Sao Simao Reservoir, Brazil (NASA, International Space Station Science, 11/22/07) by NASA's Marshall Space Flight Center.")
-                                             #                           ),
-                                             #                    column(6, offset = 1,
-                                             #                           h3("Nitrate Data Collection"),
-                                             #                           wellPanel(
-                                             #                             slickROutput("nitrate_slides3")
-                                             #                             )
-                                             #                           )
-                                             #                    )
-                                             #                  ),
-                                             # hr(),
-                                             # fluidRow(
-                                             #   column(5,
-                                             #          h3("Design Water Quality Monitoring Program"),
-                                             #          p(id = "txt_j", module_text["reservoir_monitoring_program", ]),
-                                             #          br(),
-                                             #          p(tags$b("Target period:"), "1 year"),
-                                             #          p(tags$b("Budget:"), "$10,000"),
-                                             #          br(),
-                                             #          h4("Things to consider:"),
-                                             #          wellPanel(
-                                             #            tags$ol(
-                                             #              tags$li(id = "txt_j", tags$b("If you choose to purchase sensors:")),
-                                             #              tags$ul(
-                                             #                tags$li("Be sure to purchase a buoy, reservoir access field equipment, and at least one field personnel trip to the reservoir (all of these are needed to deploy the sensors in the reservoir). "),
-                                             #                tags$li("Consider whether you would like to invest in wireless data streaming capability. Wireless data streaming will reduce your data latency. If you do not invest in wireless data streaming, you MUST budget for personnel trips to the reservoir to maintain sensors and collect data in order to retrieve data from the sensors."),
-                                             #                tags$li("Consider whether you would like to invest in personnel hours for a field technician to maintain the sensors. Regular sensor maintenance by a field technician reduces the likelihood of sensor malfunction. Maintenance is recommended at least twice a month. With no investment in personnel to maintain sensors, sensor data streams cannot be restored once they malfunction (in other words, once your sensor goes down, you’re out of luck!).")
-                                             #              ),
-                                             #              tags$br(),
-                                             #              tags$li(tags$b("If you choose to invest in personnel hours to collect field samples:")),
-                                             #              tags$ul(
-                                             #                tags$li("Be sure you purchase reservoir access and manual sampling field equipment (required equipment to collect water samples)."),
-                                             #                tags$li("You must budget for the cost of analyzing those samples in the laboratory as well.")
-                                             #              )
-                                             #            )
-                                             #          )
-                                             #   ),
-                                             #   column(6, offset = 1,
-                                             #          h3("Budgetary items"),
-                                             #          wellPanel(
-                                             #            DTOutput("wq_monitoring_tab")
-                                             #            )
-                                             #          )
-                                             #   ),
-                                             # hr(),
-                                             # fluidRow(
-                                             #   column(4,
-                                             #          h4("Check the items below which you want to include in your monitoring program."),
-                                             #          p(tags$b("Sensors")),
-                                             #          checkboxInput("chla_sens", budget_options$label[1]),
-                                             #          checkboxInput("nitrate_sens", budget_options$label[2]),
-                                             #          checkboxInput("data_stream", budget_options$label[3]),
-                                             #          p(tags$b("Field Equipment")),
-                                             #          checkboxInput("buoy", budget_options$label[4]),
-                                             #          checkboxInput("res_access", budget_options$label[5]),
-                                             #          checkboxInput("man_samp", budget_options$label[6]),
-                                             #          checkboxInput("sens_main", budget_options$label[7]),
-                                             #          p(tags$b("Field Personnel")),
-                                             #          checkboxInput("deploy_sens", budget_options$label[8]),
-                                             #          conditionalPanel("input.deploy_sens",
-                                             #                           wellPanel(
-                                             #                             radioButtons("ndeploy_sens", "Visits for the year", choices = c(1, 12, 24), inline = TRUE)
-                                             #                             )
-                                             #                           ),
-                                             #          checkboxInput("chla_samp", budget_options$label[9]),
-                                             #          conditionalPanel("input.chla_samp",
-                                             #                           # numericInput("nchla_samp", "Frequency per week", value = 1, min = 1, max = 7)
-                                             #                           radioButtons("nchla_samp", "Frequency per week", choices = c(1, 2, 7), inline = TRUE)
-                                             #          ),
-                                             #          checkboxInput("nitrate_samp", budget_options$label[10]),
-                                             #          conditionalPanel("input.nitrate_samp",
-                                             #                           radioButtons("nnitrate_samp", "Frequency per week", choices = c(1, 2, 7), inline = TRUE)
-                                             #          ),
-                                             #          p(tags$b("Laboratory Analysis")),
-                                             #          checkboxInput("analyze_chla", budget_options$label[11]),
-                                             #          conditionalPanel("input.analyze_chla",
-                                             #                           radioButtons("nanalyze_chla", "Number of samples per week", choices = c(1, 2, 7), inline = TRUE)
-                                             #          ),
-                                             #          checkboxInput("analyze_nitrate", budget_options$label[12]),
-                                             #          conditionalPanel("input.analyze_nitrate",
-                                             #                           radioButtons("nanalyze_nitrate", "Number of samples per week", choices = c(1, 2, 7), inline = TRUE)
-                                             #                           )
-                                             #          ),
-                                             #   column(8,
-                                             #          h4("Budget plot"),
-                                             #          wellPanel(
-                                             #            plotOutput("budget_plot")
-                                             #            ),
-                                             #          h3("Budget summary"),
-                                             #          DTOutput("budget_table"),
-                                             #          wellPanel(
-                                             #            textOutput("total_exp")
-                                             #          ),
-                                             #          actionButton("submit_budget", "Submit budget")
-                                             #          )
-                                             #   ),
-                                             # hr(),
-                                             # conditionalPanel("input.submit_budget == 0",
-                                             #                  wellPanel(
-                                             #                    p(tags$em("Submit your budget using the button above."))
-                                             #                  )
-                                             # ),
-                                             # conditionalPanel("input.submit_budget > 0",
-                                             #                  fluidRow(
-                                             #                    column(10, offset = 1,
-                                             #                           box(id = "box4", width = 12, status = "primary",
-                                             #                               solidHeader = TRUE,
-                                             #                               fluidRow(
-                                             #                                 column(10, offset = 1,
-                                             #                                        h3("Questions"),
-                                             #                                        textAreaInput2(inputId = qid[49], label = quest[qid[49], ], width = "90%"),
-                                             #                                        textAreaInput2(inputId = qid[50], label = quest[qid[50], ], width = "90%"),
-                                             #                                        textAreaInput2(inputId = qid[51], label = quest[qid[51], ], width = "90%"),
-                                             #                                 )
-                                             #                                 )
-                                             #                               )
-                                             #                           )
-                                             #                    )
-                                             #                  ),
-                                             # hr()
-                                             ),
-                                    #* Activity C - Summary ====
-                                    tabPanel(title = tab_names["stab12", 2], value = "stab12",
-                                             fluidRow(
-                                               column(12,
-                                                      wellPanel(style = paste0("background: ", obj_bg),
-                                                                h3(tab_names["stab12", 2])
                                                       )
-                                               )
-                                             ),
-                                             fluidRow(
-                                               column(4,
-                                                      h3("Completed Activity C!"),
-                                                      p("This is the end of Activity C. Now you can generate your final report which will input all your answers and figures into a Microsoft Word document which you can download and submit to your instructor.")
-                                               ),
-                                               column(4,
-                                                      h3("Generate Report"),
-                                                      p("This will take the answers you have input into this app and generate a Microsoft Word document (.docx) document with your answers which you can download and make further edits before submitting."),
-                                                      actionButton("generate2", "Generate Report (.docx)", icon = icon("file"), width = "190px", class = "btn-primary"
-                                                                   # id = "dl_btn", # This is the only button that shows up when the app is loaded
-                                                                   # style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-                                                      ), br(), br(),
-                                                      tags$style(type="text/css", "#download2 {background-color:#579277;color: white}"),
-                                                      conditionalPanel(condition = "output.reportbuilt2", # This button appears after the report has been generated and is ready for download.
-                                                                       downloadButton("download2", "Download Report", width = "60px", style = "width:190px;"
-                                                                       )
-                                                      )
-                                                      
-                                               ),
-                                               column(4,
-                                                      h3(tags$b("Questions to be completed:")),
-                                                      wellPanel(
-                                                        htmlOutput("check_list2")
-                                                      )
-                                               )
                                              )
-                                    )
+                                             ) #end tab panel
                         )
                )
     ),
