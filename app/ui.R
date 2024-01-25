@@ -1756,11 +1756,25 @@ ui <- function(req) {
                                                )
                                              ),
                                              hr(),
+                                             fluidRow(
+                                               column(12,
+                                                      box(id = "box10", width = 12, status = "primary",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h3("Questions"),
+                                                                   p(tags$b(quest["q53", 1]))
+                                                            )
+                                                          )
+                                                      )
+                                                      )
+                                             ),
+                                             hr(),
                                              #*** Next step ----
                                              fluidRow(
                                                column(5, offset = 1,
                                                       h3("Next step"),
-                                                      p("Synthesize your understanding of data assimilation in ecological forecasting to assimilate data into forecasts used for water resource management.")
+                                                      p("You will complete a scenario exercise to make management decisions using forecasts generated with different frequencies of data assimilation.")
                                                       )
                                                )
                                              ),

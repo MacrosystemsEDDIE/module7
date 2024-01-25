@@ -57,3 +57,4 @@ q49,Q49. Describe how the mean value of the 1-day-ahead forecasts changes over t
 q50,Q50. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when daily data are assimilated.
 q51,"Q51. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
 q52,Q52. Use the values of bias and RMSE to assess the forecasts with daily data assimilation. How well do you think the forecasts are performing?
+q53,"Q53. Fill in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.' How does your answer now compare to what your answer in Q40?"
