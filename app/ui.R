@@ -286,7 +286,7 @@ ui <- function(req) {
                ),
                
                # 4. Activity A ----
-               tabPanel(title = tab_names["mtab5", 2], value = "mtab5",
+               tabPanel(title = tab_names["mtab4", 2], value = "mtab4",
                         img(src = "project-eddie-banner-2020_green.png", height = 100,
                             width = 1544, top = 5),
                         fluidRow(
@@ -297,7 +297,7 @@ ui <- function(req) {
                                  )
                           )
                         ),
-                        tabsetPanel(id = "tabseries2",
+                        tabsetPanel(id = "tabseries1",
                                     #* Objective 1 - Select site ====
                                     tabPanel(title = "Objective 1 - Select and view a NEON site", value = "obj1",
                                              fluidRow(
@@ -391,7 +391,7 @@ ui <- function(req) {
                                              )
                                     ),
                                     #* Objective 2 - Explore data ====
-                                    tabPanel(title = "Objective 2 - Explore chlorophyll-a", value = "stab5",
+                                    tabPanel(title = "Objective 2 - Explore chlorophyll-a data", value = "obj2",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -470,7 +470,7 @@ ui <- function(req) {
                                              )
                                     ),
                                     #* Objective 3 - Fit model ====
-                                    tabPanel(title = "Objective 3 - Fit model", value = "stab6",
+                                    tabPanel(title = "Objective 3 - Fit model", value = "obj3",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -740,7 +740,7 @@ ui <- function(req) {
                                              )
                                     ),
                                     #* Objective 4 - Generate forecast ====
-                                    tabPanel(title = "Objective 4 - Generate forecast", value = "stab5",
+                                    tabPanel(title = "Objective 4 - Generate forecast", value = "obj4",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -1030,7 +1030,7 @@ ui <- function(req) {
                         )
                ),
                # 6. Activity B ----
-               tabPanel(title = tab_names["mtab6", 2], value = "mtab6",
+               tabPanel(title = tab_names["mtab5", 2], value = "mtab5",
                         img(src = "project-eddie-banner-2020_green.png", height = 100,
                             width = 1544, top = 5),
                         fluidRow(
@@ -1041,9 +1041,9 @@ ui <- function(req) {
                                  )
                           )
                         ),
-                        tabsetPanel(id = "tabseries3",
+                        tabsetPanel(id = "tabseries2",
                                     #* Objective 5 - Assimilate data ====
-                                    tabPanel(title = "Objective 5 - Assimilate data", value = "stab7",
+                                    tabPanel(title = "Objective 5 - Assimilate data", value = "obj5",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -1255,7 +1255,7 @@ ui <- function(req) {
                                              )
                                     ),
                                     #* Objective 6 - Explore observation uncertainty ====
-                                    tabPanel(title = "Objective 6 - Explore observation uncertainty", value = "stab8",
+                                    tabPanel(title = "Objective 6 - Explore observation uncertainty", value = "obj6",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -1489,7 +1489,7 @@ ui <- function(req) {
                                              )
                                     ),
                                     #* Objective 7 - Explore data assimilation frequency ====
-                                    tabPanel(title = "Objective 7 - Explore data assimilation frequency", value = "stab9",
+                                    tabPanel(title = "Objective 7 - Explore data assimilation frequency", value = "obj7",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -1781,7 +1781,7 @@ ui <- function(req) {
                         )
                ),
                # 7. Activity C ----
-               tabPanel(title = "Activity C", value = "mtab7",
+               tabPanel(title = tab_names["mtab6", 2], value = "mtab6",
                         img(src = "project-eddie-banner-2020_green.png", height = 100,
                             width = 1544, top = 5),
                         fluidRow(
@@ -1792,9 +1792,9 @@ ui <- function(req) {
                                  )
                           )
                         ),
-                        tabsetPanel(id = "tabseries4",
+                        tabsetPanel(id = "tabseries3",
                                     #* Objective 8 - Management Scenario ====
-                                    tabPanel(title = "Objective 8 - Management scenario", value = "stab11",
+                                    tabPanel(title = "Objective 8 - Management scenario", value = "obj8",
                                              fluidRow(
                                                column(12,
                                                       wellPanel(style = paste0("background: ", obj_bg),
@@ -2067,6 +2067,7 @@ ui <- function(req) {
     ),
     # Tab navigation buttons ----
     br(), hr(),
+    useShinyjs(),
     introBox(
       # h4("Use the buttons below to navigate through the tabs", align = "center"),
       box(width = 12, status = "success",
@@ -2087,11 +2088,6 @@ ui <- function(req) {
             ),
             column(2, align = "center",
                    br(),
-                   tags$style(type="text/css", paste0("#download_answers {background-color:#579277;color: white; padding:15px; font-size:18px;}")),
-                   hover_download_button(outputId = "download_answers",
-                                         label = "Save progress",
-                                         class = "butt1",
-                                         button_animation = "glow"),
                    br(), br()
             ),
             column(5, align = "center",
