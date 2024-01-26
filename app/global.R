@@ -22,6 +22,9 @@ suppressPackageStartupMessages(library(tidyverse, quietly = TRUE))
 suppressPackageStartupMessages(library(lubridate, quietly = TRUE))
 library(shinyalert, quietly = TRUE, warn.conflicts = FALSE)
 
+# Enable bookmarking
+enableBookmarking(store = "url")
+
 # Icons
 neonIcons <- iconList(
   Aquatic = makeIcon("icons/water-icon.png", iconWidth = 28, iconHeight = 28),

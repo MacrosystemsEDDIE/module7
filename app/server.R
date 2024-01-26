@@ -13,6 +13,13 @@ shinyServer(function(input, output, session) {
   output$table01 <- DT::renderDT(
     neon_sites_df[, c(1:2)], selection = "single", options = list(stateSave = TRUE, dom = 't'), server = FALSE
   )
+  
+  observe({
+    if(input$row_num != "") {
+      dt_proxy <- dataTableProxy("table01")
+      selectRows(dt_proxy, input$row_num)
+    }
+  })
 
   # to keep track of previously selected row
   prev_row <- reactiveVal()
@@ -892,6 +899,20 @@ shinyServer(function(input, output, session) {
     ic_distribution_high <- rnorm(n = n_members, mean = curr_chla, sd = ic_sd_high)
     obs_uc$ic_distribution_high <- ic_distribution_high
     
+    p <- plot_ic_dist(curr_chla = first_forecast$curr_chla, ic_uc = first_forecast$ic_distribution)
+    first_forecast$ic_distrib_x_lim = range(c(layer_scales(p)$x$range$range))
+    first_forecast$ic_distrib_y_lim = range(c(layer_scales(p)$y$range$range))
+    
+    p1 <- plot_ic_dist(curr_chla = first_forecast$curr_chla, ic_uc = obs_uc$ic_distribution_low)
+    obs_uc$ic_distrib_low_y_lim = range(c(layer_scales(p1)$y$range$range))
+    
+    p2 <- plot_ic_dist(curr_chla = first_forecast$curr_chla, ic_uc = obs_uc$ic_distribution_high)
+    obs_uc$ic_distrib_high_x_lim = range(c(layer_scales(p2)$x$range$range))
+    
+    plot.ic.uc.distrib$main <- p
+    plot.ic.uc.distrib$low <- p1
+    plot.ic.uc.distrib$high <- p2
+    
   })
   
   # Text output for ic uc sd ----
@@ -948,20 +969,8 @@ shinyServer(function(input, output, session) {
       need(input$calc_ic_uc > 0,
            message = "Click 'Calculate initial conditions uncertainty'")
     )
-    
-    p <- plot_ic_dist(curr_chla = first_forecast$curr_chla, ic_uc = first_forecast$ic_distribution)
-    first_forecast$ic_distrib_x_lim = lim <- range(c(layer_scales(p)$x$range$range))
-    first_forecast$ic_distrib_y_lim = lim <- range(c(layer_scales(p)$y$range$range))
-    
-    p1 <- plot_ic_dist(curr_chla = first_forecast$curr_chla, ic_uc = obs_uc$ic_distribution_low)
-    obs_uc$ic_distrib_low_y_lim = lim <- range(c(layer_scales(p1)$y$range$range))
-    
-    p2 <- plot_ic_dist(curr_chla = first_forecast$curr_chla, ic_uc = obs_uc$ic_distribution_high)
-    obs_uc$ic_distrib_high_x_lim = lim <- range(c(layer_scales(p2)$x$range$range))
 
-    plot.ic.uc.distrib$main <- p
-    plot.ic.uc.distrib$low <- p1
-    plot.ic.uc.distrib$high <- p2
+    p = plot.ic.uc.distrib$main
     
     return(ggplotly(p, dynamicTicks = FALSE))
     
@@ -1065,6 +1074,8 @@ shinyServer(function(input, output, session) {
   #First forecast visualization over time
   plot.fc1.viz <- reactiveValues(main=NULL)
   
+  observe({
+  
   output$fc1_viz_plot <- renderPlot({ 
     
     validate(
@@ -1111,6 +1122,8 @@ shinyServer(function(input, output, session) {
     
   })
   
+  })
+  
   # Download plot
   output$save_fc1_viz_plot <- downloadHandler(
     filename = function() {
@@ -1147,7 +1160,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1211,7 +1224,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1242,7 +1255,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     
@@ -1255,8 +1268,9 @@ shinyServer(function(input, output, session) {
     forecast_chla = as.numeric(first_forecast$forecast_chla)
     n_members = as.numeric(first_forecast$n_members)
     
+    previous_plot <- plot_fc_1day(curr_chla, start_date, forecast_date, ic_distribution, forecast_chla, n_members)
+    
     if(input$update_ic > 0 & input$view_new_obs > 0){
-      previous_plot <- plot.fc1.viz$main
       new_obs <- EnKF_inputs_outputs$new_obs
       chla_obs <- c(curr_chla, new_obs) #vector of observations to use for plotting
       ic_update = EnKF_inputs_outputs$updated_ic 
@@ -1264,13 +1278,11 @@ shinyServer(function(input, output, session) {
       plot.updated.ic$main <- p1
       return(p1)
     } else if(input$view_new_obs > 0) {
-      previous_plot <- plot.fc1.viz$main
       new_obs <- EnKF_inputs_outputs$new_obs
       p <- plot_fc_new_obs(previous_plot = previous_plot, new_obs = new_obs, forecast_date = forecast_date)
       plot.updated.ic$main <- p
       return(p)
     } else {
-      previous_plot <- plot.fc1.viz$main
       plot.updated.ic$main <- previous_plot
       return(previous_plot)
     }
@@ -1310,7 +1322,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1385,7 +1397,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     
@@ -1398,8 +1410,9 @@ shinyServer(function(input, output, session) {
     forecast_chla = as.numeric(first_forecast$forecast_chla)
     n_members = as.numeric(first_forecast$n_members)
     
+    previous_plot <- plot_fc_1day(curr_chla, start_date, forecast_date, ic_distribution, forecast_chla, n_members)
+    
     if(input$view_ic_no_da > 0 & input$show_ic == TRUE){
-      previous_plot <- plot.fc1.viz$main
       new_obs <- NA
       chla_obs <- c(curr_chla, new_obs) #vector of observations to use for plotting
       ic_update_no_da = EnKF_inputs_outputs$updated_ic_no_da
@@ -1407,7 +1420,6 @@ shinyServer(function(input, output, session) {
       plot.updated.ic.no.da$main <- p1
       return(p1)
     } else {
-      previous_plot <- plot.fc1.viz$main
       plot.updated.ic.no.da$main <- previous_plot
       return(previous_plot)
     }
@@ -1446,7 +1458,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1517,7 +1529,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1547,7 +1559,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1585,7 +1597,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1623,7 +1635,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1664,12 +1676,12 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
-      need(!is.null(plot.second.fc.da$main),
-           message = "Please complete Objective 5.")
+      need(!is.null(EnKF_inputs_outputs$second_forecast_da),
+           message = "Please generate a forecast with data assimilation in Objective 5.")
     )
     validate(
       need(input$plot_low_ic > 0,
@@ -1683,6 +1695,20 @@ shinyServer(function(input, output, session) {
     ic_distribution_low = obs_uc$ic_distribution_low
     ic_distribution_high = obs_uc$ic_distribution_high
     process_distribution = as.numeric(first_forecast$process_distribution)
+    ic_update = EnKF_inputs_outputs$updated_ic
+    second_forecast = EnKF_inputs_outputs$second_forecast_da
+    forecast_dates = EnKF_inputs_outputs$forecast_dates
+    curr_chla = as.numeric(first_forecast$curr_chla)
+    new_obs = EnKF_inputs_outputs$new_obs
+    chla_obs = c(curr_chla, new_obs) #vector of observations to use for plotting
+    start_date = first_forecast_dates$start_date
+    ic_distribution = as.numeric(first_forecast$ic_distribution)
+    forecast_chla = as.numeric(first_forecast$forecast_chla)
+    n_members = as.numeric(first_forecast$n_members)
+    
+    p <- plot_second_forecast(chla_obs, start_date, forecast_dates, ic_distribution, 
+                              ic_update, forecast_chla, second_forecast, n_members)
+    ylim <- range(c(layer_scales(p)$y$range$range))
     
     #first forecast
     first_forecast_low_obs_uc = intercept + ar1 * (ic_distribution_low - chla_mean) + chla_mean + process_distribution
@@ -1694,8 +1720,7 @@ shinyServer(function(input, output, session) {
     #more unpacking
     ic_sd_low = obs_uc$ic_sd_low
     ic_sd_high = obs_uc$ic_sd_high
-    new_obs = EnKF_inputs_outputs$new_obs
-    
+
     #update ic
     ic_update_low_obs_uc <- EnKF(forecast = first_forecast_low_obs_uc, 
                                  new_observation = new_obs, ic_sd = ic_sd_low)
@@ -1709,14 +1734,6 @@ shinyServer(function(input, output, session) {
     second_forecast_high_obs_uc = intercept + ar1 * (ic_update_high_obs_uc - chla_mean) + chla_mean + process_distribution
     second_forecast_high_obs_uc = ifelse(second_forecast_high_obs_uc < 0, 0, second_forecast_high_obs_uc)
     
-    #assign dates
-    forecast_dates = EnKF_inputs_outputs$forecast_dates
-    
-    curr_chla = as.numeric(first_forecast$curr_chla)
-    chla_obs = c(curr_chla, new_obs) #vector of observations to use for plotting
-    start_date = first_forecast_dates$start_date
-    n_members = as.numeric(first_forecast$n_members)
-    
     p1 <- plot_second_forecast(chla_obs, start_date, forecast_dates, 
                               ic_distribution_low, ic_update_low_obs_uc, 
                               first_forecast_low_obs_uc, second_forecast_low_obs_uc, 
@@ -1728,9 +1745,9 @@ shinyServer(function(input, output, session) {
                               n_members)
     high_ylim <- range(c(layer_scales(p2)$y$range$range))
     
-    final_ylim <- range(c(plot.second.fc.da$ylim, low_ylim, high_ylim))
+    final_ylim <- range(c(ylim, low_ylim, high_ylim))
     
-    p <- plot.second.fc.da$main +
+    p <- p +
       ylim(final_ylim)
     p1 <- p1 + ylim(final_ylim)
     p2 <- p2 + ylim(final_ylim)
@@ -1757,12 +1774,16 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
-      need(!is.null(plot.second.fc.da$main),
-           message = "Please complete Objective 5.")
+      need(!is.null(EnKF_inputs_outputs$second_forecast_da),
+           message = "Please generate a forecast with data assimilation in Objective 5.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.obs.uc$main),
+           message = "Please generate the distributions above.")
     )
     validate(
       need(input$plot_fc_low_obs_uc > 0,
@@ -1789,12 +1810,16 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
-      need(!is.null(plot.second.fc.da$main),
-           message = "Please complete Objective 5.")
+      need(!is.null(EnKF_inputs_outputs$second_forecast_da),
+           message = "Please generate a forecast with data assimilation in Objective 5.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.obs.uc$main),
+           message = "Please generate the distributions above.")
     )
     validate(
       need(input$plot_fc_low_obs_uc > 0,
@@ -1836,7 +1861,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1855,7 +1880,7 @@ shinyServer(function(input, output, session) {
     return(ggplotly(p, dynamicTicks = TRUE))
   })
   
-  # ic distribution with low obs uncertainty
+  # ic distribution with high obs uncertainty
   plot.ic.distrib.high <- reactiveValues(main=NULL)
   
   output$ic_distrib_high_plot <- renderPlotly({ 
@@ -1873,7 +1898,7 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
@@ -1910,12 +1935,16 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
-      need(!is.null(plot.second.fc.da$main),
-           message = "Please complete Objective 5.")
+      need(!is.null(EnKF_inputs_outputs$second_forecast_da),
+           message = "Please generate a forecast with data assimilation in Objective 5.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.obs.uc$main),
+           message = "Please generate the distributions above.")
     )
     validate(
       need(input$plot_fc_high_obs_uc > 0,
@@ -1942,12 +1971,16 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
+      need(!is.null(first_forecast$forecast_chla),
            message = "Please generate and visualize the forecast in Objective 4.")
     )
     validate(
-      need(!is.null(plot.second.fc.da$main),
-           message = "Please complete Objective 5.")
+      need(!is.null(EnKF_inputs_outputs$second_forecast_da),
+           message = "Please generate a forecast with data assimilation in Objective 5.")
+    )
+    validate(
+      need(!is.null(plot.second.fc.obs.uc$main),
+           message = "Please generate the distributions above.")
     )
     validate(
       need(input$plot_fc_high_obs_uc > 0,
@@ -2161,8 +2194,8 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
-           message = "Please generate and visualize the forecast in Objective 4.")
+      need(!is.null(first_forecast$forecast_chla),
+           message = "Please generate the forecast in Objective 4.")
     )
     validate(
       need(input$fc_series_no_da > 0,
@@ -2292,8 +2325,8 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
-           message = "Please generate and visualize the forecast in Objective 4.")
+      need(!is.null(first_forecast$forecast_chla),
+           message = "Please generate the forecast in Objective 4.")
     )
     validate(
       need(input$fc_series_weekly > 0,
@@ -2423,8 +2456,8 @@ shinyServer(function(input, output, session) {
            message = "Please fit an AR model in Objective 3.")
     )
     validate(
-      need(!is.null(plot.fc1.viz$main),
-           message = "Please generate and visualize the forecast in Objective 4.")
+      need(!is.null(first_forecast$forecast_chla),
+           message = "Please generate the forecast in Objective 4.")
     )
     validate(
       need(input$fc_series_daily > 0,
@@ -2927,6 +2960,7 @@ shinyServer(function(input, output, session) {
     })
     
     observe({
+      
       toggleState(id = "prevBtn1", condition = rv1$prev > 0)
       if(rv1$nxt > 6 & rv3a$nxt > 8) {
         shinyjs::disable("nextBtn1")
@@ -3092,17 +3126,53 @@ shinyServer(function(input, output, session) {
     shinyalert(title = "Resume Progress", text = "Use this field to upload your '.eddie' file to resume your progress.", type = "info")
   })
   
-  
-    
-    
-  # Select site when uploading answers
-  
-  observe({
-    if(input$row_num != "") {
-      dt_proxy <- dataTableProxy("table01")
-      selectRows(dt_proxy, input$row_num)
-    }
+  # Bookmarking
+  # use this to check inputs if need to update bookmarking
+  # observe({
+  #   list_of_inputs <<- reactiveValuesToList(input)
+  # })
+  # inp <- unlist(names(list_of_inputs))
+  bookmarkingWhitelist <- c("plot_chla","plot_lag1","plot_lag2","calc_ac","plot_ac","plot_pacf","fit_model" ,"calc_bias",            
+                            "calc_rmse","calc_proc_distrib","plot_high_freq","calc_ic_uc","fc1" ,"fc1_viz" ,             
+                            "view_new_obs","update_ic","second_forecast_da","view_ic_no_da","second_forecast_no_da", "plot_low_ic" ,         
+                            "plot_fc_low_obs_uc","plot_high_ic","plot_fc_high_obs_uc" , 
+                            "fc_series_no_da","calc_bias2","calc_rmse2","fc_series_weekly","calc_bias3","calc_rmse3",           
+                            "fc_series_daily","calc_bias4" ,"calc_rmse4"  ,"fc_scenario_weekly" ,"fc_scenario_daily","fc_compare",           
+                            "calc_bias5","calc_rmse5", "calc_bias6" ,"calc_rmse6" ,"show_ic","show_obs",             
+                            "show_obs2","show_obs3"  )
+
+  observeEvent(input$bookmarkBtn, {
+    session$doBookmark()
   })
+
+  ExcludedIDs <- reactiveVal(value = NULL)
+
+  observe({
+    toExclude <- setdiff(names(input), bookmarkingWhitelist)
+    setBookmarkExclude(toExclude)
+    ExcludedIDs(toExclude)
+  })
+
+  # Save extra values in state$values when we bookmark
+  onBookmark(function(state) {
+    state$values$sel_row <- input$table01_rows_selected
+  })
+
+  # Read values from state$values when we restore
+  onRestore(function(state) {
+    updateTabsetPanel(session, "maintab",
+                      selected = "mtab4")
+    updateTabsetPanel(session, "tabseries1",
+                      selected = "obj1")
+  })
+
+  onRestored(function(state) {
+    updateSelectizeInput(session, "row_num", selected = state$values$sel_row)
+  })
+  
+    
+    
+  
   
   
   
