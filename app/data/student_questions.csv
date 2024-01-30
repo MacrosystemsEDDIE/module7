@@ -9,33 +9,54 @@ q3d,d. Longitude:
 q3e,e. Lake area (km2):
 q3f,f. Elevation (m):
 q4,Q4. Why might a forecast of lake chlorophyll-a concentration days to weeks into the future be a useful tool for water managers?
-q5,Q5. Describe how chlorophyll-a changes over time in your lake. Do you notice any patterns or trends?
+q5,Q5. Describe chlorophyll-a data at your lake.
+q5a,a. Download the timeseries plot of chlorophyll-a data and copy-paste it into your report. 
+q5b,b. Describe how chlorophyll-a changes over time in your lake. Do you notice any patterns or trends?
 q6,"Q6. Explain, in your own words, how autocorrelation in a variable can help forecasters make predictions of the future."
-q7,Q7. Describe what you observe on the timeseries figure of chlorophyll-a. How do the two lines plotted on the timeseries (chlorophyll and 1 day lag of chlorophyll) relate to each other?
-q8,Q8. Describe what you observe on the scatterplot figure above. Do you think the chlorophyll-a data at your chosen lake site exhibit autocorrelation? Why or why not?
-q9,Q9. Interpret the autocorrelation value you calculated; does this value indicate low or high autocorrelation between chlorophyll-a and a 1-day lag of chlorophyll-a?
-q10,Q10. Describe how autocorrelation changes as the lag in days increases. Why do you think this pattern occurs?
+q7,Q7. Describe what you observe on the timeseries plot of lagged chlorophyll-a. How do the two lines plotted on the timeseries (chlorophyll and 1 day lag of chlorophyll) relate to each other?
+q7a,a. Download the plot of lagged chlorophyll-a and copy-paste it into your report. 
+q7b,b. How do the two lines plotted on the timeseries (chlorophyll and 1 day lag of chlorophyll) relate to each other?
+q8,Q8. Describe what you observe on the scatterplot figure to the right. Do you think the chlorophyll-a data at your chosen lake site exhibit autocorrelation? Why or why not?
+q8a,a. Download the scatterplot and copy-paste it into your report.
+q8b,b. Do you think the chlorophyll-a data at your chosen lake site exhibit autocorrelation? Why or why not?
+q9,Q9. Record the autocorrelation value you calculated. Does this value indicate low or high autocorrelation between chlorophyll-a and a 1-day lag of chlorophyll-a?
+q10,Q10. Describe autocorrelation across many lags at your lake site.
+q10a,a. Download the autocorrelation plot and copy-paste it into your report.
+q10b,b. Describe how autocorrelation changes as the lag in days increases. Why do you think this pattern occurs?
 q11,"Q11. Imagine you are asked to develop a forecasting model that uses lagged values of chlorophyll-a to predict future chlorophyll-a. Examining the autocorrelation plot above, how many lags of chlorophyll-a would you include in your forecasting model? Provide your answer in days (e.g., I would include up to a 3-day lag) and explain your reasoning."
-q12,Q12. Examine the PACF plot. Which lag contributes the most to autocorrelation in the chlorophyll-a data? Explain how you know.
+q12,Q12. Examine the PACF plot. 
+q12a,a. Download the PACF plot and copy-paste it into your report.
+q12b,b. Examine the PACF plot. Which lag contributes the most to autocorrelation in the chlorophyll-a data? Explain how you know.
 q13,"Q13. Once again, imagine you are asked to develop a forecasting model that uses lagged values of chlorophyll-a to predict future chlorophyll-a. Examining the PACF plot above, how many lags of chlorophyll-a would you include in your forecasting model? Provide your answer in days (e.g., I would include up to a 3-day lag) and explain your reasoning."
 q14,Q14. Did the number of lags you chose to include in your forecasting model change from Q11 to Q13? Why or why not?
-q15,Q15. Use the plot above to assess the model fit to data. How well do the predictions match the observations?
+q15,Q15. Use the plot above to assess the model fit to data. 
+q15a,a. Download the plot of model predictions and observations and copy-paste it into your report.
+q15b,b. How well do the predictions match the observations?
 q16,"Q16. Record your model bias. Then, use the calculated bias to assess the model fit to data. How good is the model fit? Explain your reasoning."
 q17,"Q17. Record your model RMSE. Then, use the calculated RMSE to assess the model fit to data. How good is the model fit? Explain your reasoning."
 q18,"Q18. Explain, in your own words, what forecast uncertainty is and why it is important to account for uncertainty in forecasts."
 q19,"Q19. Record the value of your process uncertainty standard deviation in ug/L, and explain in your own words how this value was calculated."
 q20,Q20. What data from your chosen lake are needed to provide the initial condition for your forecast model?
-q21,Q21. Examine the plot of high-frequency chlorophyll-a data. How variable is chlorophyll-a over the course of a day?
+q21,Q21. Examine the plot of high-frequency chlorophyll-a data. 
+q21a,a. Download the plot of high-frequency chlorophyll-a data and copy-paste it into your report.
+q21b,b. How variable is chlorophyll-a over the course of a day?
 q22,"Q22. Record the value of your initial condition uncertainty standard deviation in ug/L, and explain in your own words how this value was calculated."
-q23,"Q23. What is the forecasted chlorophyll-a concentration for Sept. 26, 2020?"
-q24,"Q24. What is the relationship between the observed chlorophyll-a for Sept. 25, 2020, and the initial condition distribution (shown in blue)?"
-q25,"Q25. Each one of the gray lines in the figure above represents an ensemble member. Explain what this means in your own words, with specific reference to the autoregressive model we are using for forecasting in this exercise."
-q26,Q26. Briefly describe in your own words how an ensemble Kalman filter can be used to assimilate data into an ecological forecast.
-q27,Q27. Compare the difference between the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. How are these two distributions different?
-q28,Q28. What is the forecasted chlorophyll-a for 2020-09-27?
-q29,Q29. Compare the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. What happened when there was no new observation to update the forecast?
-q30,Q30. What is the forecasted chlorophyll-a for 2020-09-27?
-q31,"Q31. Compare the two-forecast plot with no data assimilation (missing observation) to the two-forecast plot with data assimilation. Specifically, how do the forecasts for 2020-09-27 on each plot compare?"
+q23,Q23. Examine the chlorophyll-a forecast plot.
+q23a,a. Download the chlorophyll-a forecast plot and copy-paste it into your report.
+q23b,"b. What is the forecasted chlorophyll-a concentration for Sept. 26, 2020?"
+q23c,"c. What is the relationship between the observed chlorophyll-a for Sept. 25, 2020, and the initial condition distribution (shown in blue)?"
+q23d,"d. Each one of the gray lines in the figure above represents an ensemble member. Explain what this means in your own words, with specific reference to the autoregressive model we are using for forecasting in this exercise."
+q24,Q24. Briefly describe in your own words how an ensemble Kalman filter can be used to assimilate data into an ecological forecast.
+q25,Q25. Examine the forecast plot with an updated initial condition.
+q25a,a. Download the plot of a forecast with an updated initial condition and copy-paste it into your report.
+q25b,b. Compare the difference between the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. How are these two distributions different?
+q26,Q26. Examine the forecast plot with an updated initial condition when data are missing.
+q26a,a. Download the plot of the updated initial condition when data are missing and copy-paste it into your report.
+q26b,b. Compare the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. What happened when there was no new observation to update the forecast?
+q27,Q27. Compare the two-forecast plot with no data assimilation (missing observation) to the two-forecast plot with data assimilation.
+q27a,a. Download the two-forecast plot with data assimilation and copy-paste it into your report.
+q27b,b. Download the two-forecast plot with no data assimilation (missing observation) and copy-paste it into your report.
+q27c,c. How do the forecasts for 2020-09-27 on each plot compare?
 q32,Q32. Make a prediction. How do you think a decrease in observation uncertainty will affect the forecasts?
 q33,Q33. Compare the two initial condition distributions. How does the distribution generated with low observation uncertainty differ from the original distribution generated in Objective 4?
 q34,Q34. Compare the initial conditions distributions (blue) in Figure A above with those in Figure B. Describe how they differ.

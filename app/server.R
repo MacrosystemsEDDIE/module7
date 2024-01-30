@@ -222,7 +222,7 @@ shinyServer(function(input, output, session) {
   # Download plot of air and water temperature
   output$save_chla_plot <- downloadHandler(
     filename = function() {
-      paste("Q5-plot-", Sys.Date(), ".png", sep="")
+      paste("Q5a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -278,7 +278,7 @@ shinyServer(function(input, output, session) {
   # Download timeseries of lagged chl-a
   output$save_lag_plot1 <- downloadHandler(
     filename = function() {
-      paste("Q7-plot-", Sys.Date(), ".png", sep="")
+      paste("Q7a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -329,7 +329,7 @@ shinyServer(function(input, output, session) {
   # Download scatterplot of lagged chl-a
   output$save_lag_plot2 <- downloadHandler(
     filename = function() {
-      paste("Q8-plot-", Sys.Date(), ".png", sep="")
+      paste("Q8a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -412,7 +412,7 @@ shinyServer(function(input, output, session) {
   # Download ac plot
   output$save_ac_plot <- downloadHandler(
     filename = function() {
-      paste("Q10-Q11-plot-", Sys.Date(), ".png", sep="")
+      paste("Q10a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -467,7 +467,7 @@ shinyServer(function(input, output, session) {
   # Download scatterplot of pacf
   output$save_pacf_plot <- downloadHandler(
     filename = function() {
-      paste("Q12-Q14-plot-", Sys.Date(), ".png", sep="")
+      paste("Q12a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -571,7 +571,7 @@ shinyServer(function(input, output, session) {
   # Download scatterplot of pacf
   output$save_arfit_plot <- downloadHandler(
     filename = function() {
-      paste("Q15-plot-", Sys.Date(), ".png", sep="")
+      paste("Q15a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -756,20 +756,6 @@ shinyServer(function(input, output, session) {
   })
   })
   
-  # Download scatterplot of pacf
-  output$save_proc_uc_distrib_plot <- downloadHandler(
-    filename = function() {
-      paste("Q19-plot-", Sys.Date(), ".png", sep="")
-    },
-    content = function(file) {
-      device <- function(..., width, height) {
-        grDevices::png(..., width = 8, height = 4,
-                       res = 200, units = "in")
-      }
-      ggsave(file, plot = plot.proc.uc.distrib$main, device = device)
-    }
-  )
-  
   #** Slickr Initial conditions UC slides ----
   output$ic_uc_slides <- renderSlickR({
     slickR(ic_uc_slides) + settings(dots = TRUE)
@@ -853,7 +839,7 @@ shinyServer(function(input, output, session) {
   # Download scatterplot of pacf
   output$save_high_freq_plot <- downloadHandler(
     filename = function() {
-      paste("Q21-plot-", Sys.Date(), ".png", sep="")
+      paste("Q21a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -994,20 +980,6 @@ shinyServer(function(input, output, session) {
     
   })
   
-  # Download scatterplot of pacf
-  output$save_ic_distrib_plot <- downloadHandler(
-    filename = function() {
-      paste("Q22-plot-", Sys.Date(), ".png", sep="")
-    },
-    content = function(file) {
-      device <- function(..., width, height) {
-        grDevices::png(..., width = 8, height = 4,
-                       res = 200, units = "in")
-      }
-      ggsave(file, plot = plot.ic.uc.distrib$main, device = device)
-    }
-  )
-  
   #First forecast plot
   plot.fc1 <- reactiveValues(main=NULL)
   
@@ -1145,7 +1117,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_fc1_viz_plot <- downloadHandler(
     filename = function() {
-      paste("Q23-Q25-plot-", Sys.Date(), ".png", sep="")
+      paste("Q23a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -1310,7 +1282,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_updated_ic_plot <- downloadHandler(
     filename = function() {
-      paste("Q27-plot-", Sys.Date(), ".png", sep="")
+      paste("Q25a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {

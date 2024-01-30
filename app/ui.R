@@ -442,7 +442,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h4("Questions"),
-                                                                   p(tags$b(quest["q5", 1]))
+                                                                   p(tags$b(quest["q5", 1])),
+                                                                   p(tags$em(quest["q5a", 1])),
+                                                                   p(tags$em(quest["q5b", 1]))
                                                             )
                                                           ),
                                                           br()
@@ -531,7 +533,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q7", 1]))
+                                                                   p(tags$b(quest["q7", 1])),
+                                                                   p(tags$em(quest["q7a", 1])),
+                                                                   p(tags$em(quest["q7b", 1]))
                                                             )
                                                           )
                                                       )
@@ -556,7 +560,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q8", 1]))
+                                                                   p(tags$b(quest["q8", 1])),
+                                                                   p(tags$em(quest["q8a", 1])),
+                                                                   p(tags$em(quest["q8b", 1]))
                                                             )
                                                           )
                                                       )
@@ -611,6 +617,8 @@ ui <- function(req) {
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
                                                                    p(tags$b(quest["q10", 1])),
+                                                                   p(tags$em(quest["q10a", 1])),
+                                                                   p(tags$em(quest["q10b", 1])),
                                                                    p(tags$b(quest["q11", 1]))
                                                             )
                                                           )
@@ -633,6 +641,8 @@ ui <- function(req) {
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
                                                                    p(tags$b(quest["q12", 1])),
+                                                                   p(tags$em(quest["q12a", 1])),
+                                                                   p(tags$em(quest["q12b", 1])),
                                                                    p(tags$b(quest["q13", 1])),
                                                                    p(tags$b(quest["q14", 1]))
                                                             )
@@ -667,7 +677,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q15", 1]))
+                                                                   p(tags$b(quest["q15", 1])),
+                                                                   p(tags$em(quest["q15a", 1])),
+                                                                   p(tags$em(quest["q15b", 1]))
                                                             )
                                                           )
                                                       )
@@ -853,8 +865,7 @@ ui <- function(req) {
                                                column(6,
                                                       wellPanel(
                                                         plotlyOutput("proc_uc_distrib")
-                                                      ),
-                                                      downloadButton("save_proc_uc_distrib_plot", "Download plot", icon = icon("download"))
+                                                      )
                                                       )
                                              ),
                                              hr(),
@@ -918,7 +929,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q21", 1]))
+                                                                   p(tags$b(quest["q21", 1])),
+                                                                   p(tags$em(quest["q21a", 1])),
+                                                                   p(tags$em(quest["q21b", 1]))
                                                             )
                                                           )
                                                       )
@@ -953,8 +966,7 @@ ui <- function(req) {
                                                column(6,
                                                       wellPanel(
                                                         plotlyOutput("ic_distrib_plot")
-                                                      ),
-                                                      downloadButton("save_ic_distrib_plot", "Download plot", icon = icon("download"))
+                                                      )
                                                       )
                                              ),
                                              br(),
@@ -1005,8 +1017,10 @@ ui <- function(req) {
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
                                                                    p(tags$b(quest["q23", 1])),
-                                                                   p(tags$b(quest["q24", 1])),
-                                                                   p(tags$b(quest["q25", 1]))
+                                                                   p(tags$em(quest["q23a", 1])),
+                                                                   p(tags$em(quest["q23b", 1])),
+                                                                   p(tags$em(quest["q23c", 1])),
+                                                                   p(tags$em(quest["q23d", 1]))
                                                             )
                                                           )
                                                       )
@@ -1089,7 +1103,7 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q26", 1]))
+                                                                   p(tags$b(quest["q24", 1]))
                                                             )
                                                           )
                                                       )
@@ -1113,7 +1127,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q27", 1]))
+                                                                   p(tags$b(quest["q25", 1])),
+                                                                   p(tags$em(quest["q25a", 1])),
+                                                                   p(tags$em(quest["q25b", 1]))
                                                             )
                                                           )
                                                       )
@@ -1132,16 +1148,7 @@ ui <- function(req) {
                                                       p("Now we will make a second forecast for the next day using our updated initial conditions."),
                                                       p("We will plot both of our forecasts together with the initial conditions for each forecast."),
                                                       actionButton("second_forecast_da","Generate forecast"),
-                                                      br(),br(),
-                                                      box(id = "box10", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   p(tags$b(quest["q28", 1]))
-                                                            )
-                                                          )
-                                                      )
+                                                      br(),br()
                                                       ),
                                                column(6,
                                                       wellPanel(
@@ -1167,7 +1174,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q29", 1]))
+                                                                   p(tags$b(quest["q26", 1])),
+                                                                   p(tags$em(quest["q26a", 1])),
+                                                                   p(tags$em(quest["q26b", 1]))
                                                             )
                                                           )
                                                       )
@@ -1187,15 +1196,6 @@ ui <- function(req) {
                                                       p("We will plot both of our forecasts together with the initial conditions for each forecast"),
                                                       actionButton("second_forecast_no_da","Generate forecast"),
                                                       br(),br(),
-                                                      box(id = "box10", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   p(tags$b(quest["q30", 1]))
-                                                            )
-                                                          )
-                                                      ),
                                                       box(id = "box2", width = 12, status = "warning",
                                                           solidHeader = TRUE,
                                                           fluidRow(
@@ -1239,7 +1239,7 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q31", 1]))
+                                                                   p(tags$b(quest["q29", 1]))
                                                             )
                                                           )
                                                       )
