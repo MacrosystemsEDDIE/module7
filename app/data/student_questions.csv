@@ -57,33 +57,52 @@ q27,Q27. Compare the two-forecast plot with no data assimilation (missing observ
 q27a,a. Download the two-forecast plot with data assimilation and copy-paste it into your report.
 q27b,b. Download the two-forecast plot with no data assimilation (missing observation) and copy-paste it into your report.
 q27c,c. How do the forecasts for 2020-09-27 on each plot compare?
-q32,Q32. Make a prediction. How do you think a decrease in observation uncertainty will affect the forecasts?
-q33,Q33. Compare the two initial condition distributions. How does the distribution generated with low observation uncertainty differ from the original distribution generated in Objective 4?
-q34,Q34. Compare the initial conditions distributions (blue) in Figure A above with those in Figure B. Describe how they differ.
-q35,Q35. What is the effect of a decrease in observation uncertainty on the forecasts? Does this match what you predicted in Q32?
-q36,"Q36. Make a prediction. Using your experience from the previous example, how do you think an increase in observation uncertainty will affect the forecasts?"
-q37,Q37. Compare the two initial condition distributions. How does the distribution generated with high observation uncertainty differ from the original distribution generated in Objective 4?
-q38,Q38. Compare the initial conditions distributions (blue) in Figure C above with those in Figure D. Describe how they differ.
-q39,Q39. What is the effect of an increase in observation uncertainty on the forecasts? Does this match what you predicted in Q36?
-q40,"Q40. Make a prediction by filling in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.'"
-q41,Q41. Describe how the mean value of the 1-day-ahead forecasts changes over time when no data are assimilated.
-q42,Q42. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when no data are assimilated.
-q43,"Q43. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
-q44,Q44. Use the values of bias and RMSE to assess the forecasts with no data assimilation. How well do you think the forecasts are performing?
-q45,Q45. Describe how the mean value of the 1-day-ahead forecasts changes over time when weekly data are assimilated.
-q46,Q46. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when weekly data are assimilated.
-q47,"Q47. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
-q48,Q48. Use the values of bias and RMSE to assess the forecasts with weekly data assimilation. How well do you think the forecasts are performing?
-q49,Q49. Describe how the mean value of the 1-day-ahead forecasts changes over time when daily data are assimilated.
-q50,Q50. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when daily data are assimilated.
-q51,"Q51. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
-q52,Q52. Use the values of bias and RMSE to assess the forecasts with daily data assimilation. How well do you think the forecasts are performing?
-q53,"Q53. Fill in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.' How does your answer now compare to what your answer in Q40?"
-q54,"Q54. Make a preliminary recommendation. Based on what you have learned in Activities A and B, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
-q55,"Q55. Based on the forecasts presented here, as a manager, would you recommend a beach closure for Saturday, October 11?"
-q56,"Q56. Based on the forecasts presented here, as a manager, would you recommend a beach closure for Saturday, October 11?"
-q57,"Q57. Which forecast series - the one with weekly or daily data assimilation - provided a more accurate forecast for Saturday, Oct. 11?"
-q58,"Q58. How did your lake closure decision made using the forecast series with weekly, manual data assimilation compare to the decision made using the forecast series with daily sensor data assimilation?"
-q59,"Q59. Compare the values of bias and RMSE for the forecast series with data assimilation of weekly manual data vs. the forecast series with data assimilation of daily sensor data. Overall, which forecast series produces more accurate forecasts?"
-q60,"Q60. Make a final recommendation. Based on what you have learned from your forecast trials with the high-frequency sensor, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
-q61,Q61. Briefly explain the reasoning behind your final recommendation in Q.60. Did it change from the preliminary recommendation that you made in Q.54?
+q28,Q28. Make a prediction. How do you think a decrease in observation uncertainty will affect the forecasts?
+q29,Q29. Compare the initial conditions distributions (blue) in Figure A with those in Figure B. 
+q29a,a. Download the plot of forecasts assimilating data with low observation uncertainty and copy-paste it into your report.
+q29b,b. Describe how the initial conditions distributions differ between the two figures.
+q29c,c. What is the effect of a decrease in observation uncertainty on the forecasts? Does this match what you predicted in Q28?
+q30,"Q30. Make a prediction. Using your experience from the previous example, how do you think an increase in observation uncertainty will affect the forecasts?"
+q31,Q31. Compare the initial conditions distributions (blue) in Figure C above with those in Figure D. 
+q31a,a. Download the plot of forecasts assimilating data with high observation uncertainty and copy-paste it into your report.
+q31b,b. Describe how the initial conditions distributions differ between the two figures.
+q31c,c. What is the effect of an increase in observation uncertainty on the forecasts? Does this match what you predicted in Q30?
+q32,"Q32. Make a prediction by filling in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.'"
+q33,Q33. Describe the series of one-day-ahead forecasts with no data assimilation.
+q33a,a. Download the plot of a series of one-day-ahead forecasts with no data assimilation and copy-paste it into your report.
+q33b,b. Describe how the mean value of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q33c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q34,Q34. Assess the series of one-day-ahead forecasts with no data assimilation.
+q34a,"a. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
+q34b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with no data assimilation. How well do you think the forecasts are performing?"
+q35,Q35. Describe the series of one-day-ahead forecasts with no data assimilation.
+q35a,a. Download the plot of a series of one-day-ahead forecasts with no data assimilation and copy-paste it into your report.
+q35b,b. Describe how the mean value of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q35c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q36,Q36. Assess the series of one-day-ahead forecasts with no data assimilation.
+q36a,"a. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
+q36b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with no data assimilation. How well do you think the forecasts are performing?"
+q37,Q37. Describe the series of one-day-ahead forecasts with no data assimilation.
+q37a,a. Download the plot of a series of one-day-ahead forecasts with no data assimilation and copy-paste it into your report.
+q37b,b. Describe how the mean value of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q37c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q38,Q38. Assess the series of one-day-ahead forecasts with no data assimilation.
+q38a,"a. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
+q38b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with no data assimilation. How well do you think the forecasts are performing?"
+q39,"Q39. Fill in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.' How does your answer now compare to what your answer in Q40?"
+q40,"Q40. Make a preliminary recommendation. Based on what you have learned in Activities A and B, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
+q41,Q41. Make a management decision.
+q41a,a. Download the plot of the series of forecasts generated using the current forecasting system and copy-paste it into your report.
+q41b,"b. Based on the forecasts presented here, as a manager, would you recommend a beach closure for Saturday, October 11?"
+q42,Q42. Make a management decision.
+q42a,a. Download the plot of the series of forecasts generated using the borrowed high-frequency sensor and copy-paste it into your report.
+q42b,"b. Based on the forecasts presented here, as a manager, would you recommend a beach closure for Saturday, October 11?"
+q43,Q43. Compare the two series of forecasts.
+q43a,"a. Download the plot of the series of forecasts generated using the current forecasting system AND the observation for Saturday, Oct. 11 and copy-paste it into your report."
+q43b,"b. Download the plot of the series of forecasts generated using the borrowed high-frequency sensor AND the observation for Saturday, Oct. 11 and copy-paste it into your report."
+q43c,"c. Which forecast series - the one with or without the high-frequency sensor data - provided a more accurate forecast for Saturday, Oct. 11?"
+q43d,"d. How did your lake closure decision made using the forecast series with weekly, manual data assimilation compare to the decision made using the forecast series with daily high-frequency sensor data assimilation?"
+q44,"Q44. Compare the values of bias and RMSE for the forecast series with data assimilation of weekly manual data vs. the forecast series with data assimilation of daily sensor data. Overall, which forecast series produces more accurate forecasts?"
+q45,Q45. Make a final recommendation.
+q45a,"a. Based on what you have learned from your forecast trials with the high-frequency sensor, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
+q45b,b. Briefly explain the reasoning behind your final recommendation. Did it change from the preliminary recommendation that you made in Q.40?

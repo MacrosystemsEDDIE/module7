@@ -27,7 +27,7 @@ obj_04,We will use the autoregressive model fit in the previous objective to gen
 obj_05,Compare one-day-ahead forecasts generated with and without data assimilation.
 obj_06,"Compare one-day-ahead forecasts generated with data assimilation, using data with low vs. high observation uncertainty."
 obj_07,"Compare a series of one-day-ahead forecasts with no data assimilation, weekly data assimilation, and daily data assimilation. "
-obj_08,"We learned in Objective 7 that we can use observations to inform forecasts and potentially improve forecast accuracy. However, observations themselves are uncertain. Some sensors and ways of collecting data are more precise and accurate than others. Listed below are some different methods for collecting the ecological data that we need for our ecological model, with a brief description of the observation uncertainty associated with each method."
+obj_08,Make management decisions using ecological forecasts generated with different levels of observation uncertainty and different frequencies of data assimilation.
 weather_forecast1,A weather forecast is probably the most widely used and applied forecast. Here we will examine the output from a weather forecast model from NOAA.
 weather_forecast2,"Weather forecasts use multiple simulations from the same model, but alters the initial conditions of the model to generate different potential futures."
 model1,"A model is a representation (physical, conceptual or mathematical) of a real ecological phenomenon that is difficult to observe directly (e.g., the abundance of foxes in a forest)."

@@ -1153,8 +1153,7 @@ ui <- function(req) {
                                                column(6,
                                                       wellPanel(
                                                         plotOutput("second_fc_da_plot")
-                                                      ),
-                                                      downloadButton("save_second_fc_da_plot", "Download plot", icon = icon("download"))
+                                                      )
                                                       )
                                              ),
                                              hr(),
@@ -1212,8 +1211,7 @@ ui <- function(req) {
                                                column(6,
                                                       wellPanel(
                                                         plotOutput("second_fc_no_da_plot")
-                                                      ),
-                                                      downloadButton("save_second_fc_no_da_plot", "Download plot", icon = icon("download"))
+                                                      )
                                                )
                                              ),
                                              hr(),
@@ -1225,21 +1223,28 @@ ui <- function(req) {
                                                                h4("Forecast with data assimilation"),
                                                                wellPanel(
                                                                  plotOutput("second_fc_da_plot2")
-                                                               )
+                                                               ),
+                                                               downloadButton("save_second_fc_da_plot2", "Download plot", icon = icon("download"))
                                                                ),
                                                         column(6,
                                                                h4("Forecast without data assimilation"),
                                                                wellPanel(
                                                                  plotOutput("second_fc_no_da_plot2")
-                                                               )
+                                                               ),
+                                                               downloadButton("save_second_fc_no_da_plot2", "Download plot", icon = icon("download"))
                                                                )
                                                       ),
+                                                      br(),
                                                       box(id = "box10", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q29", 1]))
+                                                                   p(tags$b(quest["q27", 1])),
+                                                                   p(tags$em(quest["q27a", 1])),
+                                                                   p(tags$em(quest["q27b", 1])),
+                                                                   p(tags$em(quest["q27c", 1]))
+                                                                   
                                                             )
                                                           )
                                                       )
@@ -1309,7 +1314,7 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q32", 1]))
+                                                                   p(tags$b(quest["q28", 1]))
                                                             )
                                                           )
                                                       )
@@ -1326,17 +1331,7 @@ ui <- function(req) {
                                                       h3("Generate initial condition distribution with low observation uncertainty"),
                                                       p("Let's plot an initial conditions distribution that reflects the lower uncertainty due to our new water quality sensor."),
                                                       p("We will also plot the original initial condition you generated in Objective 4 for comparison."),
-                                                      actionButton("plot_low_ic","Generate distribution"),
-                                                      br(),br(),
-                                                      box(id = "box10", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   p(tags$b(quest["q33", 1]))
-                                                            )
-                                                          )
-                                                      )
+                                                      actionButton("plot_low_ic","Generate distribution")
                                                       ),
                                                column(4,
                                                       h4("Initial condition distribution with low observation uncertainty"),
@@ -1360,6 +1355,7 @@ ui <- function(req) {
                                                       fluidRow(
                                                         column(6,
                                                                h4("Figure A. Forecasts assimilating data with low observation uncertainty"),
+                                                               p(tags$em("Q29a-plot.png")),
                                                                wellPanel(
                                                                  plotOutput("second_fc_low_obs_uc")
                                                                ),
@@ -1367,6 +1363,7 @@ ui <- function(req) {
                                                         ),
                                                         column(6,
                                                                h4("Figure B. Previous forecasts with data assimilation"),
+                                                               p(tags$em("Q27a-plot.png from Objective 5; reproduced again here for ease of comparison")),
                                                                wellPanel(
                                                                  plotOutput("second_fc_da_plot3")
                                                                )
@@ -1382,8 +1379,10 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q34", 1])),
-                                                                   p(tags$b(quest["q35", 1]))
+                                                                   p(tags$b(quest["q29", 1])),
+                                                                   p(tags$em(quest["q29a", 1])),
+                                                                   p(tags$em(quest["q29b", 1])),
+                                                                   p(tags$em(quest["q29c", 1]))
                                                             )
                                                           )
                                                       )
@@ -1399,7 +1398,7 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q36", 1]))
+                                                                   p(tags$b(quest["q30", 1]))
                                                             )
                                                           )
                                                       )
@@ -1416,17 +1415,7 @@ ui <- function(req) {
                                                       h3("Generate initial condition distribution with high observation uncertainty"),
                                                       p("Let's plot an initial conditions distribution with high uncertainty."),
                                                       p("We will also plot the original initial condition you generated in Objective 4 for comparison."),
-                                                      actionButton("plot_high_ic","Generate distribution"),
-                                                      br(),br(),
-                                                      box(id = "box10", width = 12, status = "primary",
-                                                          solidHeader = TRUE,
-                                                          fluidRow(
-                                                            column(10, offset = 1,
-                                                                   h3("Questions"),
-                                                                   p(tags$b(quest["q37", 1]))
-                                                            )
-                                                          )
-                                                      )
+                                                      actionButton("plot_high_ic","Generate distribution")
                                                ),
                                                column(4,
                                                       h4("Initial condition distribution with high observation uncertainty"),
@@ -1450,6 +1439,7 @@ ui <- function(req) {
                                                       fluidRow(
                                                         column(6,
                                                                h4("Figure C. Forecasts assimilating data with high observation uncertainty"),
+                                                               p(tags$em("Q31a-plot.png")),
                                                                wellPanel(
                                                                  plotOutput("second_fc_high_obs_uc")
                                                                ),
@@ -1457,6 +1447,7 @@ ui <- function(req) {
                                                         ),
                                                         column(6,
                                                                h4("Figure D. Previous forecasts with data assimilation"),
+                                                               p(tags$em("Q27a-plot.png from Objective 5; reproduced again here for ease of comparison")),
                                                                wellPanel(
                                                                  plotOutput("second_fc_da_plot4")
                                                                )
@@ -1472,8 +1463,10 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q38", 1])),
-                                                                   p(tags$b(quest["q39", 1]))
+                                                                   p(tags$b(quest["q31", 1])),
+                                                                   p(tags$em(quest["q31a", 1])),
+                                                                   p(tags$em(quest["q31b", 1])),
+                                                                   p(tags$em(quest["q31c", 1]))
                                                             )
                                                           )
                                                       )
@@ -1543,7 +1536,7 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q40", 1]))
+                                                                   p(tags$b(quest["q32", 1]))
                                                             )
                                                           )
                                                       )
@@ -1566,8 +1559,10 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q41", 1])),
-                                                                   p(tags$b(quest["q42", 1]))
+                                                                   p(tags$b(quest["q33", 1])),
+                                                                   p(tags$em(quest["q33a", 1])),
+                                                                   p(tags$em(quest["q33b", 1])),
+                                                                   p(tags$em(quest["q33c", 1]))
                                                             )
                                                           )
                                                       )
@@ -1591,8 +1586,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q43", 1])),
-                                                                   p(tags$b(quest["q44", 1]))
+                                                                   p(tags$b(quest["q34", 1])),
+                                                                   p(tags$em(quest["q34a", 1])),
+                                                                   p(tags$em(quest["q34b", 1]))
                                                             )
                                                           )
                                                       )
@@ -1633,8 +1629,10 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q45", 1])),
-                                                                   p(tags$b(quest["q46", 1]))
+                                                                   p(tags$b(quest["q35", 1])),
+                                                                   p(tags$em(quest["q35a", 1])),
+                                                                   p(tags$em(quest["q35b", 1])),
+                                                                   p(tags$em(quest["q35c", 1]))
                                                             )
                                                           )
                                                       )
@@ -1658,8 +1656,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q47", 1])),
-                                                                   p(tags$b(quest["q48", 1]))
+                                                                   p(tags$b(quest["q36", 1])),
+                                                                   p(tags$em(quest["q36a", 1])),
+                                                                   p(tags$em(quest["q36b", 1]))
                                                             )
                                                           )
                                                       )
@@ -1700,8 +1699,10 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q49", 1])),
-                                                                   p(tags$b(quest["q50", 1]))
+                                                                   p(tags$b(quest["q37", 1])),
+                                                                   p(tags$em(quest["q37a", 1])),
+                                                                   p(tags$em(quest["q37b", 1])),
+                                                                   p(tags$em(quest["q37c", 1]))
                                                             )
                                                           )
                                                       )
@@ -1725,8 +1726,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q51", 1])),
-                                                                   p(tags$b(quest["q52", 1]))
+                                                                   p(tags$b(quest["q38", 1])),
+                                                                   p(tags$em(quest["q38a", 1])),
+                                                                   p(tags$em(quest["q38b", 1]))
                                                             )
                                                           )
                                                       )
@@ -1763,7 +1765,7 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q53", 1]))
+                                                                   p(tags$b(quest["q39", 1]))
                                                             )
                                                           )
                                                       )
@@ -1828,7 +1830,7 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q54", 1]))
+                                                                   p(tags$b(quest["q40", 1]))
                                                             )
                                                           )
                                                       )
@@ -1853,7 +1855,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q55", 1]))
+                                                                   p(tags$b(quest["q41", 1])),
+                                                                   p(tags$em(quest["q41a", 1])),
+                                                                   p(tags$em(quest["q41b", 1]))
                                                             )
                                                           )
                                                       )
@@ -1879,7 +1883,9 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q56", 1]))
+                                                                   p(tags$b(quest["q42", 1])),
+                                                                   p(tags$em(quest["q42a", 1])),
+                                                                   p(tags$em(quest["q42b", 1]))
                                                             )
                                                           )
                                                       ),
@@ -1914,15 +1920,18 @@ ui <- function(req) {
                                                       h4(tags$em("Forecasts without high-frequency sensor")),
                                                       wellPanel(
                                                         plotOutput("fc_scenario_weekly_plot2")
-                                                      )
+                                                      ),
+                                                      downloadButton("save_fc_scenario_weekly_plot2", "Download plot", icon = icon("download"))
                                                       ),
                                                column(6,
                                                       h4(tags$em("Forecasts with high-frequency sensor")),
                                                       wellPanel(
                                                         plotOutput("fc_scenario_daily_plot2")
-                                                      )
+                                                      ),
+                                                      downloadButton("save_fc_scenario_daily_plot2", "Download plot", icon = icon("download"))
                                                       )
                                              ),
+                                             br(),
                                              fluidRow(
                                                column(12,
                                                       box(id = "box10", width = 12, status = "primary",
@@ -1930,8 +1939,11 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q57", 1])),
-                                                                   p(tags$b(quest["q58", 1]))
+                                                                   p(tags$b(quest["q43", 1])),
+                                                                   p(tags$em(quest["q43a", 1])),
+                                                                   p(tags$em(quest["q43b", 1])),
+                                                                   p(tags$em(quest["q43c", 1])),
+                                                                   p(tags$em(quest["q43d", 1]))
                                                             )
                                                           )
                                                       )
@@ -1990,9 +2002,10 @@ ui <- function(req) {
                                                           fluidRow(
                                                             column(10, offset = 1,
                                                                    h3("Questions"),
-                                                                   p(tags$b(quest["q59", 1])),
-                                                                   p(tags$b(quest["q60", 1])),
-                                                                   p(tags$b(quest["q61", 1]))
+                                                                   p(tags$b(quest["q44", 1])),
+                                                                   p(tags$b(quest["q45", 1])),
+                                                                   p(tags$em(quest["q45a", 1])),
+                                                                   p(tags$em(quest["q45b", 1]))
                                                             )
                                                           )
                                                       )

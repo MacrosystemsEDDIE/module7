@@ -272,7 +272,7 @@ Answer the following questions:
 
            *Please copy-paste your Q12a-plot.png image here.*
 
-           *Figure 4. Partial autocorrelation of chlorophyll-a at your lake site.*
+           *Figure 5. Partial autocorrelation of chlorophyll-a at your lake site.*
 
       b.  `r substr(quest["q12b", ], 3, nchar(quest["q12b", ]))` 
 
@@ -293,7 +293,7 @@ Answer the following questions:
 
            *Please copy-paste your Q15a-plot.png image here.*
 
-           *Figure 5. Autoregressive model predictions and chlorophyll-a observations at your lake site.*
+           *Figure 6. Autoregressive model predictions and chlorophyll-a observations at your lake site.*
 
       b.  `r substr(quest["q15b", ], 3, nchar(quest["q15b", ]))` 
 
@@ -335,7 +335,7 @@ Answer the following questions:
 
            *Please copy-paste your Q21a-plot.png image here.*
 
-           *Figure 6. High-frequency chlorophyll-a data at your lake site.*
+           *Figure 7. High-frequency chlorophyll-a data at your lake site.*
 
       b.  `r substr(quest["q21b", ], 3, nchar(quest["q21b", ]))` 
 
@@ -352,7 +352,7 @@ Answer the following questions:
 
            *Please copy-paste your Q23a-plot.png image here.*
 
-           *Figure 7. A one-day-ahead forecast of chlorophyll-a at your lake site.*
+           *Figure 8. A one-day-ahead forecast of chlorophyll-a at your lake site.*
 
       b.  `r substr(quest["q23b", ], 3, nchar(quest["q23b", ]))` 
 
@@ -390,15 +390,279 @@ Answer the following questions:
 
            *Please copy-paste your Q25a-plot.png image here.*
 
-           *Figure 7. One-day-ahead forecast with updated initial condition using newly observed chlorophyll-a data.*
+           *Figure 9. One-day-ahead forecast with updated initial condition using newly observed chlorophyll-a data.*
 
       b.  `r substr(quest["q25b", ], 3, nchar(quest["q25b", ]))` 
 
            **Answer:**  
            
     
+26. `r substr(quest["q26", ], 5, nchar(quest["q26", ]))`
 
-## End of module - nice work!\
+      a.  `r substr(quest["q26a", ], 3, nchar(quest["q26a", ]))` 
 
-`r module_text["acknowledgement", ]`
-`r app_update_txt`
+           *Please copy-paste your Q26a-plot.png image here.*
+
+           *Figure 10. One-day-ahead forecast with updated initial condition when chlorophyll-a data are missing.*
+
+      b.  `r substr(quest["q26b", ], 3, nchar(quest["q26b", ]))` 
+
+           **Answer:**  
+           
+           
+27. `r substr(quest["q27", ], 5, nchar(quest["q27", ]))`
+
+      a.  `r substr(quest["q27a", ], 3, nchar(quest["q27a", ]))` 
+
+           *Please copy-paste your Q27a-plot.png image here.*
+
+           *Figure 11. Two-forecast plot with data assimilation.*
+
+      b.  `r substr(quest["q27b", ], 3, nchar(quest["q27b", ]))` 
+
+           *Please copy-paste your Q27b-plot.png image here.*
+
+           *Figure 12. Two-forecast plot without data assimilation.*
+
+      c.  `r substr(quest["q27c", ], 3, nchar(quest["q27c", ]))` 
+
+           **Answer:**  
+           
+
+<br>
+
+## Objective 6: Explore observation uncertainty
+
+***
+`r module_text["obj_06", ]`
+
+***
+
+28. `r substr(quest["q28", ], 5, nchar(quest["q28", ]))`    
+
+     **Answer:**
+     
+29. `r substr(quest["q29", ], 5, nchar(quest["q29", ]))`
+
+      a.  `r substr(quest["q29a", ], 3, nchar(quest["q29a", ]))` 
+
+           *Please copy-paste your Q29a-plot.png image here.*
+
+           *Figure 13. Plot of forecasts assimilating data with low observation uncertainty.*
+
+      b.  `r substr(quest["q29b", ], 3, nchar(quest["q29b", ]))` 
+
+           **Answer:** 
+
+      c.  `r substr(quest["q29c", ], 3, nchar(quest["q29c", ]))` 
+
+           **Answer:**  
+           
+
+30. `r substr(quest["q30", ], 5, nchar(quest["q30", ]))`    
+
+     **Answer:**
+     
+31. `r substr(quest["q31", ], 5, nchar(quest["q31", ]))`
+
+      a.  `r substr(quest["q31a", ], 3, nchar(quest["q31a", ]))` 
+
+           *Please copy-paste your Q31a-plot.png image here.*
+
+           *Figure 14. Plot of forecasts assimilating data with high observation uncertainty.*
+
+      b.  `r substr(quest["q31b", ], 3, nchar(quest["q31b", ]))` 
+
+           **Answer:** 
+
+      c.  `r substr(quest["q31c", ], 3, nchar(quest["q31c", ]))` 
+
+           **Answer:**  
+           
+
+<br>
+
+## Objective 7: Explore data assimilation frequency
+
+***
+`r module_text["obj_07", ]`
+
+***
+
+32. `r substr(quest["q32", ], 5, nchar(quest["q32", ]))`    
+
+     **Answer:**
+     
+33. `r substr(quest["q33", ], 5, nchar(quest["q33", ]))`
+
+      a.  `r substr(quest["q33a", ], 3, nchar(quest["q33a", ]))` 
+
+           *Please copy-paste your Q33a-plot.png image here.*
+
+           *Figure 15. A series of one-day-ahead forecasts with no data assimilation.*
+
+      b.  `r substr(quest["q33b", ], 3, nchar(quest["q33b", ]))` 
+
+           **Answer:** 
+
+      c.  `r substr(quest["q33c", ], 3, nchar(quest["q33c", ]))` 
+
+           **Answer:**  
+           
+
+34. `r substr(quest["q34", ], 5, nchar(quest["q34", ]))`
+
+      a.  `r substr(quest["q34a", ], 3, nchar(quest["q34a", ]))` 
+
+           **Answer:**
+
+      b.  `r substr(quest["q34b", ], 3, nchar(quest["q34b", ]))` 
+
+           **Answer:** 
+
+
+35. `r substr(quest["q35", ], 5, nchar(quest["q35", ]))`
+
+      a.  `r substr(quest["q35a", ], 3, nchar(quest["q35a", ]))` 
+
+           *Please copy-paste your Q35a-plot.png image here.*
+
+           *Figure 16. A series of one-day-ahead forecasts with weekly data assimilation.*
+
+      b.  `r substr(quest["q35b", ], 3, nchar(quest["q35b", ]))` 
+
+           **Answer:** 
+
+      c.  `r substr(quest["q35c", ], 3, nchar(quest["q35c", ]))` 
+
+           **Answer:**  
+           
+
+36. `r substr(quest["q36", ], 5, nchar(quest["q36", ]))`
+
+      a.  `r substr(quest["q36a", ], 3, nchar(quest["q36a", ]))` 
+
+           **Answer:**
+
+      b.  `r substr(quest["q36b", ], 3, nchar(quest["q36b", ]))` 
+
+           **Answer:** 
+
+
+37. `r substr(quest["q37", ], 5, nchar(quest["q37", ]))`
+
+      a.  `r substr(quest["q37a", ], 3, nchar(quest["q37a", ]))` 
+
+           *Please copy-paste your Q37a-plot.png image here.*
+
+           *Figure 17. A series of one-day-ahead forecasts with daily data assimilation.*
+
+      b.  `r substr(quest["q37b", ], 3, nchar(quest["q37b", ]))` 
+
+           **Answer:** 
+
+      c.  `r substr(quest["q37c", ], 3, nchar(quest["q37c", ]))` 
+
+           **Answer:**  
+           
+
+38. `r substr(quest["q38", ], 5, nchar(quest["q38", ]))`
+
+      a.  `r substr(quest["q38a", ], 3, nchar(quest["q38a", ]))` 
+
+           **Answer:**
+
+      b.  `r substr(quest["q38b", ], 3, nchar(quest["q38b", ]))` 
+
+           **Answer:** 
+           
+           
+39. `r substr(quest["q39", ], 5, nchar(quest["q39", ]))`    
+
+     **Answer:**
+     
+\newpage 
+
+# Activity C - Management Scenario
+
+`r module_text["act_C", ]`
+
+## Objective 8: Management scenario
+
+***
+`r module_text["obj_08", ]`
+
+***
+
+40. `r substr(quest["q40", ], 5, nchar(quest["q40", ]))`    
+
+     **Answer:**
+    
+41. `r substr(quest["q41", ], 5, nchar(quest["q41", ]))`
+
+      a.  `r substr(quest["q41a", ], 3, nchar(quest["q41a", ]))` 
+
+           *Please copy-paste your Q41a-plot.png image here.*
+
+           *Figure 18. A series of of one-day-ahead forecasts generated using the current forecasting system and data collection method.*
+
+      b.  `r substr(quest["q41b", ], 3, nchar(quest["q41b", ]))` 
+
+           **Answer:** 
+
+
+42. `r substr(quest["q42", ], 5, nchar(quest["q42", ]))`
+
+      a.  `r substr(quest["q42a", ], 3, nchar(quest["q42a", ]))` 
+
+           *Please copy-paste your Q42a-plot.png image here.*
+
+           *Figure 19. A series of of one-day-ahead forecasts generated using the borrowed high-frequency sensor.*
+
+      b.  `r substr(quest["q42b", ], 3, nchar(quest["q42b", ]))` 
+
+           **Answer:** 
+
+
+43. `r substr(quest["q43", ], 5, nchar(quest["q43", ]))`
+
+      a.  `r substr(quest["q43a", ], 3, nchar(quest["q43a", ]))` 
+
+           *Please copy-paste your Q43a-plot.png image here.*
+
+           *Figure 20. A series of of one-day-ahead forecasts generated using the current forecasting system and data collection method and showing the observation for Saturday, Oct. 11.*
+
+      b.  `r substr(quest["q43b", ], 3, nchar(quest["q43b", ]))` 
+
+           *Please copy-paste your Q43b-plot.png image here.*
+
+           *Figure 21. A series of of one-day-ahead forecasts generated using the borrowed high-frequency sensor and showing the observation for Saturday, Oct. 11.*
+
+      c.  `r substr(quest["q43c", ], 3, nchar(quest["q43c", ]))` 
+
+           **Answer:** 
+
+      d.  `r substr(quest["q43d", ], 3, nchar(quest["q43d", ]))` 
+
+           **Answer:** 
+
+
+44. `r substr(quest["q44", ], 5, nchar(quest["q44", ]))`    
+
+     **Answer:**
+  
+45. `r substr(quest["q45", ], 5, nchar(quest["q45", ]))`
+
+      a.  `r substr(quest["q45a", ], 3, nchar(quest["q45a", ]))` 
+
+           **Answer:**
+
+      b.  `r substr(quest["q45b", ], 3, nchar(quest["q45b", ]))` 
+
+           **Answer:** 
+           
+    
+<br>
+
+*`r module_text["acknowledgement", ]`*
+*`r app_update_txt`*

@@ -1355,19 +1355,6 @@ shinyServer(function(input, output, session) {
     
   })
   
-  # Download plot
-  output$save_second_fc_da_plot <- downloadHandler(
-    filename = function() {
-      paste("Q28-plot-", Sys.Date(), ".png", sep="")
-    },
-    content = function(file) {
-      device <- function(..., width, height) {
-        grDevices::png(..., width = 8, height = 4,
-                       res = 200, units = "in")
-      }
-      ggsave(file, plot = plot.second.fc.da$main, device = device)
-    }
-  )
   
   #Initial condition no DA figure
   plot.updated.ic.no.da <- reactiveValues(main=NULL)
@@ -1419,7 +1406,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_updated_ic_no_da_plot <- downloadHandler(
     filename = function() {
-      paste("Q29-plot-", Sys.Date(), ".png", sep="")
+      paste("Q26a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -1488,20 +1475,6 @@ shinyServer(function(input, output, session) {
     
   })
   
-  # Download plot
-  output$save_second_fc_no_da_plot <- downloadHandler(
-    filename = function() {
-      paste("Q30-plot-", Sys.Date(), ".png", sep="")
-    },
-    content = function(file) {
-      device <- function(..., width, height) {
-        grDevices::png(..., width = 8, height = 4,
-                       res = 200, units = "in")
-      }
-      ggsave(file, plot = plot.second.fc.no.da$main, device = device)
-    }
-  )
-  
   # Repeat plots for comparison at bottom of objective
   
   output$second_fc_da_plot2 <- renderPlot({
@@ -1535,6 +1508,20 @@ shinyServer(function(input, output, session) {
     return(p)
   })
   
+  # Download plot
+  output$save_second_fc_da_plot2 <- downloadHandler(
+    filename = function() {
+      paste("Q27a-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.second.fc.da$main, device = device)
+    }
+  )
+  
   output$second_fc_no_da_plot2 <- renderPlot({
     validate(
       need(input$table01_rows_selected != "",
@@ -1563,6 +1550,20 @@ shinyServer(function(input, output, session) {
     p <- plot.second.fc.no.da$main
     return(p)
   })
+  
+  # Download plot
+  output$save_second_fc_no_da_plot2 <- downloadHandler(
+    filename = function() {
+      paste("Q27b-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.second.fc.no.da$main, device = device)
+    }
+  )
   
   #### Objective 6 ----
   
@@ -1824,7 +1825,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_second_fc_low_obs_uc_plot <- downloadHandler(
     filename = function() {
-      paste("Q34-Q35-plot-", Sys.Date(), ".png", sep="")
+      paste("Q29a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -1985,7 +1986,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_second_fc_high_obs_uc_plot <- downloadHandler(
     filename = function() {
-      paste("Q38-Q39-plot-", Sys.Date(), ".png", sep="")
+      paste("Q31a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -2205,7 +2206,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_fc_series_no_da_plot <- downloadHandler(
     filename = function() {
-      paste("Q41-Q44-plot-", Sys.Date(), ".png", sep="")
+      paste("Q33a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -2336,7 +2337,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_fc_series_weekly_plot <- downloadHandler(
     filename = function() {
-      paste("Q45-Q48-plot-", Sys.Date(), ".png", sep="")
+      paste("Q35a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -2467,7 +2468,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_fc_series_daily_plot <- downloadHandler(
     filename = function() {
-      paste("Q49-Q52-plot-", Sys.Date(), ".png", sep="")
+      paste("Q37a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -2744,7 +2745,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_fc_scenario_weekly_plot <- downloadHandler(
     filename = function() {
-      paste("Q55-plot-", Sys.Date(), ".png", sep="")
+      paste("Q41a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -2772,7 +2773,7 @@ shinyServer(function(input, output, session) {
   # Download plot
   output$save_fc_scenario_daily_plot <- downloadHandler(
     filename = function() {
-      paste("Q56-plot-", Sys.Date(), ".png", sep="")
+      paste("Q42a-plot-", Sys.Date(), ".png", sep="")
     },
     content = function(file) {
       device <- function(..., width, height) {
@@ -2798,6 +2799,20 @@ shinyServer(function(input, output, session) {
     
   })
   
+  # Download plot
+  output$save_fc_scenario_weekly_plot2 <- downloadHandler(
+    filename = function() {
+      paste("Q43a-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.forecast.scenario.w.obs$weekly, device = device)
+    }
+  )
+  
   output$fc_scenario_daily_plot2 <- renderPlot({ 
     
     validate(
@@ -2810,6 +2825,20 @@ shinyServer(function(input, output, session) {
     return(p)
     
   })
+  
+  # Download plot
+  output$save_fc_scenario_daily_plot2 <- downloadHandler(
+    filename = function() {
+      paste("Q43b-plot-", Sys.Date(), ".png", sep="")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(..., width = 8, height = 4,
+                       res = 200, units = "in")
+      }
+      ggsave(file, plot = plot.forecast.scenario.w.obs$daily, device = device)
+    }
+  )
   
   #calculate forecast assessment metrics
   # calculate bias and rmse for weekly da
