@@ -211,7 +211,7 @@ ui <- function(req) {
                                     align = "center"),
                                  h5("Click the arrows to navigate through the slides", align = "center"),
                                  wellPanel(
-                                   slickROutput("slides", width = "550px", height = "400px")
+                                   slickROutput("slides", width = "700px", height = "525px")
                                  )
                           )
                         )
@@ -501,7 +501,7 @@ ui <- function(req) {
                                                column(8,
                                                       h5("Click the arrows to navigate through the slides", align = "center"),
                                                       wellPanel(
-                                                        slickROutput("model_slides", width = "640px", height = "480px")
+                                                        slickROutput("model_slides", width = "700px", height = "525px")
                                                       )
                                                )
                                              ),
