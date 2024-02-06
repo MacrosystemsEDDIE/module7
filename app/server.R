@@ -2789,6 +2789,11 @@ shinyServer(function(input, output, session) {
   output$fc_scenario_weekly_plot2 <- renderPlot({ 
     
     validate(
+      need(input$fc_scenario_weekly > 0,
+           message = "Please click 'Run forecasts with weekly data assimilation'.")
+    )
+    
+    validate(
       need(input$fc_compare > 0,
            message = "Please click 'Compare forecasts made with and without high-frequency sensor'.")
     )
@@ -2814,6 +2819,11 @@ shinyServer(function(input, output, session) {
   )
   
   output$fc_scenario_daily_plot2 <- renderPlot({ 
+    
+    validate(
+      need(input$fc_scenario_daily > 0,
+           message = "Please click 'Run forecasts with daily data assimilation'.")
+    )
     
     validate(
       need(input$fc_compare > 0,
@@ -2846,6 +2856,11 @@ shinyServer(function(input, output, session) {
     output$out_bias5 <- renderUI({
       
       validate(
+        need(input$fc_scenario_weekly > 0,
+             message = "Please click 'Run forecasts with weekly data assimilation'.")
+      )
+      
+      validate(
         need(input$calc_bias5 > 0,
              message = "Please click 'Calculate bias'.")
       )
@@ -2874,6 +2889,11 @@ shinyServer(function(input, output, session) {
   
   # Text output for RMSE ----
     output$out_rmse5 <- renderUI({
+      
+      validate(
+        need(input$fc_scenario_weekly > 0,
+             message = "Please click 'Run forecasts with weekly data assimilation'.")
+      )
       
       validate(
         need(input$calc_rmse5 > 0,
@@ -2906,6 +2926,11 @@ shinyServer(function(input, output, session) {
     output$out_bias6 <- renderUI({
       
       validate(
+        need(input$fc_scenario_daily > 0,
+             message = "Please click 'Run forecasts with daily data assimilation'.")
+      )
+      
+      validate(
         need(input$calc_bias6 > 0,
              message = "Please click 'Calculate bias'.")
       )
@@ -2934,6 +2959,11 @@ shinyServer(function(input, output, session) {
     
     # Text output for RMSE ----
     output$out_rmse6 <- renderUI({
+      
+      validate(
+        need(input$fc_scenario_daily > 0,
+             message = "Please click 'Run forecasts with daily data assimilation'.")
+      )
       
       validate(
         need(input$calc_rmse6 > 0,
