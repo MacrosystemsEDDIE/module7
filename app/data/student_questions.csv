@@ -75,21 +75,21 @@ q33c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts c
 q34,Q34. Assess the series of one-day-ahead forecasts with no data assimilation.
 q34a,"a. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
 q34b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with no data assimilation. How well do you think the forecasts are performing?"
-q35,Q35. Describe the series of one-day-ahead forecasts with no data assimilation.
-q35a,a. Download the plot of a series of one-day-ahead forecasts with no data assimilation and copy-paste it into your report.
-q35b,b. Describe how the mean value of the 1-day-ahead forecasts changes over time when no data are assimilated.
-q35c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when no data are assimilated.
-q36,Q36. Assess the series of one-day-ahead forecasts with no data assimilation.
+q35,Q35. Describe the series of one-day-ahead forecasts with weekly data assimilation.
+q35a,a. Download the plot of a series of one-day-ahead forecasts with weekly data assimilation and copy-paste it into your report.
+q35b,b. Describe how the mean value of the 1-day-ahead forecasts changes over time when weekly data are assimilated.
+q35c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when weekly data are assimilated.
+q36,Q36. Assess the series of one-day-ahead forecasts with weekly data assimilation.
 q36a,"a. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
-q36b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with no data assimilation. How well do you think the forecasts are performing?"
-q37,Q37. Describe the series of one-day-ahead forecasts with no data assimilation.
-q37a,a. Download the plot of a series of one-day-ahead forecasts with no data assimilation and copy-paste it into your report.
-q37b,b. Describe how the mean value of the 1-day-ahead forecasts changes over time when no data are assimilated.
-q37c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when no data are assimilated.
-q38,Q38. Assess the series of one-day-ahead forecasts with no data assimilation.
+q36b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with weekly data assimilation. How well do you think the forecasts are performing?"
+q37,Q37. Describe the series of one-day-ahead forecasts with daily data assimilation.
+q37a,a. Download the plot of a series of one-day-ahead forecasts with daily data assimilation and copy-paste it into your report.
+q37b,b. Describe how the mean value of the 1-day-ahead forecasts changes over time when daily data are assimilated.
+q37c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when daily data are assimilated.
+q38,Q38. Assess the series of one-day-ahead forecasts with daily data assimilation.
 q38a,"a. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
-q38b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with no data assimilation. How well do you think the forecasts are performing?"
-q39,"Q39. Fill in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.' How does your answer now compare to what your answer in Q40?"
+q38b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with daily data assimilation. How well do you think the forecasts are performing?"
+q39,"Q39. Fill in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.' How does your answer now compare to what your answer in Q32?"
 q40,"Q40. Make a preliminary recommendation. Based on what you have learned in Activities A and B, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
 q41,Q41. Make a management decision.
 q41a,a. Download the plot of the series of forecasts generated using the current forecasting system and copy-paste it into your report.

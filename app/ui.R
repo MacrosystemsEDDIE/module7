@@ -1976,7 +1976,7 @@ ui <- function(req) {
                                                       )
                                                       ),
                                                column(6,
-                                                      h4(tags$em("Assessment metrics for forecasts without high-frequency sensor")),
+                                                      h4(tags$em("Assessment metrics for forecasts with high-frequency sensor")),
                                                       wellPanel(
                                                         fluidRow(
                                                           column(6,
