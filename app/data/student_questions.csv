@@ -45,7 +45,7 @@ q23,Q23. Examine the chlorophyll-a forecast plot.
 q23a,a. Download the chlorophyll-a forecast plot and copy-paste it into your report.
 q23b,"b. What is the forecasted chlorophyll-a concentration for Sept. 26, 2020?"
 q23c,"c. What is the relationship between the observed chlorophyll-a for Sept. 25, 2020, and the initial condition distribution (shown in blue)?"
-q23d,"d. Each one of the gray lines in the figure above represents an ensemble member. Explain what this means in your own words, with specific reference to the autoregressive model we are using for forecasting in this exercise."
+q23d,"d. Each one of the gray lines in the figure above represents an ensemble member. Describe the sources of uncertainty in the ensemble forecast for Sept. 26, 2020 in your own words."
 q24,Q24. Briefly describe in your own words how an ensemble Kalman filter can be used to assimilate data into an ecological forecast.
 q25,Q25. Examine the forecast plot with an updated initial condition.
 q25a,a. Download the plot of a forecast with an updated initial condition and copy-paste it into your report.
@@ -102,7 +102,7 @@ q43a,"a. Download the plot of the series of forecasts generated using the curren
 q43b,"b. Download the plot of the series of forecasts generated using the borrowed high-frequency sensor AND the observation for Saturday, Oct. 11 and copy-paste it into your report."
 q43c,"c. Which forecast series - the one with or without the high-frequency sensor data - provided a more accurate forecast for Saturday, Oct. 11?"
 q43d,"d. How did your lake closure decision made using the forecast series with weekly, manual data assimilation compare to the decision made using the forecast series with daily high-frequency sensor data assimilation?"
-q44,"Q44. Compare the values of bias and RMSE for the forecast series with data assimilation of weekly manual data vs. the forecast series with data assimilation of daily sensor data. Overall, which forecast series produces more accurate forecasts?"
+q44,"Q44. Compare the values of bias and RMSE for the forecast series with data assimilation of weekly manual data vs. the forecast series with data assimilation of daily sensor data. Overall, which forecast series produces more accurate forecasts over the trial forecasting period?"
 q45,Q45. Make a final recommendation.
-q45a,"a. Based on what you have learned from your forecast trials with the high-frequency sensor, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
+q45a,"a. Based on what you have learned from your forecast trials with the high-frequency sensor over the full week of forecasts, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
 q45b,b. Briefly explain the reasoning behind your final recommendation. Did it change from the preliminary recommendation that you made in Q.40?
