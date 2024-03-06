@@ -1196,7 +1196,7 @@ ui <- function(req) {
                                                column(6,
                                                       h3("Make a second forecast when no data have been assimilated"),
                                                       p("Now we will make a second forecast. You have seen that when an observation is missing, the initial condition cannot be updated. Let's see how this affects the second forecast."),
-                                                      p("We will plot both of our forecasts together with the initial conditions for each forecast"),
+                                                      p("We will plot both of our forecasts together with the initial conditions for each forecast."),
                                                       actionButton("second_forecast_no_da","Generate forecast"),
                                                       br(),br(),
                                                       box(id = "box2", width = 12, status = "warning",
@@ -1278,7 +1278,7 @@ ui <- function(req) {
                                                       h3("What is observation uncertainty?"),
                                                       h4(tags$em("Key terms:")),
                                                       tags$ul(
-                                                        tags$li(tags$b("Observation uncertainty")," is the error associated with measurement of a variable. Importantly, ",tags$b("observation uncertainty is different from initial conditions uncertainty,")," which is uncertainty regarding the starting conditions of a model. Greater observation uncertainty can lead to greater initial conditions uncertainty."),
+                                                        tags$li(tags$b("Observation uncertainty")," is the error associated with measurement of a variable. Importantly, ",tags$b("observation uncertainty is different from initial conditions uncertainty,")," which is uncertainty regarding the starting conditions of a model. Greater observation uncertainty (i.e., lower confidence in the accuracy of observations) can lead to greater initial conditions uncertainty."),
                                                         tags$li("A ",tags$b("sensor")," is a device that responds to a stimulus (such as heat, light, sound, pressure, magnetism, or motion) and transmits an electric impulse which is converted into a meaningful measurement for users.")
                                                       )
                                                       )
@@ -1514,7 +1514,7 @@ ui <- function(req) {
                                                column(4,
                                                       h4("In-Lake Sensor"),
                                                       p(tags$b("Frequency:")),
-                                                      p("If deployed in a lake, chlorophyll-a sensor data can be collected at a ",tags$b("high data frequency")," (e.g., every minute or even more often). Otherwise, data are collected however frequently a human travels to the lake to collect data."),
+                                                      p("If deployed in a lake, chlorophyll-a sensor data can be collected at a ",tags$b("high data frequency")," (e.g., every minute or even more often). Otherwise, data are collected how ever frequently a human travels to the lake to collect data."),
                                                       p(tags$b("Latency:")),
                                                       p("Chlorophyll-a sensor data may be streamed wirelessly from the lake to a computer, resulting in ",tags$b("low data latency.")," Otherwise, a human must travel to the lake, download the sensor data, and upload it to a computer, increasing latency."),
                                                       h4("Lab Analysis of Water Sample"),
@@ -1533,7 +1533,7 @@ ui <- function(req) {
                                              fluidRow(
                                                column(6,
                                                       h3("How does the frequency of data assimilation affect forecast performance?"),
-                                                      p("We are going explore the effect of data assimilation on forecast accuracy - does going to the effort of collecting lots of data and assimilating it into our predictions really improve our forecasts?"),
+                                                      p("We are going explore the effect of data assimilation on forecast accuracy - does collecting lots of data and assimilating it into our predictions really improve our forecasts?"),
                                                       p("To answer this question, we will generate multiple series of one-day-ahead forecasts over a period of 10 days. For each series of forecasts, we will assimilate data at different time intervals (one series with no data assimilation, one series with weekly data assimilation, and one series with daily data assimilation) and compare the accuracy of the resulting forecasts."),
                                                       box(id = "box10", width = 12, status = "primary",
                                                           solidHeader = TRUE,
@@ -1813,7 +1813,7 @@ ui <- function(req) {
                                                       p("Green Reservoir is a popular recreational reservoir for fishing, swimming, and boating. Periodically, the lake experiences harmful algal blooms that may pose a threat to lake users due to algal toxin exposure."),
                                                       p("The management authority for Green Reservoir has a ",tags$b("water quality threshold of 10 ug/L for chlorophyll-a.")," If chlorophyll-a surpasses this threshold, the lake must be closed for recreation. If the lake is closed unnecessarily, lake users become frustrated and make complaints to the management authority. But if the lake is not closed and chlorophyll-a levels surpass the water quality threshold, the management authority is putting lake users at risk of exposure to algal toxins."),
                                                       p("Currently, managers at Green Reservoir issue a daily, 1-day-ahead forecast of lake chlorophyll-a levels, which are informed by weekly observations of chlorophyll-a that are obtained by managers manually collecting a water sample and analyzing it in the water quality lab."),
-                                                      p("The Green Reservoir management authority is exploring the idea of purchasing a new water quality sensor that will automatically collect daily chlorophyll-a measurements to inform their forecasting system. Chlorophyll-a sensors are expensive (~15K USD), and the authority wants to know if this substantial investment will result in improvements in forecast accuracy."),
+                                                      p("The Green Reservoir management authority is exploring the idea of purchasing a new water quality sensor that will automatically collect daily chlorophyll-a measurements to inform their forecasting system. Chlorophyll-a sensors are expensive (~$15,000 USD), and the authority wants to know if this substantial investment will result in improvements in forecast accuracy."),
                                                       ),
                                                column(6,
                                                       img(src = "Objective10_Scenario1.jpg", height = "80%", id = "bla_border",

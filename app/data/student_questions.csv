@@ -54,8 +54,8 @@ q26,Q26. Examine the forecast plot with an updated initial condition when data a
 q26a,a. Download the plot of the updated initial condition when data are missing and copy-paste it into your report.
 q26b,b. Compare the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. What happened when there was no new observation to update the forecast?
 q27,Q27. Compare the two-forecast plot with no data assimilation (missing observation) to the two-forecast plot with data assimilation.
-q27a,a. Download the two-forecast plot with data assimilation and copy-paste it into your report.
-q27b,b. Download the two-forecast plot with no data assimilation (missing observation) and copy-paste it into your report.
+q27a,a. Download the two 1-day-ahead forecasts plot with data assimilation and copy-paste it into your report.
+q27b,b. Download the two 1-day-ahead forecasts plot with no data assimilation (missing observation) and copy-paste it into your report.
 q27c,c. How do the forecasts for 2020-09-27 on each plot compare?
 q28,Q28. Make a prediction. How do you think a decrease in observation uncertainty will affect the forecasts?
 q29,Q29. Compare the initial conditions distributions (blue) in Figure A with those in Figure B. 
