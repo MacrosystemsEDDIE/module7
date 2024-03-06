@@ -170,13 +170,7 @@ shinyServer(function(input, output, session) {
     url <- paste0("https://www.neonscience.org/field-sites/field-sites-map/", sid)
 
     output$site_link <- renderUI({
-      tags$a(href = url, "Click here for more site info", target = "_blank")
-    })
-  })
-  #** Create prompt ----
-  observeEvent(input$table01_rows_selected, {
-    output$prompt2 <- renderText({
-      "Click on the link below to find out more information about your site."
+      tags$a(href = url, "Click here for more site info and to view in-text references", target = "_blank")
     })
   })
 

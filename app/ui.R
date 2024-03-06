@@ -163,7 +163,7 @@ ui <- function(req) {
                           h4(tags$b(tags$i("How can we use data to improve ecological forecasts?"))),
                           h3("Summary"),
                           p("To be useful for management, ecological forecasts need to be both accurate enough for managers to be able to rely on them for decision-making",tags$i("and"), " include a representation of forecast uncertainty, so managers can properly interpret the probability of future events. To improve forecast accuracy, we can update forecasts with observational data once they become available, a process known as", tags$b("data assimilation.")," Recent improvements in environmental sensor technology and an increase in the number of sensors deployed in ecosystems have increased the availability of data for assimilation to develop and improve forecasts for natural resource management."),
-                          p("In this module, you will explore how assimilating data with different amounts of observation uncertainty and at different temporal frequencies affects forecasts of lake water quality at an ecological site of your choice."),
+                          p("In this module, you will explore how assimilating data with different amounts of observation uncertainty and at different temporal frequencies affects forecasts of water quality at a lake site of your choice."),
                           h3("Learning Outcomes"),
                           tags$line(),
                           tags$ul(
@@ -230,7 +230,7 @@ ui <- function(req) {
                         fluidRow(
                           column(6, 
                                  h3("Student Handout"),
-                                 p("Within the Introduction and Activities A, B and C tabs there are questions for students to complete as part of this module. These can be completed by writing your answers into the final report template, which can be downloaded as a Word document (.docx) below."),
+                                 p("Within the Introduction and Activities A, B, and C tabs, there are questions for students to complete as part of this module. These can be completed by writing your answers into the final report template, which can be downloaded as a Word document (.docx) below."),
                                  tags$style(type="text/css", "#stud_dl {background-color:#579277;color: white}"),
                                  conditionalPanel("output.handoutbuilt",
                                                   downloadButton(outputId = "stud_dl", label = "Download Final Report Template")
@@ -239,7 +239,7 @@ ui <- function(req) {
                           column(6,
                                  h3("Saving your progress"),
                                  p(style="text-align: justify;", "As you go, fill out answers to questions in the final report Word document. Some of the plots you generate in the Shiny app will be needed for the final report. When prompted, be sure to download these plots so you can copy-paste them into the final report."),
-                                 p(style="text-align: justify;", "If you run out of time to finish all the activities you can save your progress and return to it at a later date. Click the 'Bookmark my progress' button at the top of the page and you will obtain a link, which you should save by copy-pasting it at the top of your final report. When you are ready to resume work, paste the link into your web browser, and it will load a Shiny app session that contains your progress."),
+                                 p(style="text-align: justify;", "If you run out of time to finish all the activities, you can save your progress and return to it at a later date. Click the 'Bookmark my progress' button at the top of the page and you will obtain a link, which you should save by copy-pasting it at the top of your final report. When you are ready to resume work, paste the link into your web browser, and it will load a Shiny app session that contains your progress."),
                                  br()
                           )
                         ),
@@ -345,7 +345,6 @@ ui <- function(req) {
                                                wellPanel(
                                                  h4(tags$b("About Site")),
                                                  uiOutput("site_html"),
-                                                 textOutput("prompt2"),
                                                  htmlOutput("site_link")
                                                )
                                              ),
