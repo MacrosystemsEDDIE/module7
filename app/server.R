@@ -71,8 +71,7 @@ shinyServer(function(input, output, session) {
     if(!is.null(prev_row()))
     {
       proxy %>%
-        addMarkers(data = prev_row(),
-                   layerId = as.character(prev_row()$uid))
+        removeMarker(layerId = as.character(prev_row()$uid))
     }
     # set new value to reactiveVal
     prev_row(row_selected)
@@ -88,7 +87,8 @@ shinyServer(function(input, output, session) {
     lake_data$df <- read_csv(lake_data_file, show_col_types = FALSE) %>%
       rename(datetime = Date, chla = V1) %>%
       filter(cumsum(!is.na(chla)) > 0) %>%
-      mutate(chla = ifelse(chla < 0, 0, chla))
+      mutate(chla = ifelse(chla < 0, 0, chla)) %>%
+      filter(year(datetime) >= 2019)
    
     #create autocorrelation dataset
     autocorrelation_data$df <- lake_data$df %>%
@@ -107,9 +107,9 @@ shinyServer(function(input, output, session) {
       addProviderTiles(providers$Esri.NatGeoWorldMap,
                        options = providerTileOptions(noWrap = TRUE)
       ) %>%
-      addMarkers(data = neon_sites,
+      addMarkers(data = neon_sites_df,
                  layerId = ~uid, clusterOptions = markerClusterOptions(),
-                 label = ~locationDescription, icon = ~neonIcons[type])
+                 label = ~location, icon = ~neonIcons[type])
 
   })
 
@@ -199,7 +199,7 @@ shinyServer(function(input, output, session) {
     df <- lake_data$df
     
     p <- ggplot(data = df, aes(x = datetime, y = chla))+
-      geom_line(aes(color = "Chl-a"))+
+      geom_point(aes(color = "Chl-a"))+
       xlab("")+
       ylab("Chlorophyll-a (ug/L)")+
       scale_color_manual(values = c("Chl-a" = "chartreuse4"), name = "")+

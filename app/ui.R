@@ -400,8 +400,9 @@ ui <- function(req) {
                                                       p("Forecasts of chlorophyll-a concentrations days to weeks into the future can give water managers important information about the likelihood of a bloom event. This permits pre-emptive management to prevent or mitigate water quality concerns caused by blooms.")
                                                       ),
                                                column(8,
-                                                      img(src = "hab_Erie.jpg", height = "100%", id = "bla_border",
-                                                          width = "100%", tags$style("border: solid 2px black;")),
+                                                      img(src = "lake_hab.png", height = "100%", id = "bla_border",
+                                                          width = "100%", tags$style("border: solid 2px black;", alt = "Algal bloom on Lake Erie; Source: https://d2j02ha532z66v.cloudfront.net/wp-content/uploads/2018/07/2018-07-16_1333.png")),
+                                                      p(tags$em("Lake algal bloom; Photo credit: Zachary Haslick via Flickr.com")),
                                                       br(),
                                                       br(),
                                                       box(id = "box4", width = 12, status = "primary",
@@ -422,7 +423,7 @@ ui <- function(req) {
                                                       h3("Explore chlorophyll-a"),
                                                       p(id = "txt_j", "Click 'Plot chlorophyll-a' to view a time series of the real chlorophyll-a data measured at the lake you chose."),
                                                       p(tags$em("Most plots throughout the app are interactive; hover on the plot to see the various options for manipulating the plot that will appear as a menu in the top right corner")),
-                                                      p(tags$b("Note that gaps in chlorophyll-a data are normal, as sensor buoys cannot always be left in lakes through the winter in cold climates.")),
+                                                      p(tags$b("Note that gaps in chlorophyll-a data are normal, as sensor buoys cannot always be left in lakes through the winter in cold climates. Additionally, chlorophyll-a sensors sometimes malfunction.")),
                                                       fluidRow(
                                                         column(12, align = "right",
                                                                actionButton("plot_chla", "Plot chlorophyll-a")
@@ -581,7 +582,7 @@ ui <- function(req) {
                                                       br(),br(),
                                                       wellPanel(
                                                         htmlOutput("out_ac"),
-                                                        p("The closer the autocorrelation is to 1, the stronger the autocorrelation between the variable and its lag.")
+                                                        p("Autocorrelation can range from -1 to 1. The closer the autocorrelation is to -1 or 1, the stronger the correspondence between the variable and its lag. An autocorrelation value close to 1 means that the 1-day lag is positively correlated with today, while an autocorrelation value close to -1 means the the 1-day lag is negatively correlated with today. An autocorrelation close to 0 means there is little correspondence between the 1-day lag and today.")
                                                       ),
                                                       box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
@@ -623,7 +624,7 @@ ui <- function(req) {
                                                       h3("Partial autocorrelation"),
                                                       p("As you may have discovered while answering Q.11, it can be difficult to decide exactly how many lags to include in a forecasting model. Fortunately, forecasters have developed tools to help make this decision. One such tool is the ", tags$b("partial autocorrelation function"), " or ", tags$b("PACF.")," This function calculates the autocorrelation of a particular lag ",tags$em("while removing")," the effects of indirect correlations with other lags."),
                                                       p("To explain another way: the ",tags$b("autocorrelation")," of chlorophyll-a and the 7-day lag of chlorophyll-a is affected by the autocorrelation of chlorophyll-a with the 1-day lag, the 2-day lag, the 3-day lag, and so on, as well as the relationship of the 7-day lag to the 1-day lag, the 2-day lag, the 3-day lag, and so on."),
-                                                      p("The PACF avoids this problem. You can think of it as only measuring the effect of one particular set of lagged values (e.g., the 5-day lagged values), while accounting for (and thereby removing the influence of) all other lags."),
+                                                      p("The PACF avoids this problem. You can think of it as only measuring the effect of one particular set of lagged values (e.g., the 5-day lagged values), while accounting for (and thereby removing the influence of) all other lags. ",tags$b("The PACF ranges from -1 to 1, and can be interpreted in the same way as autocorrelation,")," where PACF values close to -1 and 1 indicate strong correspondence of a lag with the current value, while PACF values close to 0 indicate low correspondence between a lag and the current value."),
                                                       p("Let's plot the PACF of chlorophyll-a data at your chosen lake site."),
                                                       actionButton("plot_pacf",label = "Plot PACF"),
                                                       br(),br(),
@@ -655,7 +656,7 @@ ui <- function(req) {
                                                       p("Today, we will fit a simple form of an autoregressive, or AR model, which uses yesterday's chlorophyll-a observation (so, a 1-day lag) to predict today's observation. This model can be written as:"),
                                                       wellPanel(
                                                         div("$$Chla_{t} = \\beta_0 + \\beta_1 * (Chla_{t-1} - \\overline{Chla}) + \\overline{Chla}$$"),
-                                                        p("where ",tags$em("Chla")," is our timeseries of chlorophyll-a data, \\(\\beta_0\\) is the intercept parameter, \\(\\beta_1\\) is the coefficient on the 1-day lag of chlorophyll-a, and \\(\\overline{Chla}\\) is the mean of the chlorophyll-a timeseries."),
+                                                        p("where ",tags$em("Chla")," is our timeseries of chlorophyll-a data, \\(\\beta_0\\) is the intercept parameter, \\(\\beta_1\\) is the coefficient on the 1-day lag of chlorophyll-a, and \\(\\overline{Chla}\\) is the mean of the chlorophyll-a timeseries. Including the mean of the timeseries, or 'de-meaning', can help with fitting of model parameters."),
                                                         p("Note that a subscript of ",tags$em("t")," represents today's chlorophyll-a, while ", tags$em("t-1"), " represents the 1-day lag of chlorophyll-a.")
                                                       ),
                                                       p("Let's fit this model to our data!"),
@@ -698,8 +699,18 @@ ui <- function(req) {
                                                       wellPanel(
                                                         div("$$RMSE = \\sqrt{\\frac{\\sum_{i=1}^{N}(Predicted_i - Observed_i)^2}{N}}$$"),
                                                         p("The closer RMSE is to 0, the better your model fit.")
-                                                      )
                                                       ),
+                                                      p("The units of both ",tags$b("bias")," and ",tags$b("RMSE")," are the same as the units of the variable, which in our case is ",tags$b("micrograms per liter (ug/L).")) 
+                                                      ),
+                                               column(6,
+                                                      h4("Interpreting bias and RMSE"),
+                                                      p("Bias helps us understand whether, on average, the model predicts high (positive bias) or low (negative bias). RMSE also accounts for variability in the predictions. In other words, RMSE can indicate whether are predictions consistently just a little bit low, or whether they are 'all over the place' but on average a little bit low. RMSE will be higher (indicating a poorer model fit) if the variance in predictions is high. Bias does not account for the variance of the predictions."),
+                                                      img(src = "bias_vs_rmse.png", height = "100%", id = "bla_border",
+                                                          width = "100%", tags$style("border: solid 2px black;")),
+                                                      br(),br()
+                                                      )
+                                             ),
+                                             fluidRow(
                                                column(6,
                                                       h4(tags$em("Let's calculate bias and RMSE for the AR model you just fit!")),
                                                       fluidRow(
@@ -721,7 +732,9 @@ ui <- function(req) {
                                                                  htmlOutput("out_rmse")
                                                                )
                                                         )
+                                                      )
                                                       ),
+                                               column(6,
                                                       box(id = "box2", width = 12, status = "primary",
                                                           solidHeader = TRUE,
                                                           fluidRow(
@@ -1021,6 +1034,7 @@ ui <- function(req) {
                                                       wellPanel(
                                                         plotOutput("fc1_viz_plot")
                                                       ),
+                                                      p(tags$em("Note: Unlike some of the earlier plots in the module, this plot and the following similar plots are not intended to be interactive.")),
                                                       downloadButton("save_fc1_viz_plot", "Download plot", icon = icon("download"))
                                                       )
                                              ),
@@ -1151,7 +1165,7 @@ ui <- function(req) {
                                                column(6,
                                                       h3("Updating initial conditions when observations are missing"),
                                                       p("We have explored how the ensemble Kalman filter can update the forecast initial condition using a new observation.",tags$b("But what if there is no observation to use for updating?")," What will be the outcome of the applying the ensemble Kalman filter in this situation?"),
-                                                      p("Let's pretend that instead of recording a new observation, a thunderstorm came up and we were unable to sample at your chosen lake. We will run the ensemble Kalman filter with an 'NA' in place of an observation."),
+                                                      p("Let's pretend that instead of recording a new observation, a thunderstorm occurred and we were unable to sample at your chosen lake. We will run the ensemble Kalman filter with an 'NA' in place of an observation."),
                                                       p("Click the button below to see what happens to the initial condition when an observation is missing"),
                                                       actionButton("view_ic_no_da","Run ensemble Kalman filter with missing observation"),
                                                       br(),br(),
@@ -1312,7 +1326,7 @@ ui <- function(req) {
                                                column(6,
                                                       img(src = "LSPA_buoy_and_friends.png", height = "90%", id = "bla_border",
                                                           width = "90%", align = "center"),
-                                                      p(tags$em("Members of the Virginia Tech Reservoir Group and Lake Sunapee Protective Association with the Lake Sunapee buoy. Photo credit: "))
+                                                      p(tags$em("Members of the Virginia Tech Reservoir Group and Lake Sunapee Protective Association with the Lake Sunapee buoy. Photo credit: Summer Sanderson"))
                                                       )
                                              ),
                                              hr(),

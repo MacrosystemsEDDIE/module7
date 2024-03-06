@@ -43,9 +43,9 @@ q21b,b. How variable is chlorophyll-a over the course of a day?
 q22,"Q22. Record the value of your initial condition uncertainty standard deviation in ug/L, and explain in your own words how this value was calculated."
 q23,Q23. Examine the chlorophyll-a forecast plot.
 q23a,a. Download the chlorophyll-a forecast plot and copy-paste it into your report.
-q23b,"b. What is the forecasted chlorophyll-a concentration for Sept. 26, 2020?"
-q23c,"c. What is the relationship between the observed chlorophyll-a for Sept. 25, 2020, and the initial condition distribution (shown in blue)?"
-q23d,"d. Each one of the gray lines in the figure above represents an ensemble member. Describe the sources of uncertainty in the ensemble forecast for Sept. 26, 2020 in your own words."
+q23b,b. What is the forecasted chlorophyll-a concentration for 2020-09-26?
+q23c,"c. What is the relationship between the observed chlorophyll-a for 2020-09-25, and the initial condition distribution (shown in blue)?"
+q23d,d. Each one of the gray lines in the figure above represents an ensemble member. Describe the sources of uncertainty in the ensemble forecast for 2020-09-26 in your own words.
 q24,Q24. Briefly describe in your own words how an ensemble Kalman filter can be used to assimilate data into an ecological forecast.
 q25,Q25. Examine the forecast plot with an updated initial condition.
 q25a,a. Download the plot of a forecast with an updated initial condition and copy-paste it into your report.
