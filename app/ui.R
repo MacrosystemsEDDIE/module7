@@ -1081,22 +1081,32 @@ ui <- function(req) {
                                              ),
                                              hr(),
                                              fluidRow(
-                                               column(5,
+                                               column(4,
                                                       h3("Understanding the ensemble Kalman filter"),
                                                       h4(tags$em("What is an ensemble Kalman filter?")),
                                                       p("An ",tags$b("ensemble Kalman filter")," is a statistical technique that updates model predictions to more closely match the most recently observed data, while accounting for uncertainty in both model predictions and observations. While there are many techniques that can be used to assimilate data in ecological forecasts, the benefits of an ensemble Kalman filter are:"),
                                                       tags$ol(
-                                                        tags$li("It is ",tags$b("designed to be used with model ensembles,")," and so is an ideal method for forecasts which include uncertainty."),
+                                                        tags$li("It is ",tags$b("designed to be used with model ensembles,")," and so it is an ideal method for forecasts which include uncertainty."),
                                                         tags$li("It ",tags$b("accounts for uncertainty in both model predictions and observations,")," rather than assuming that observations are 'true' and have no uncertainty. As a result, when a model is updated with an ensemble Kalman filter, the updated state of the model will not always perfectly match the new observations, because the ensemble Kalman filter integrates information from both the model predictions and the observations."),
                                                         tags$li("It can be ",tags$b("used to update multiple variables and parameters")," within a model, even if not all of the variables and parameters are observed. For example, suppose you have a model that predicts both water temperature and air temperature, but you only have observations of water temperature. An ensemble Kalman filter can use the relationship between water and air temperature in the model to update both variables as well as relevant model parameters using just the water temperature observations.")
                                                       ),
                                                       p("For today, we will use a simplified version of the ensemble Kalman filter that just updates the initial condition of chlorophyll-a using new observations when they become available.")
                                                ),
-                                               column(6, offset = 1,
+                                               column(8,
                                                       br(),br(),
-                                                      img(src = "EnKF_figure.png", height = "90%", id = "bla_border",
-                                                          width = "90%", align = "center"),
-                                                      p("Image adapted from: Reichle, R. H., Walker, J. P., Koster, R. D., & Houser, P. R. (2002). ", a("Extended versus Ensemble Kalman Filtering for Land Data Assimilation", href = "https://doi.org/10.1175/1525-7541(2002)003%3C0728:EVEKFF%3E2.0.CO;2", target = "_blank"), ", Journal of Hydrometeorology, 3(6).")
+                                                      img(src = "enkf.png", height = "100%", id = "bla_border",
+                                                          width = "100%", align = "center"),
+                                                      br(),
+                                                      box(id = "box2", width = 12, status = "warning",
+                                                          solidHeader = TRUE,
+                                                          fluidRow(
+                                                            column(10, offset = 1,
+                                                                   h4(tags$b("To learn more about how an ensemble Kalman filter works (including example code), explore the ",tags$a(href="https://github.com/MacrosystemsEDDIE/module7_R", 
+                                                                                                                                                                                     "RMarkdown version", target="_blank")," of this module."))
+                                                            )
+                                                          )
+                                                      )
+                                                      
                                                )
                                              ),
                                              hr(),

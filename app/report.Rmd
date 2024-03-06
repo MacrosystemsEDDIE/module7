@@ -89,7 +89,7 @@ Webpages:
 
 Articles:
 
-- Silver, N. (2012) Chapter 6: How to drown in three feet of water.Pages 176-203 inThe Signal and the Noise: Why so many Predictions Fail – but some Don't. Penguin Books.
+- Silver, N. 2012. The Signal and the Noise: Why so many Predictions Fail – but some Don't. Penguin Books.
 - Dietze, M. and Lynch, H. 2019. Forecasting a bright future for ecology. _Frontiers in Ecology and the Environment_, _17_(1), 3. [https://doi.org/10.1002/fee.1994](https://doi.org/10.1002/fee.1994)
 - Dietze, M.C., et al. 2018. Iterative near-term ecological forecasting: Needs, opportunities, and challenges. Proceedings of the National Academy of Sciences, 115(7), 1424–1432. [https://doi.org/10.1073/pnas.1710231115](https://doi.org/10.1073/pnas.1710231115)
 
@@ -141,7 +141,9 @@ The questions you must answer are written both in the Shiny interface as well as
 
 \newpage
 
-# Think about it!
+# Introduction
+
+## Think about it!
 
 Answer the following questions:  
   
@@ -164,6 +166,8 @@ Answer the following questions:
 `r module_text["obj_01", ]`
 
 ***
+
+Be sure you have answered questions 1 and 2 in the previous Introduction section before you begin Activity A!
 
 3. `r substr(quest["q3", ], 4, nchar(quest["q3", ]))` 
 
@@ -604,7 +608,7 @@ Answer the following questions:
 
            *Please copy-paste your Q41a-plot.png image here.*
 
-           *Figure 18. A series of of one-day-ahead forecasts generated using the current forecasting system and data collection method.*
+           *Figure 18. A series of one-day-ahead forecasts generated using the current forecasting system and data collection method.*
 
       b.  `r substr(quest["q41b", ], 3, nchar(quest["q41b", ]))` 
 
@@ -617,7 +621,7 @@ Answer the following questions:
 
            *Please copy-paste your Q42a-plot.png image here.*
 
-           *Figure 19. A series of of one-day-ahead forecasts generated using the borrowed high-frequency sensor.*
+           *Figure 19. A series of one-day-ahead forecasts generated using the borrowed high-frequency sensor.*
 
       b.  `r substr(quest["q42b", ], 3, nchar(quest["q42b", ]))` 
 
@@ -630,13 +634,13 @@ Answer the following questions:
 
            *Please copy-paste your Q43a-plot.png image here.*
 
-           *Figure 20. A series of of one-day-ahead forecasts generated using the current forecasting system and data collection method and showing the observation for Saturday, Oct. 11.*
+           *Figure 20. A series of one-day-ahead forecasts generated using the current forecasting system and data collection method and showing the observation for Saturday, Oct. 11.*
 
       b.  `r substr(quest["q43b", ], 3, nchar(quest["q43b", ]))` 
 
            *Please copy-paste your Q43b-plot.png image here.*
 
-           *Figure 21. A series of of one-day-ahead forecasts generated using the borrowed high-frequency sensor and showing the observation for Saturday, Oct. 11.*
+           *Figure 21. A series of one-day-ahead forecasts generated using the borrowed high-frequency sensor and showing the observation for Saturday, Oct. 11.*
 
       c.  `r substr(quest["q43c", ], 3, nchar(quest["q43c", ]))` 
 
