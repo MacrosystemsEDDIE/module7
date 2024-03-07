@@ -817,10 +817,15 @@ shinyServer(function(input, output, session) {
            message = "Click 'Plot high-frequency data'")
     )
     
-    p <- ggplot(data = high_frequency_data$df)+
-      geom_line(aes(x = time, y = chla, group = date, color = as.factor(date)))+
+    df <- high_frequency_data$df %>%
+      group_by(date) %>%
+      mutate(group_id = cur_group_id()) %>%
+      ungroup()
+    
+    p <- ggplot(data = df)+
+      geom_line(aes(x = time, y = chla, group = group_id, color = as.factor(group_id)))+
       theme_bw()+
-      labs(color = "Date")+
+      labs(color = "Day of experiment")+
       xlab("Hour of day")+
       ylab("Chlorophyll-a (ug/L)")
     
@@ -1412,7 +1417,8 @@ shinyServer(function(input, output, session) {
   )
   
   # Second forecast figure
-  plot.second.fc.no.da <- reactiveValues(main=NULL)
+  plot.second.fc.no.da <- reactiveValues(main=NULL,
+                                         ylim=NULL)
   
   output$second_fc_no_da_plot <- renderPlot({ 
     
@@ -1464,6 +1470,7 @@ shinyServer(function(input, output, session) {
                               ic_update_no_da, forecast_chla, second_forecast_no_da, n_members)
     
     plot.second.fc.no.da$main <- p
+    plot.second.fc.no.da$ylim <- range(c(layer_scales(p)$y$range$range))
     
     return(p)
     
@@ -1497,8 +1504,13 @@ shinyServer(function(input, output, session) {
       need(input$second_forecast_da > 0,
            message = "Please generate a forecast with data assimilation above.")
     )
+    validate(
+      need(input$compare_da_no_da > 0,
+           message = "Please click 'Compare forecasts'.")
+    )
     
-    p <- plot.second.fc.da$main
+    p <- plot.second.fc.da$main +
+      ylim(plot.second.fc.no.da$ylim)
     return(p)
   })
   
@@ -1540,6 +1552,10 @@ shinyServer(function(input, output, session) {
     validate(
       need(input$second_forecast_no_da > 0,
            message = "Please generate a forecast with no data assimilation above.")
+    )
+    validate(
+      need(input$compare_da_no_da > 0,
+           message = "Please click 'Compare forecasts'.")
     )
     p <- plot.second.fc.no.da$main
     return(p)
@@ -2149,16 +2165,22 @@ shinyServer(function(input, output, session) {
     }
     
     plot.forecast.series$none <- plot_many_forecasts(forecast_data = forecast.series.data$none, forecast_series = forecast.series$none)
-    plot.forecast.series$weekly <- plot_many_forecasts(forecast_data = forecast.series.data$weekly, forecast_series = forecast.series$weekly)
-    plot.forecast.series$daily <- plot_many_forecasts(forecast_data = forecast.series.data$daily, forecast_series = forecast.series$daily)
+    forecast_series_ylim <- range(c(layer_scales(plot.forecast.series$none)$y$range$range))
+    plot.forecast.series$weekly <- plot_many_forecasts(forecast_data = forecast.series.data$weekly, forecast_series = forecast.series$weekly)+
+      ylim(forecast_series_ylim)
+    plot.forecast.series$daily <- plot_many_forecasts(forecast_data = forecast.series.data$daily, forecast_series = forecast.series$daily)+
+      ylim(forecast_series_ylim)
     
     progress$inc(message = "Running forecasts",
                  detail = "This may take a while. This window will disappear
                      when forecasts are complete.", amount = 0.1)
     
     plot.forecast.series.w.obs$none <- plot_many_forecasts_with_obs(forecast_data = forecast.series.data$none, forecast_series = forecast.series$none, observations = chla_observations)
-    plot.forecast.series.w.obs$weekly <- plot_many_forecasts_with_obs(forecast_data = forecast.series.data$weekly, forecast_series = forecast.series$weekly, observations = chla_observations)
-    plot.forecast.series.w.obs$daily <- plot_many_forecasts_with_obs(forecast_data = forecast.series.data$daily, forecast_series = forecast.series$daily, observations = chla_observations)
+    forecast_series_w_obs_ylim <- range(c(layer_scales(plot.forecast.series.w.obs$none)$y$range$range))
+    plot.forecast.series.w.obs$weekly <- plot_many_forecasts_with_obs(forecast_data = forecast.series.data$weekly, forecast_series = forecast.series$weekly, observations = chla_observations) +
+      ylim(forecast_series_w_obs_ylim)
+    plot.forecast.series.w.obs$daily <- plot_many_forecasts_with_obs(forecast_data = forecast.series.data$daily, forecast_series = forecast.series$daily, observations = chla_observations) +
+      ylim(forecast_series_w_obs_ylim)
     
     # Make sure it closes when we exit this reactive, even if there's an error
     on.exit(progress$close())
@@ -2708,15 +2730,19 @@ shinyServer(function(input, output, session) {
       
     }
     
-    plot.forecast.scenario$weekly <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$weekly, forecast_series = forecast.scenario$weekly)
-    plot.forecast.scenario$daily <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$daily, forecast_series = forecast.scenario$daily)
+    plot.forecast.scenario$weekly <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$weekly, forecast_series = forecast.scenario$weekly)+
+      ylim(4,18)
+    plot.forecast.scenario$daily <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$daily, forecast_series = forecast.scenario$daily)+
+      ylim(4,18)
     
     progress$inc(message = "Running forecasts",
                  detail = "This may take a while. This window will disappear
                      when forecasts are complete.", amount = 0.1)
     
-    plot.forecast.scenario.w.obs$weekly <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$weekly, forecast_series = forecast.scenario$weekly, show_final_obs = TRUE)
-    plot.forecast.scenario.w.obs$daily <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$daily, forecast_series = forecast.scenario$daily, show_final_obs = TRUE)
+    plot.forecast.scenario.w.obs$weekly <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$weekly, forecast_series = forecast.scenario$weekly, show_final_obs = TRUE)+
+      ylim(4,18)
+    plot.forecast.scenario.w.obs$daily <- plot_scenario_forecasts(forecast_data = forecast.scenario.data$daily, forecast_series = forecast.scenario$daily, show_final_obs = TRUE)+
+      ylim(4,18)
     
     # Make sure it closes when we exit this reactive, even if there's an error
     on.exit(progress$close())
@@ -3177,12 +3203,12 @@ shinyServer(function(input, output, session) {
   # inp <- unlist(names(list_of_inputs))
   bookmarkingWhitelist <- c("plot_chla","plot_lag1","plot_lag2","calc_ac","plot_ac","plot_pacf","fit_model" ,"calc_bias",            
                             "calc_rmse","calc_proc_distrib","plot_high_freq","calc_ic_uc","fc1" ,"fc1_viz" ,             
-                            "view_new_obs","update_ic","second_forecast_da","view_ic_no_da","second_forecast_no_da", "plot_low_ic" ,         
+                            "view_new_obs","update_ic","second_forecast_da","view_ic_no_da","second_forecast_no_da", "compare_da_no_da","plot_low_ic" ,         
                             "plot_fc_low_obs_uc","plot_high_ic","plot_fc_high_obs_uc" , 
                             "fc_series_no_da","calc_bias2","calc_rmse2","fc_series_weekly","calc_bias3","calc_rmse3",           
                             "fc_series_daily","calc_bias4" ,"calc_rmse4"  ,"fc_scenario_weekly" ,"fc_scenario_daily","fc_compare",           
                             "calc_bias5","calc_rmse5", "calc_bias6" ,"calc_rmse6" ,"show_ic","show_obs",             
-                            "show_obs2","show_obs3"  )
+                            "show_obs2","show_obs3")
 
   observeEvent(input$bookmarkBtn, {
     session$doBookmark()

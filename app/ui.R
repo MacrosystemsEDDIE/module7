@@ -924,9 +924,9 @@ ui <- function(req) {
                                              hr(),
                                              fluidRow(
                                                column(6,
-                                                      h3("Plot high-frequency data"),
+                                                      h3("Plot data collected in a controlled environment"),
                                                       p("So far, we have been working with daily mean chlorophyll-a values from your chosen lake site to fit our model."),
-                                                      p("Now, we will use some high-frequency (5-minute) chlorophyll-a data from our lake to estimate initial conditions uncertainty. For ease of visualization, we will only look at data from a few days. Click the button below to visualize the high-frequency data."),
+                                                      p("Now, we will use some high-frequency (5-minute) chlorophyll-a data collected in a controlled laboratory environment to estimate initial conditions uncertainty. Because these data are collected in a container with a known chlorophyll-a concentration, variability in the data can be used to represent observation uncertainty. Click the button below to visualize the high-frequency data."),
                                                       actionButton("plot_high_freq","Plot high-frequency data"),
                                                       br(),br(),
                                                       box(id = "box10", width = 12, status = "primary",
@@ -1232,6 +1232,8 @@ ui <- function(req) {
                                              fluidRow(
                                                column(12,
                                                       h3("Compare forecasts generated with and without data assimilation"),
+                                                      p("Click the button below to view plots and compare forecasts."),
+                                                      actionButton("compare_da_no_da","Compare forecasts"),
                                                       fluidRow(
                                                         column(6,
                                                                h4("Forecast with data assimilation"),
