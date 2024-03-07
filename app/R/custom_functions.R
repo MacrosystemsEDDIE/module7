@@ -89,7 +89,7 @@ plot_chla_lag <- function(plot_data){
   p <- ggplot(data = plot_data)+
     geom_line(aes(x = datetime, y = chla_lag, color = "1 day lag of chlorophyll"))+
     geom_line(aes(x = datetime, y = chla, color = "chlorophyll"))+
-    xlab("2018")+
+    xlab("2019")+
     ylab("Chlorophyll-a (ug/L)")+
     scale_color_manual(values = c("chlorophyll" = "darkgreen","1 day lag of chlorophyll" = "lightgreen"))+
     labs(color = NULL)+
