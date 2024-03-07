@@ -106,7 +106,7 @@ Videos:
   
 Read the following paper, which you can either access independently online or obtain from your instructor:  
   
-*Luo, Y., Ogle, K., Tucker, C., Fei, S., Gao, C., LaDeau, S., Clark, J.S. and Schimel, D.S. (2011), Ecological forecasting and data assimilation in a data-rich era. Ecological Applications, 21: 1429-1442. https://doi.org/10.1890/09-1275.1*   
+*Niu S, Luo Y, Dietze MC, Keenan TF, Shi Z, Li J, Iii FSC. 2014. The role of data assimilation in predictive ecology. Ecosphere 5: 1–16. https://doi.org/10.1890/ES13-00273.1*   
   
 #### Refer to the paper you read to answer the questions below.  
   
@@ -115,22 +115,17 @@ A.  Define 'data assimilation'.
     **Answer:** 
 
 
-B.  Summarize why, in the authors' opinion, data assimilation is needed for ecological forecasting.
+B.  Summarize why, in the authors' opinion, data assimilation is needed for ecological forecasting (which the authors refer to as "predictive ecology").
 
     **Answer:** 
 
 
-C.  Name one limitation of data assimilation in ecological forecasting.
+C.  The authors review four examples of how data assimilation has been applied in ecology (infectious disease, fisheries, wildfires, and the terrestrial carbon cycle). Choose ONE of these examples and explain 1) how data assimilation has been applied; and 2) how it has advanced research in this area. 
 
     **Answer:** 
 
 
-D.  The authors argue that the current, data-rich era in ecology is the perfect time to implement data assimilation more often in ecological modeling and forecasting. Why is the data-rich era an especially promising time for data assimilation efforts?
-
-    **Answer:** 
-
-
-E.  Provide one question you have after reading the paper. This could be, for example, a point you found confusing and would like to clarify, or a follow-up question on the topic.
+D.  The authors discuss several areas which present challenges and opportunities for application of data assimilation in ecology (models becoming more complex, data becoming more available, ecological issues becoming more complex, and real-time predictions). Choose ONE of these areas and explain, in your own words, the challenges and opportunities for applying data assimilation.
 
     **Answer:** 
 
