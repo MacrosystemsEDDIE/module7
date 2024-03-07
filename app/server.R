@@ -3031,13 +3031,26 @@ shinyServer(function(input, output, session) {
     observe({
       
       toggleState(id = "prevBtn1", condition = rv1$prev > 0)
-      if(rv1$nxt > 5 & rv3a$nxt > 9) {
+      if(rv1$nxt > 6 & rv3a$nxt > 8) {
         shinyjs::disable("nextBtn1")
       } else {
         shinyjs::enable("nextBtn1")
       }
       hide(selector = ".page")
     })
+    
+    # Diagnostics
+    # observe({
+    #   print(paste0("rv1$nxt=",rv1$nxt))
+    #   print(paste0("rv1a$nxt=",rv1$nxt))
+    #   print(paste0("rv2a$nxt=",rv1$nxt))
+    #   print(paste0("rv3a$nxt=",rv1$nxt))
+    #   print(paste0("input$tabseries1=",input$tabseries1))
+    #   print(paste0("input$tabseries2=",input$tabseries2))
+    #   print(paste0("input$tabseries3=",input$tabseries3))
+    #   print(paste0("save_prompt$times=",save_prompt$times))
+    #   
+    # })
     
     
     # Next button
@@ -3099,8 +3112,25 @@ shinyServer(function(input, output, session) {
     })
     
     
-    # Advancing Tabs
+    # Advancing Tabs and Prompting Students to Save Progress
+    save_prompt <- reactiveValues(times = 0)
     observeEvent(input$nextBtn1, {
+      
+      if(input$maintab == "mtab4" & input$tabseries1 == "obj4" & save_prompt$times == 0) {
+        showModal(
+          modalDialog(
+            title = "Save Progress",
+            "Don't forget to save your progress as you go just in case you lose your internet connection. Click 'Bookmark my progress' at the top of the page and copy-paste the link into your report.")
+        )
+        save_prompt$times <- save_prompt$times+1
+      } else if(input$maintab == "mtab5" & input$tabseries2 == "obj7" & save_prompt$times < 2) {
+        showModal(
+          modalDialog(
+            title = "Save Progress",
+            "Don't forget to save your progress as you go just in case you lose your internet connection. Click 'Bookmark my progress' at the top of the page and copy-paste the link into your report.")
+        )
+        save_prompt$times <- save_prompt$times+1
+      } else {
       
       curr_tab1 <- input$maintab
       idx <- which(tab_names$tab_id == curr_tab1)
@@ -3115,7 +3145,7 @@ shinyServer(function(input, output, session) {
         updateTabsetPanel(session, "tabseries2",
                           selected = paste0("obj", rv2a$nxt))
       } else if (curr_tab1 == "mtab6" & rv3a$nxt < 9) {
-        curr_obj <- input$tabseries2
+        curr_obj <- input$tabseries3
         updateTabsetPanel(session, "tabseries3",
                           selected = paste0("obj", rv3a$nxt))
       } else {
@@ -3129,6 +3159,7 @@ shinyServer(function(input, output, session) {
                           selected = paste0("mtab", rv1$nxt))
       }
       shinyjs::runjs("window.scrollTo(0, 0)") # scroll to top of page
+      }
     })
     
     # Moving back through tabs
