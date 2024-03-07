@@ -3,73 +3,12 @@ title: "Module 7: Using Data to Improve Ecological Forecasts - Student Handout"
 output: 
    word_document:
     reference_docx: report-style.docx
-params:
-  name: ""
-  id_number: ""
-  a1: ""
-  a2: ""
-  a3a: ""
-  a3b: ""
-  a3c: ""
-  a3d: ""
-  a3e: ""
-  a3f: ""
-  a4_at_freq: ""
-  a4_wt_freq: ""
-  a4_swr_freq: ""
-  a4_par_freq: ""
-  a4_n_freq: ""
-  a4_chl_freq: ""
-  a5: ""
-  a6a: ""
-  a6b: ""
-  a6c: ""
-  a6d: ""
-  a7a: ""
-  a7b: ""
-  a7c: ""
-  a8_states: ""
-  a8_pars: ""
-  a9: ""
-  a10: ""
-  a11: ""
-  a12: ""
-  a13: ""
-  a14: ""
-  a15: ""
-  a16: ""
-  a17: ""
-  a18: ""
-  a19: ""
-  a20: ""
-  a21: ""
-  a22: ""
-  a23: ""
-  a24: ""
-  a25: ""
-  a26: ""
-  a27: ""
-  a28: ""
-  a29: ""
-  a30: ""
-  a31: ""
-  a32: ""
-  a33: ""
-  a34: ""
-  a35: ""
-  a36: ""
-  a37: ""
-  pheno_file: NULL
-  da_method_plot: ""
-  no_da_rmse: ""
-  chla_assim_rmse: ""
-  obs_uc_rmse: ""
-  da_freq_rmse: ""
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
+
 ```{r}
 time <- Sys.time()
 
@@ -78,63 +17,15 @@ app_time <- format(file.info("ui.R")$mtime, "%Y-%m-%d")
 app_update_txt <- paste0("This app was last updated on: ", app_time)
 
 # Read in assessment questions
-# Load and format questions
 quest <- read.csv("data/student_questions.csv", row.names = 1)
-# Number rows
-ab1 <- 4:9
-ab2 <- 13:16
-ab3 <- 18:20
-ab4 <- 23:24
-
-l1 <- length(ab1)
-l2 <- length(ab2)
-l3 <- length(ab3)
-l4 <- length(ab4)
-
-# Number rows
-row.names(quest) <- NULL
-row.names(quest)[1:(ab1[1]-1)] <- paste0("q", 1:(ab1[1] -1))
-row.names(quest)[ab1[1]:ab1[l1]] <- paste0("q", (ab1[1] -1), letters[1:l1])
-row.names(quest)[(ab1[l1]+1):(ab2[1]-1)] <- paste0("q", ((ab1[l1]+1):(ab2[1] -1) - l1))
-row.names(quest)[ab2[1]:ab2[l2]] <- paste0("q", (ab2[1]-1-l1), letters[1:l2])
-row.names(quest)[(ab2[l2]+1):(ab3[1] -1)] <- paste0("q", (((ab2[l2]+1):(ab3[1] -1)) -(l1+l2)))
-row.names(quest)[ab3[1]:ab3[l3]] <- paste0("q", (ab3[1]-1-l1-l2), letters[1:l3])
-row.names(quest)[(ab3[l3]+1):(ab4[1] -1)] <- paste0("q", (((ab3[l3]+1):(ab4[1] -1)) -(l1+l2+l3)))
-row.names(quest)[ab4[1]:ab4[l4]] <- paste0("q", (ab4[1]-1-l1-l2-l3), letters[1:l4])
-row.names(quest)[(ab4[l4]+1):nrow(quest)] <- paste0("q", (((ab4[l4]+1):nrow(quest)) -(l1+l2+l3+l4)))
-
-
-
-qid <- row.names(quest)
-# Number location
-# quest$location[1:(idx-1)] <- paste0(quest$location[1:(idx-1)], " - Q.", 1:(idx-1))
-# # quest$location[idx:(idx2)] <- paste0(quest$location[idx:idx2],letters[1:length(idx:idx2)], ". ", )
-# quest$location[(idx2+1):nrow(quest)] <- paste0(quest$location[(idx2+1):nrow(quest)], " - Q.", ((idx2+1):nrow(quest) - 6))
-
-# answers <- params$answers
-# answers[is.na(answers[, 1]), 1] <- ""
-
-compare_da_plot_chk <- file.exists(params$da_method_plot)
-
-# Read in tables
-# tab_lr <- read.csv("data/out_tables/tab_lr.csv")
-# tab_lr[is.na(tab_lr)] <- ""
-
-# if(length(answers) == 1) {
-#   answers <- quest
-#   quest$location <- NULL
-#   colnames(answers)[1] <- "Answer"
-#   answers[, 1] <- ""
-# }
-
 
 # Load in text
 module_text <- read.csv("data/module_text.csv", row.names = 1, header = FALSE)
-tab_names <- read.csv("data/tab_names.csv", fileEncoding = "UTF-8-BOM")
-rownames(tab_names) <- tab_names[, 1]
 
-# Check for existence of files
-pheno_chk <- !is.null(params$pheno_file)
+# Make tables
+lake_tab <- data.frame("Characteristic" = c(substr(quest["q3a", ], 3, nchar(quest["q3a", ])),substr(quest["q3b", ], 3, nchar(quest["q3b", ])),substr(quest["q3c", ], 3, nchar(quest["q3c", ])),substr(quest["q3d", ], 3, nchar(quest["q3d", ])),substr(quest["q3e", ], 3, nchar(quest["q3e", ])),
+                                            substr(quest["q3f", ], 3, nchar(quest["q3f", ]))),
+                       "Answer" = rep("",6))
 
 
 ```
@@ -142,9 +33,10 @@ pheno_chk <- !is.null(params$pheno_file)
 ![](www/report-header.png)
 
 ***
-### Name: `r params$name`  
-### Student ID: `r params$id_number` 
-#### Completed on: `r time`
+### Name: 
+### Student ID: 
+#### Completed on: 
+#### Copy-paste your save progress link from the Shiny app here for ease of reference:
 ***
 
 # **Macrosystems EDDIE Module 7: Using Data to Improve Ecological Forecasts**
@@ -154,44 +46,38 @@ pheno_chk <- !is.null(params$pheno_file)
 
 By the end of this module, you will be able to:
 
-- `r module_text["LO1", ]`
-- `r module_text["LO2", ]`
-- `r module_text["LO3", ]`
-- `r module_text["LO4", ]`
-- `r module_text["LO5", ]`
-\
-
-```{r, echo=FALSE, fig.align="center", out.width="200px", fig.cap=""}
-knitr::include_graphics("www/mod7_conceptual_figure.png")
-```
+- Define data assimilation (Activity A)
+- Generate an ecological forecast for primary productivity (Activity A)
+- Describe how to assess ecological forecast accuracy (Activity A)
+- Describe how data assimilation affects forecast accuracy and uncertainty (Activity B)
+- Explain how updating models with data collected at different time scales (e.g., daily, weekly) and with different levels of associated uncertainty affects ecological forecasts (Activity B, C)
 
 
 # Why macrosystems ecology and ecological forecasting?
 
 **Macrosystems ecology** is the study of ecological dynamics at multiple interacting spatial and temporal scales (e.g., Heffernan et al. 2014). For example, _global_ climate change can interact with _local_ land-use activities to control how an ecosystem changes over the next decades. Macrosystems ecology recently emerged as a new sub-discipline of ecology to study ecosystems and ecological communities around the globe that are changing at an unprecedented rate because of human activities (IPCC 2013). The responses of ecosystems and communities are complex, non-linear, and driven by feedbacks across local, regional, and global scales (Heffernan et al. 2014). These characteristics necessitate novel approaches for making predictions about how systems may change to improve both our understanding of ecological phenomena as well as inform resource management.  
 
-
 **Forecasting** is a tool that can be used for understanding and predicting macrosystems dynamics. To anticipate and prepare for increased variability in populations, communities, and ecosystems, there is a pressing need to know the future state of ecological systems across space and time (Dietze et al. 2018). Ecological forecasting is an emerging approach which provides an estimate of the future state of an ecological system with uncertainty, allowing society to prepare for changes in important ecosystem services. Ecological forecasts are a powerful test of the scientific method because ecologists make a hypothesis of how an ecological system works; embed their hypothesis in a model; use the model to make a forecast of future conditions; and then when observations become available, assess the accuracy of their forecast, which indicates if their hypothesis is supported or needs to be updated. Forecasts that are effectively communicated to the public and managers will be most useful for aiding decision-making. Consequently, macrosystems ecologists are increasingly using ecological forecasts to predict how ecosystems are changing over space and time (Dietze and Lynch 2019).  
-\
+
 In this module, students will generate an ecological forecast for a NEON site and explore how to use ecological data to improve forecast accuracy. This module will introduce students to the concept of data assimilation within an ecological forecast; how data assimilation can be used to improve forecast accuracy; how the level of uncertainty and temporal frequency of observations affects forecast output; and how data assimilation can affect decision-making using ecological forecasts.  \
 
-## `r tab_names["mtab1", 2]`:
+## Module overview:
 
-- Introduction to Ecological Forecasting: pre-readings and PowerPoint in class
-- Activity A: Students build a model to simulate primary productivity for their chosen NEON site and generate a forecast.
-- Activity B: Students generate multiple forecasts while assimilating data at different temporal frequencies and with different amounts of observation uncertainty.
-- Activity C: Students then explore the effect of assimilating sensor data with different levels of observation uncertainty on forecast accuracy and make management decisions using an ecological forecast.
-\
+- Introductory presentation to the concepts of ecological forecasting, forecast accuracy and uncertainty, and data assimilation
+- Activity A: Access and explore data from an ecological site of your choice in the National Ecological Observatory Network, then fit a model and generate a forecast of lake chlorophyll-a
+- Activity B: Explore how updating model predictions with data affects forecast accuracy, including the effects of data observation uncertainty and temporal frequency
+- Activity C: Update forecasts with data that have different levels of observation uncertainty for making management decisions
 
 ## Today's focal question: _How can we use data to improve ecological forecasts?_
 
-We will address this question by building an ecological model to predict chlorophyll-a (a metric of algal biomass and primary productivity), generating ecological forecasts, and using data science approaches to integrate the most recently collected data into a forecast, a process known as data assimilation. Assimilating the most recent observations into a forecast model allows the forecaster to update the initial conditions, or the starting conditions, of the model, with the goal of improving forecast accuracy. For example, if our task is to generate a forecast of chlorophyll-a concentrations in a lake for tomorrow, it is likely that our forecast will be more accurate if we use today’s measurement of chlorophyll-a as the initial condition for our model, rather than last week’s measurement.
+To be useful for management, ecological forecasts need to be both accurate enough for managers to be able to rely on them for decision-making and include a representation of forecast uncertainty, so managers can properly interpret the probability of future events. To improve forecast accuracy, we can update forecasts with observational data once they become available, a process known as data assimilation. Recent improvements in environmental sensor technology and an increase in the number of sensors deployed in ecosystems have increased the availability of data for assimilation to develop and improve forecasts for natural resource management.
 
-We will explore how assimilating different types of data (e.g., chlorophyll-a, nutrient concentrations, water temperature) at different temporal frequencies (e.g., daily, weekly) affects forecast output. Finally, we will assimilate different types of data into forecasts and examine how data assimilation affects water resource management decisions.
+In this module, you will explore how assimilating data with different amounts of observation uncertainty and at different temporal frequencies affects forecasts of lake water quality at an ecological site of your choice.
 
 ## R Shiny App:
 
 The lesson content is hosted on an R Shiny App at [https://macrosystemseddie.shinyapps.io/module7/](https://macrosystemseddie.shinyapps.io/module7/)  
+
 This can be accessed via any internet browser and allows you to navigate through the lesson via this app. You will fill in the questions below on this handout as you complete the lesson activities.
 
 ## Optional pre-class readings and video:
@@ -203,7 +89,7 @@ Webpages:
 
 Articles:
 
-- Silver, N. (2012) Chapter 6: How to drown in three feet of water.Pages 176-203 inThe Signal and the Noise: Why so many Predictions Fail – but some Don't. Penguin Books.
+- Silver, N. 2012. The Signal and the Noise: Why so many Predictions Fail – but some Don't. Penguin Books.
 - Dietze, M. and Lynch, H. 2019. Forecasting a bright future for ecology. _Frontiers in Ecology and the Environment_, _17_(1), 3. [https://doi.org/10.1002/fee.1994](https://doi.org/10.1002/fee.1994)
 - Dietze, M.C., et al. 2018. Iterative near-term ecological forecasting: Needs, opportunities, and challenges. Proceedings of the National Academy of Sciences, 115(7), 1424–1432. [https://doi.org/10.1073/pnas.1710231115](https://doi.org/10.1073/pnas.1710231115)
 
@@ -214,398 +100,568 @@ Videos:
 - Fundamentals of Ecological Forecasting Series: [Forecast Analysis Cycle](https://www.youtube.com/watch?v=zBsqjmdLYfk&list=PLLWiknuNGd50Lc3rft4kFPc_oxAhiQ-6s&index=1)
 - Fundamentals of Ecological Forecasting Series: [Ensemble Kalman Filter](https://www.youtube.com/watch?v=UeFsEOGz_cc&list=PLLWiknuNGd50Lc3rft4kFPc_oxAhiQ-6s&index=1)
 
-The questions you must answer are embedded in the Shiny interface. You can answer the questions there and generate a report at the end or you can fill out the questions within this document.
+\newpage
 
-# Think about it!
-\
-Answer the following questions:
+## Pre-class activity: Explore how data assimilation can affect forecast accuracy
+  
+Read the following paper, which you can either access independently online or obtain from your instructor:  
+  
+*Niu S, Luo Y, Dietze MC, Keenan TF, Shi Z, Li J, Iii FSC. 2014. The role of data assimilation in predictive ecology. Ecosphere 5: 1–16. https://doi.org/10.1890/ES13-00273.1*   
+  
+#### Refer to the paper you read to answer the questions below.  
+  
+A.  Define 'data assimilation'. 
 
-1. `r quest[qid[1], 1]`  
-\
-**Answer:** `r params$a1`\
+    **Answer:** 
 
-2. `r quest[qid[2], 1]`   
-\
-**Answer:** `r params$a2`\
+
+B.  Summarize why, in the authors' opinion, data assimilation is needed for ecological forecasting (which the authors refer to as "predictive ecology").
+
+    **Answer:** 
+
+
+C.  The authors review four examples of how data assimilation has been applied in ecology (infectious disease, fisheries, wildfires, and the terrestrial carbon cycle). Choose ONE of these examples and explain 1) how data assimilation has been applied; and 2) how it has advanced research in this area. 
+
+    **Answer:** 
+
+
+D.  The authors discuss several areas which present challenges and opportunities for application of data assimilation in ecology (models becoming more complex, data becoming more available, ecological issues becoming more complex, and real-time predictions). Choose ONE of these areas and explain, in your own words, the challenges and opportunities for applying data assimilation.
+
+    **Answer:** 
 
 
 Now navigate to the [Shiny interface](https://macrosystemseddie.shinyapps.io/module7) to answer the rest of the questions.
 
-# `r tab_names["mtab4", 2]`
+The questions you must answer are written both in the Shiny interface as well as in this handout. As you go, you should fill out your answers in this document.
 
-## `r tab_names["stab1", 2]`\
+\newpage
+
+# Introduction
+
+## Think about it!
+
+Answer the following questions:  
+  
+1. `r substr(quest["q1", ], 4, nchar(quest["q1", ]))` 
+
+    **Answer:** 
+
+2. `r substr(quest["q2", ], 4, nchar(quest["q2", ]))`  
+
+    **Answer:** 
+
+
+# Activity A - Build A Model and Generate A Forecast
+
+`r module_text["act_A", ]`
+
+## Objective 1: Select and view a NEON site
 
 ***
 `r module_text["obj_01", ]`
 
 ***
 
-```{r results='asis', echo=FALSE}
-if (!pheno_chk) {cat("<!---")}
-```
-![](`r params$pheno_file`)  
-*Figure 1. Phenocam image downloaded for `r quest[qid[4], 1]`.*
-```{r results='asis', echo=FALSE}
-if (!pheno_chk) {cat("-->")}
-```
-\
+Be sure you have answered questions 1 and 2 in the previous Introduction section before you begin Activity A!
 
-3. `r quest[qid[3], 1]`  
-\
+3. `r substr(quest["q3", ], 4, nchar(quest["q3", ]))` 
 
-*Table 1. Site Characteristics*
+     a.  `r substr(quest["q3a", ], 3, nchar(quest["q3a", ]))` 
 
-| | |
-| --- | --- |
-| `r quest[qid[4], 1]` | `r params$a3a` |
-| `r quest[qid[5], 1]` | `r params$a3b` |
-| `r quest[qid[6], 1]` | `r params$a3c` |
-| `r quest[qid[7], 1]` | `r params$a3d` |
-| `r quest[qid[8], 1]` | `r params$a3e` |
-| `r quest[qid[9], 1]` | `r params$a3f` |
-\
+     b.  `r substr(quest["q3b", ], 3, nchar(quest["q3b", ]))`
+     
+     c.  `r substr(quest["q3c", ], 3, nchar(quest["q3c", ]))` 
 
-## `r tab_names["stab2", 2]`\
+     d.  `r substr(quest["q3d", ], 3, nchar(quest["q3d", ]))`
+     
+     e.  `r substr(quest["q3e", ], 3, nchar(quest["q3e", ]))` 
+
+     f.  `r substr(quest["q3f", ], 3, nchar(quest["q3f", ]))`
+
+   
+<br>
+
+## Objective 2: Explore water temperature
 
 ***
 `r module_text["obj_02", ]`
 
 ***
 
-4. `r quest[qid[10], 1]`  
+4. `r substr(quest["q4", ], 4, nchar(quest["q4", ]))`  
 
-*Table 2. Description of site variable collection frequency:*  
+    **Answer:** 
 
-| **Variable** | **Data collection frequency** | 
-| --- | --- |  
-| Air temperature | `r params$a4_at_freq` | 
-| Surface water temperature | `r params$a4_wt_freq` | 
-| Shortwave radiation | `r params$a4_swr_freq` | 
-| Underwater PAR | `r params$a4_par_freq` | 
-| Nitrogen | `r params$a4_n_freq` | 
-| Chlorophyll-a | `r params$a4_chl_freq` | 
+5. `r substr(quest["q5", ], 4, nchar(quest["q5", ]))`
 
-\
+      a.  `r substr(quest["q5a", ], 3, nchar(quest["q5a", ]))` 
 
-5. `r quest[qid[11], 1]`   
-\
-**Answer:** `r params$a5`\
+           *Please copy-paste your Q5a-plot.png image here.*
 
-## `r tab_names["stab3", 2]`\
+           *Figure 1. Time series of chlorophyll-a data for your selected NEON lake.*
+
+      b.  `r substr(quest["q5b", ], 3, nchar(quest["q5b", ]))` 
+
+           **Answer:**   
+
+
+<br>
+
+## Objective 3: Fit model
 
 ***
 `r module_text["obj_03", ]`
 
 ***
 
-6. `r quest[qid[12], 1]`  
-\
+6. `r substr(quest["q6", ], 4, nchar(quest["q6", ]))`  
 
-a. `r quest[qid[13], 1]`  
-\
-**Answer:** `r params$a6a`  
-\
+    **Answer:** 
 
-b. `r quest[qid[14], 1]`  
-\
-**Answer:** `r params$a6b`  
-\
+7. `r substr(quest["q7", ], 4, nchar(quest["q7", ]))`
 
-c. `r quest[qid[15], 1]`  
-\
-**Answer:** `r params$a6c`  
-\
+      a.  `r substr(quest["q7a", ], 3, nchar(quest["q7a", ]))` 
 
-d. `r quest[qid[16], 1]`  
-\
-**Answer:** `r params$a6d`  
-\
+           *Please copy-paste your Q7a-plot.png image here.*
 
-```{r}
+           *Figure 2. Time series of lagged chlorophyll-a data for your selected NEON lake.*
 
-```
+      b.  `r substr(quest["q7b", ], 3, nchar(quest["q7b", ]))` 
 
+           **Answer:**   
+           
 
-# Activity A - Build a Model with Uncertainty
+8. `r substr(quest["q8", ], 4, nchar(quest["q8", ]))`
 
-`r module_text["act_A", ]`
+      a.  `r substr(quest["q8a", ], 3, nchar(quest["q8a", ]))` 
 
-## `r tab_names["stab4", 2]`\
+           *Please copy-paste your Q8a-plot.png image here.*
+
+           *Figure 3. Scatterplot of chlorophyll-a data vs. lagged chlorophyll-a data for your selected NEON lake.*
+
+      b.  `r substr(quest["q8b", ], 3, nchar(quest["q8b", ]))` 
+
+           **Answer:**   
+           
+
+9. `r substr(quest["q9", ], 4, nchar(quest["q9", ]))`  
+
+    **Answer:** 
+
+10. `r substr(quest["q10", ], 5, nchar(quest["q10", ]))`
+
+      a.  `r substr(quest["q10a", ], 3, nchar(quest["q10a", ]))` 
+
+           *Please copy-paste your Q10a-plot.png image here.*
+
+           *Figure 4. Autocorrelation of lagged chlorophyll-a at your lake site.*
+
+      b.  `r substr(quest["q10b", ], 3, nchar(quest["q10b", ]))` 
+
+           **Answer:**   
+           
+
+11. `r substr(quest["q11", ], 5, nchar(quest["q11", ]))`    
+
+     **Answer:**
+
+12. `r substr(quest["q12", ], 5, nchar(quest["q12", ]))`
+
+      a.  `r substr(quest["q12a", ], 3, nchar(quest["q12a", ]))` 
+
+           *Please copy-paste your Q12a-plot.png image here.*
+
+           *Figure 5. Partial autocorrelation of chlorophyll-a at your lake site.*
+
+      b.  `r substr(quest["q12b", ], 3, nchar(quest["q12b", ]))` 
+
+           **Answer:**   
+           
+           
+13. `r substr(quest["q13", ], 5, nchar(quest["q13", ]))`    
+
+     **Answer:**
+     
+14. `r substr(quest["q14", ], 5, nchar(quest["q14", ]))`    
+
+     **Answer:**
+
+15. `r substr(quest["q15", ], 5, nchar(quest["q15", ]))`
+
+      a.  `r substr(quest["q15a", ], 3, nchar(quest["q15a", ]))` 
+
+           *Please copy-paste your Q15a-plot.png image here.*
+
+           *Figure 6. Autoregressive model predictions and chlorophyll-a observations at your lake site.*
+
+      b.  `r substr(quest["q15b", ], 3, nchar(quest["q15b", ]))` 
+
+           **Answer:**  
+           
+           
+16. `r substr(quest["q16", ], 5, nchar(quest["q16", ]))`    
+
+     **Answer:**
+     
+17. `r substr(quest["q17", ], 5, nchar(quest["q17", ]))`    
+
+     **Answer:**    
+     
+<br>
+
+## Objective 4: Generate forecast
 
 ***
 `r module_text["obj_04", ]`
 
 ***
 
-7. `r quest[qid[17], 1]`  
-\
-a. `r quest[qid[18], 1]` 
-\
-**Answer:** `r params$a7a`  
-\
-b. `r quest[qid[19], 1]`  
-\
-**Answer:** `r params$a7b`  
-\
-c. `r quest[qid[20], 1]`  
-\
-**Answer:** `r params$a7c`  
-\
+18. `r substr(quest["q18", ], 5, nchar(quest["q18", ]))`    
 
-8. `r quest[qid[21], 1]`  
+     **Answer:**
+     
+19. `r substr(quest["q19", ], 5, nchar(quest["q19", ]))`    
 
-*Table 3. Sorted model states and parameters:*  
+     **Answer:**    
+     
+20. `r substr(quest["q20", ], 5, nchar(quest["q20", ]))`    
 
-| **State variables** | **Parameters** | 
-| --- | --- |  
-| `r params$a8_states` | `r params$a8_pars` | 
+     **Answer:**
+          
+21. `r substr(quest["q21", ], 5, nchar(quest["q21", ]))`
 
-\
+      a.  `r substr(quest["q21a", ], 3, nchar(quest["q21a", ]))` 
 
-9. `r quest[qid[22], 1]`  
-\
-**Answer:** `r params$a9`  
-\
+           *Please copy-paste your Q21a-plot.png image here.*
 
+           *Figure 7. High-frequency chlorophyll-a data at your lake site.*
 
-*Table 4. Relationships between primary productivity and environmental variables:*  
+      b.  `r substr(quest["q21b", ], 3, nchar(quest["q21b", ]))` 
 
-| **Variable relationship** | **Q.6 Answers** | **Q.7 Answers** |   
-| --- | --- | --- |  
-| Primary productivity (chl-a) vs. water temperature | `r params$a6b` | `r params$a7a` |
-| Primary productivity (chl-a) vs. light (underwater PAR) | `r params$a6c` | `r params$a7b` |
-| Primary productivity (chl-a) vs. nutrients (nitrate sensor) | `r params$a6d` | `r params$a7c` |
+           **Answer:**  
+           
+           
+22. `r substr(quest["q22", ], 5, nchar(quest["q22", ]))`    
 
+     **Answer:**
+          
+23. `r substr(quest["q23", ], 5, nchar(quest["q23", ]))`
 
-\
+      a.  `r substr(quest["q23a", ], 3, nchar(quest["q23a", ]))` 
 
+           *Please copy-paste your Q23a-plot.png image here.*
 
-## `r tab_names["stab5", 2]`\
+           *Figure 8. A one-day-ahead forecast of chlorophyll-a at your lake site.*
+
+      b.  `r substr(quest["q23b", ], 3, nchar(quest["q23b", ]))` 
+
+           **Answer:**  
+           
+      c.  `r substr(quest["q23c", ], 3, nchar(quest["q23c", ]))` 
+
+           **Answer:**  
+           
+      d.  `r substr(quest["q23d", ], 3, nchar(quest["q23d", ]))` 
+
+           **Answer:**  
+           
+        
+\newpage
+
+# Activity B - Explore Data Assimilation
+
+`r module_text["act_B", ]`
+
+## Objective 5: Assimilate data
 
 ***
 `r module_text["obj_05", ]`
 
 ***
 
-## `r tab_names["stab6", 2]`\
+24. `r substr(quest["q24", ], 5, nchar(quest["q24", ]))`    
+
+     **Answer:**
+     
+25. `r substr(quest["q25", ], 5, nchar(quest["q25", ]))`
+
+      a.  `r substr(quest["q25a", ], 3, nchar(quest["q25a", ]))` 
+
+           *Please copy-paste your Q25a-plot.png image here.*
+
+           *Figure 9. One-day-ahead forecast with updated initial condition using newly observed chlorophyll-a data.*
+
+      b.  `r substr(quest["q25b", ], 3, nchar(quest["q25b", ]))` 
+
+           **Answer:**  
+           
+    
+26. `r substr(quest["q26", ], 5, nchar(quest["q26", ]))`
+
+      a.  `r substr(quest["q26a", ], 3, nchar(quest["q26a", ]))` 
+
+           *Please copy-paste your Q26a-plot.png image here.*
+
+           *Figure 10. One-day-ahead forecast with updated initial condition when chlorophyll-a data are missing.*
+
+      b.  `r substr(quest["q26b", ], 3, nchar(quest["q26b", ]))` 
+
+           **Answer:**  
+           
+           
+27. `r substr(quest["q27", ], 5, nchar(quest["q27", ]))`
+
+      a.  `r substr(quest["q27a", ], 3, nchar(quest["q27a", ]))` 
+
+           *Please copy-paste your Q27a-plot.png image here.*
+
+           *Figure 11. Two-forecast plot with data assimilation.*
+
+      b.  `r substr(quest["q27b", ], 3, nchar(quest["q27b", ]))` 
+
+           *Please copy-paste your Q27b-plot.png image here.*
+
+           *Figure 12. Two-forecast plot without data assimilation.*
+
+      c.  `r substr(quest["q27c", ], 3, nchar(quest["q27c", ]))` 
+
+           **Answer:**  
+           
+
+<br>
+
+## Objective 6: Explore observation uncertainty
 
 ***
 `r module_text["obj_06", ]`
 
 ***
 
-10. `r quest[qid[25], 1]`  
-\
-**Answer:** `r params$a10`  
-\
+28. `r substr(quest["q28", ], 5, nchar(quest["q28", ]))`    
 
-11. `r quest[qid[26], 1]`  
-\
-**Answer:** `r params$a11`  
-\
+     **Answer:**
+     
+29. `r substr(quest["q29", ], 5, nchar(quest["q29", ]))`
 
-12. `r quest[qid[27], 1]`  
-\
-**Answer:** `r params$a12`  
-\
+      a.  `r substr(quest["q29a", ], 3, nchar(quest["q29a", ]))` 
 
-13. `r quest[qid[28], 1]`  
-\
-**Answer:** `r params$a13`  
-\
+           *Please copy-paste your Q29a-plot.png image here.*
 
+           *Figure 13. Plot of forecasts assimilating data with low observation uncertainty.*
 
-# Activity B - Assimilate Data\
+      b.  `r substr(quest["q29b", ], 3, nchar(quest["q29b", ]))` 
 
-***
-`r module_text["act_B", ]`
+           **Answer:** 
 
-***
+      c.  `r substr(quest["q29c", ], 3, nchar(quest["q29c", ]))` 
 
-## `r tab_names["stab7", 2]`\
+           **Answer:**  
+           
+
+30. `r substr(quest["q30", ], 5, nchar(quest["q30", ]))`    
+
+     **Answer:**
+     
+31. `r substr(quest["q31", ], 5, nchar(quest["q31", ]))`
+
+      a.  `r substr(quest["q31a", ], 3, nchar(quest["q31a", ]))` 
+
+           *Please copy-paste your Q31a-plot.png image here.*
+
+           *Figure 14. Plot of forecasts assimilating data with high observation uncertainty.*
+
+      b.  `r substr(quest["q31b", ], 3, nchar(quest["q31b", ]))` 
+
+           **Answer:** 
+
+      c.  `r substr(quest["q31c", ], 3, nchar(quest["q31c", ]))` 
+
+           **Answer:**  
+           
+
+<br>
+
+## Objective 7: Explore data assimilation frequency
 
 ***
 `r module_text["obj_07", ]`
 
 ***
 
-14. `r quest[qid[29], 1]`  
-\
-**Answer:** `r params$a14`  
-\
+32. `r substr(quest["q32", ], 5, nchar(quest["q32", ]))`    
 
-15. `r quest[qid[30], 1]`  
-\
-**Answer:** `r params$a15`  
-\
+     **Answer:**
+     
+33. `r substr(quest["q33", ], 5, nchar(quest["q33", ]))`
 
-16. `r quest[qid[31], 1]`  
-\
-**Answer:** `r params$a16`  
-\
+      a.  `r substr(quest["q33a", ], 3, nchar(quest["q33a", ]))` 
 
-17. `r quest[qid[32], 1]`  
-\
-**Answer:** `r params$a17`  
-\
+           *Please copy-paste your Q33a-plot.png image here.*
 
-18. `r quest[qid[33], 1]`  
-\
-**Answer:** `r params$a18`  
-\
+           *Figure 15. A series of one-day-ahead forecasts with no data assimilation.*
 
-```{r results='asis', echo=FALSE}
-if (!compare_da_plot_chk) {cat("<!---")}
-```
-![](`r params$da_method_plot`)  
-*Figure 1: Comparison of forecast with and without data assimilation*   
-```{r results='asis', echo=FALSE}
-if (!compare_da_plot_chk) {cat("-->")}
-```
-\
-*Table 5. Effect of data assimilation on forecast accuracy.*  
+      b.  `r substr(quest["q33b", ], 3, nchar(quest["q33b", ]))` 
 
-| **DA Method** | **Forecast RMSE** | 
-| --- | --- |  
-| No data assimilation | `r params$no_da_rmse` | 
-| Chlorophyll-a data assimilation | `r params$chla_assim_rmse` | 
-\
-19. `r quest[qid[34], 1]`  
-\
-**Answer:** `r params$a19`  
-\
+           **Answer:** 
+
+      c.  `r substr(quest["q33c", ], 3, nchar(quest["q33c", ]))` 
+
+           **Answer:**  
+           
+
+34. `r substr(quest["q34", ], 5, nchar(quest["q34", ]))`
+
+      a.  `r substr(quest["q34a", ], 3, nchar(quest["q34a", ]))` 
+
+           **Answer:**
+
+      b.  `r substr(quest["q34b", ], 3, nchar(quest["q34b", ]))` 
+
+           **Answer:** 
 
 
-## `r tab_names["stab8", 2]`\
+35. `r substr(quest["q35", ], 5, nchar(quest["q35", ]))`
+
+      a.  `r substr(quest["q35a", ], 3, nchar(quest["q35a", ]))` 
+
+           *Please copy-paste your Q35a-plot.png image here.*
+
+           *Figure 16. A series of one-day-ahead forecasts with weekly data assimilation.*
+
+      b.  `r substr(quest["q35b", ], 3, nchar(quest["q35b", ]))` 
+
+           **Answer:** 
+
+      c.  `r substr(quest["q35c", ], 3, nchar(quest["q35c", ]))` 
+
+           **Answer:**  
+           
+
+36. `r substr(quest["q36", ], 5, nchar(quest["q36", ]))`
+
+      a.  `r substr(quest["q36a", ], 3, nchar(quest["q36a", ]))` 
+
+           **Answer:**
+
+      b.  `r substr(quest["q36b", ], 3, nchar(quest["q36b", ]))` 
+
+           **Answer:** 
+
+
+37. `r substr(quest["q37", ], 5, nchar(quest["q37", ]))`
+
+      a.  `r substr(quest["q37a", ], 3, nchar(quest["q37a", ]))` 
+
+           *Please copy-paste your Q37a-plot.png image here.*
+
+           *Figure 17. A series of one-day-ahead forecasts with daily data assimilation.*
+
+      b.  `r substr(quest["q37b", ], 3, nchar(quest["q37b", ]))` 
+
+           **Answer:** 
+
+      c.  `r substr(quest["q37c", ], 3, nchar(quest["q37c", ]))` 
+
+           **Answer:**  
+           
+
+38. `r substr(quest["q38", ], 5, nchar(quest["q38", ]))`
+
+      a.  `r substr(quest["q38a", ], 3, nchar(quest["q38a", ]))` 
+
+           **Answer:**
+
+      b.  `r substr(quest["q38b", ], 3, nchar(quest["q38b", ]))` 
+
+           **Answer:** 
+           
+           
+39. `r substr(quest["q39", ], 5, nchar(quest["q39", ]))`    
+
+     **Answer:**
+     
+\newpage 
+
+# Activity C - Management Scenario
+
+`r module_text["act_C", ]`
+
+## Objective 8: Management scenario
 
 ***
 `r module_text["obj_08", ]`
 
 ***
 
-20. `r quest[qid[35], 1]`  
-\
-**Answer:** `r params$a20`  
-\
+40. `r substr(quest["q40", ], 5, nchar(quest["q40", ]))`    
 
-21. `r quest[qid[36], 1]`  
-\
-**Answer:** `r params$a21`  
-\
-*Table 6. Effect of observation uncertainty on forecast accuracy.*  
+     **Answer:**
+    
+41. `r substr(quest["q41", ], 5, nchar(quest["q41", ]))`
 
-| **Chl-a observation uncertainty** | **Forecast RMSE** | 
-| --- | --- |  
-| `r params$obs_uc_rmse[1,1]` | `r params$obs_uc_rmse[1,2]` | 
-| `r params$obs_uc_rmse[2,1]` | `r params$obs_uc_rmse[2,2]` | 
-| `r params$obs_uc_rmse[3,1]` | `r params$obs_uc_rmse[3,2]` | 
-| `r params$obs_uc_rmse[4,1]` | `r params$obs_uc_rmse[4,2]` | 
-| `r params$obs_uc_rmse[5,1]` | `r params$obs_uc_rmse[5,2]` | 
-\
-22. `r quest[qid[37], 1]`  
-\
-**Answer:** `r params$a22`  
-\
+      a.  `r substr(quest["q41a", ], 3, nchar(quest["q41a", ]))` 
+
+           *Please copy-paste your Q41a-plot.png image here.*
+
+           *Figure 18. A series of one-day-ahead forecasts generated using the current forecasting system and data collection method.*
+
+      b.  `r substr(quest["q41b", ], 3, nchar(quest["q41b", ]))` 
+
+           **Answer:** 
 
 
-## `r tab_names["stab9", 2]`\
+42. `r substr(quest["q42", ], 5, nchar(quest["q42", ]))`
 
-***
-`r module_text["obj_09", ]`
+      a.  `r substr(quest["q42a", ], 3, nchar(quest["q42a", ]))` 
 
-***
+           *Please copy-paste your Q42a-plot.png image here.*
 
-23. `r quest[qid[38], 1]`  
-\
-**Answer:** `r params$a23`  
-\
+           *Figure 19. A series of one-day-ahead forecasts generated using the borrowed high-frequency sensor.*
 
-24. `r quest[qid[39], 1]`  
-\
-**Answer:** `r params$a24`  
-\
-*Table 7. Effect of data assimilation frequency on forecast accuracy.*  
+      b.  `r substr(quest["q42b", ], 3, nchar(quest["q42b", ]))` 
 
-| **Chl-a observation uncertainty** | **Forecast RMSE** | 
-| --- | --- |  
-| `r params$da_freq_rmse[1,1]` | `r params$da_freq_rmse[1,2]` | 
-| `r params$da_freq_rmse[2,1]` | `r params$da_freq_rmse[2,2]` | 
-| `r params$da_freq_rmse[3,1]` | `r params$da_freq_rmse[3,2]` | 
-| `r params$da_freq_rmse[4,1]` | `r params$da_freq_rmse[4,2]` | 
-| `r params$da_freq_rmse[5,1]` | `r params$da_freq_rmse[5,2]` | 
-\
-25. `r quest[qid[40], 1]`  
-\
-**Answer:** `r params$a25`  
-\
-
-26. `r quest[qid[41], 1]`  
-\
-**Answer:** `r params$a26`  
-\
-
-27. `r quest[qid[42], 1]`  
-\
-**Answer:** `r params$a27`  
-\
-
-## `r tab_names["stab10", 2]`\
-
-***
-`r module_text["act_B_summ", ]`
-
-***
-
-28. `r quest[qid[43], 1]`  
-\
-**Answer:** `r params$a28`  
-\
-
-29. `r quest[qid[44], 1]`  
-\
-**Answer:** `r params$a29`  
-\
+           **Answer:** 
 
 
-# Activity C: Management Scenario\
+43. `r substr(quest["q43", ], 5, nchar(quest["q43", ]))`
 
-`r module_text["act_C", ]`
+      a.  `r substr(quest["q43a", ], 3, nchar(quest["q43a", ]))` 
 
-## `r tab_names["stab11", 2]`\
+           *Please copy-paste your Q43a-plot.png image here.*
 
-***
-`r module_text["obj_10", ]`
+           *Figure 20. A series of one-day-ahead forecasts generated using the current forecasting system and data collection method and showing the observation for Saturday, Oct. 11.*
 
-***
+      b.  `r substr(quest["q43b", ], 3, nchar(quest["q43b", ]))` 
 
-30. `r quest[qid[45], 1]`  
-\
-**Answer:** `r params$a30`  
-\
+           *Please copy-paste your Q43b-plot.png image here.*
 
-**Note:** Questions 31-33 are not included in the final report as the order of these questions and their answers will vary depending on which sensor you have selected to purchase.\
+           *Figure 21. A series of one-day-ahead forecasts generated using the borrowed high-frequency sensor and showing the observation for Saturday, Oct. 11.*
 
-34. `r quest[qid[49], 1]`  
-\
-**Answer:** `r params$a34`  
-\
+      c.  `r substr(quest["q43c", ], 3, nchar(quest["q43c", ]))` 
 
-35. `r quest[qid[50], 1]`  
-\
-**Answer:** `r params$a35`  
-\
+           **Answer:** 
 
-36. `r quest[qid[51], 1]`  
-\
-**Answer:** `r params$a36`  
-\
+      d.  `r substr(quest["q43d", ], 3, nchar(quest["q43d", ]))` 
 
-37. `r quest[qid[52], 1]`  
-\
-**Answer:** `r params$a37`  
-\
+           **Answer:** 
 
-## End of module - nice work!\
 
-`r module_text["acknowledgement", ]`
-`r app_update_txt`
+44. `r substr(quest["q44", ], 5, nchar(quest["q44", ]))`    
+
+     **Answer:**
+  
+45. `r substr(quest["q45", ], 5, nchar(quest["q45", ]))`
+
+      a.  `r substr(quest["q45a", ], 3, nchar(quest["q45a", ]))` 
+
+           **Answer:**
+
+      b.  `r substr(quest["q45b", ], 3, nchar(quest["q45b", ]))` 
+
+           **Answer:** 
+           
+    
+<br>
+
+*`r module_text["acknowledgement", ]`*
+*`r app_update_txt`*

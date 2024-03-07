@@ -1,53 +1,108 @@
-﻿q_no,Question,location
-q1,What is meant by the term 'data assimilation' in the context of ecological forecasting?,Introduction:
-q2,How do you think the process of integrating the most recently observed data into models can improve forecasts? ,Introduction:
-q3,Fill out information about your selected NEON site:,Site Selection: Objective 1
-q3a,Name of selected site:,Site Selection: Objective 1
-q3b,Four letter site identifier:,Site Selection: Objective 1
-q3c,Latitude:,Site Selection: Objective 1
-q3d,Longitude:,Site Selection: Objective 1
-q3e,Lake area (km2):,Site Selection: Objective 1
-q3f,Elevation (m):,Site Selection: Objective 1
-q4,Scroll over the interactive plot to determine how frequently different types of data are collected. Fill out the table below with the collection frequency of the listed environmental variables. To edit the table you must double click the cell and then type in your answer.,Site Selection: Objective 2
-q5,Why might some types of data be collected more frequently than others? Try to think of two reasons.,Site Selection: Objective 2
-q6,Describe the effect of each of the following variables on chlorophyll-a. Chlorophyll-a is used as a proxy measurement for algal biomass (phytoplankton concentration) and primary productivity in aquatic environments.,Site Selection: Objective 3
-q6a,Air temperature,Site Selection: Objective 3
-q6b,Surface water temperature,Site Selection: Objective 3
-q6c,Underwater PAR,Site Selection: Objective 3
-q6d,Nitrate sensor,Site Selection: Objective 3
-q7,"In our ecological model of primary productivity, what is the relationship between each of these driver variables and productivity? For example, if the driver variable increases, will it cause productivity to increase (positive relationship), decrease (negative relationship), or have no effect (stay the same). Hint: Use the slides at the top of the page to help you if you are not sure of the answer.",Activity A: Objective 4
-q7a,Surface water temperature,Activity A: Objective 4
-q7b,Incoming light,Activity A: Objective 4
-q7c,Available nutrients,Activity A: Objective 4
-q8,Classify the following as either a state variable or a driver variable by dragging it into the corresponding bin.,Activity A: Objective 4
-q9,Compare your answers between Q.6 and Q.7. Are there any differences in the relationships between primary productivity and driver variables that you observed in the lake data (Q.6) and the relationships between primary productivity and driver variables in the ecological model (Q.7)?,Activity A: Objective 4
-q9a,Increases in water temperature,Activity A: Objective 4
-q9b,Increases in underwater light,Activity A: Objective 4
-q10,"How sensitive is your forecast to the initial condition of chlorophyll-a? Specifically, if you start the model at low or high values of chlorophyll-a concentration, how does this affect forecast output?",Activity A: Objective 6
-q11,"How sensitive is your forecast to initial condition uncertainty? Specifically, if you start the model using a normal distribution of initial conditions with a small versus a large standard deviation, how does this affect forecast output?",Activity A: Objective 6
-q12,"Based on your answer to questions 10 and 11, how do you think your forecast would be affected by assimilating the most recently observed data into the model to inform the value of the initial condition of chlorophyll-a?",Activity A: Objective 6
-q13,How does changing the value of the initial condition AND the uncertainty of the initial condition affect your ensemble forecast output?,Activity A: Objective 6
-q14,"Make a hypothesis by choosing the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation.""",Activity B: Objective 7
-q15,Describe the predicted vs. observed plot for your forecast with no data assimilation. How accurate do you think the forecast is?,Activity B: Objective 7
-q16,Record the RMSE of your forecast with no data assimilation.,Activity B: Objective 7
-q17,Describe the predicted vs. observed plot for your forecast with chlorophyll-a data assimilation. How accurate do you think the forecast is?,Activity B: Objective 7
-q18,Record the RMSE of your forecast with chlorophyll-a data assimilation.,Activity B: Objective 7
-q19,"Using RMSE from the table above, choose the word that you think best completes the following sentence: ""Assimilating chlorophyll-a data will cause forecast accuracy to [increase, decrease, stay the same] compared to the forecast with no data assimilation."" Remember, a lower RMSE value indicates a more accurate forecast.",Activity B: Objective 7
-q20,"Using the table above, briefly characterize the relative amount of observation uncertainty associated with chl-a sensors and chl-a lab measurements.",Activity B: Objective 8
-q21,Make a hypothesis: how do you think a high level of observation uncertainty might affect the process of data assimilation into forecasts and forecast output?,Activity B: Objective 8
-q22,Describe the effect of changes in observation uncertainty on your forecast output. Does this match your stated expectation from the previous question?,Activity B: Objective 8
-q23,"Referring to the table above, what are some of the most common factors affecting how often data are available for assimilation into ecological forecasts?",Activity B: Objective 9
-q24,"Make a hypothesis: how do you think the frequency of data assimilation might affect forecast output? Specifically, how do you think that a forecast which assimilates data once a month might differ from a forecast that assimilates data every day?",Activity B: Objective 9
-q25,"Generate a forecast with chl-a data assimilation every 10 days, and record the RMSE of the forecast.",Activity B: Objective 9
-q26,"Generate a forecast with daily data assimilation for chl-a, and record the RMSE of the forecast.",Activity B: Objective 9
-q27,Compare the RMSEs of forecasts when data are assimilated every day vs. when data are only assimilated every 10 days. How do they compare? What does this comparison indicate about the effect of data assimilation frequency on forecast output?,Activity B: Objective 9
-q28,What are some characteristics of environmental data that would make data easier or harder to assimilate into forecasts? Explain your reasoning.,Activity B: Summary
-q29,What are some characteristics of environmental data that would lead to the greatest improvement in forecast accuracy when those data are assimilated? Explain your reasoning.,Activity B: Summary
-q30,Briefly explain your decision to purchase either Sensor A (cheap sensor) or Sensor B (expensive sensor).,Activity C: Objective 10
-q31,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
-q32,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
-q33,"Based on the forecast presented here, would managers of Green Reservoir issue a drinking water warning for Oct. 27?",Activity C: Objective 10
-q34,How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor A (cheaper sensor)?,Activity C: Objective 10
-q35,How did the management decision made using a forecast with no sensor compare to the decision made using a forecast with Sensor B (expensive sensor)?,Activity C: Objective 10
-q36,How did the management decision made using a forecast with Sensor A (cheaper sensor) compare to the decision made using a forecast with Sensor B (expensive sensor)?,Activity C: Objective 10
-q37,"Now that you can see forecasts generated with each sensor as well as all the data collected during the forecast period, would you change your recommendation to the water authority about which sensor to use? Why or why not?",Activity C: Objective 10
+﻿q_no,Question
+q1,Q1. What is meant by the term 'data assimilation' in the context of ecological forecasting?
+q2,Q2. How do you think the process of integrating the most recently observed data into models can improve forecasts? 
+q3,Q3. Fill out information about your selected NEON site.
+q3a,a. Name of selected site:
+q3b,b. Four letter site identifier:
+q3c,c. Latitude:
+q3d,d. Longitude:
+q3e,e. Lake area (km2):
+q3f,f. Elevation (m):
+q4,Q4. Why might a forecast of lake chlorophyll-a concentration days to weeks into the future be a useful tool for water managers?
+q5,Q5. Describe chlorophyll-a data at your lake.
+q5a,a. Download the timeseries plot of chlorophyll-a data and copy-paste it into your report. 
+q5b,b. Describe how chlorophyll-a changes over time in your lake. Do you notice any patterns or trends?
+q6,"Q6. Explain, in your own words, how autocorrelation in a variable can help forecasters make predictions of the future."
+q7,Q7. Describe what you observe on the timeseries plot of lagged chlorophyll-a. How do the two lines plotted on the timeseries (chlorophyll and 1 day lag of chlorophyll) relate to each other?
+q7a,a. Download the plot of lagged chlorophyll-a and copy-paste it into your report. 
+q7b,b. How do the two lines plotted on the timeseries (chlorophyll and 1 day lag of chlorophyll) relate to each other?
+q8,Q8. Describe what you observe on the scatterplot figure to the right. Do you think the chlorophyll-a data at your chosen lake site exhibit autocorrelation? Why or why not?
+q8a,a. Download the scatterplot and copy-paste it into your report.
+q8b,b. Do you think the chlorophyll-a data at your chosen lake site exhibit autocorrelation? Why or why not?
+q9,Q9. Record the autocorrelation value you calculated. Does this value indicate low or high autocorrelation between chlorophyll-a and a 1-day lag of chlorophyll-a?
+q10,Q10. Describe autocorrelation across many lags at your lake site.
+q10a,a. Download the autocorrelation plot and copy-paste it into your report.
+q10b,b. Describe how autocorrelation changes as the lag in days increases. Why do you think this pattern occurs?
+q11,"Q11. Imagine you are asked to develop a forecasting model that uses lagged values of chlorophyll-a to predict future chlorophyll-a. Examining the autocorrelation plot above, how many lags of chlorophyll-a would you include in your forecasting model? Provide your answer in days (e.g., I would include up to a 3-day lag) and explain your reasoning."
+q12,Q12. Examine the PACF plot. 
+q12a,a. Download the PACF plot and copy-paste it into your report.
+q12b,b. Examine the PACF plot. Which lag contributes the most to autocorrelation in the chlorophyll-a data? Explain how you know.
+q13,"Q13. Once again, imagine you are asked to develop a forecasting model that uses lagged values of chlorophyll-a to predict future chlorophyll-a. Examining the PACF plot above, how many lags of chlorophyll-a would you include in your forecasting model? Provide your answer in days (e.g., I would include up to a 3-day lag) and explain your reasoning."
+q14,Q14. Did the number of lags you chose to include in your forecasting model change from Q11 to Q13? Why or why not?
+q15,Q15. Use the plot above to assess the model fit to data. 
+q15a,a. Download the plot of model predictions and observations and copy-paste it into your report.
+q15b,b. How well do the predictions match the observations?
+q16,"Q16. Record your model bias. Then, use the calculated bias to assess the model fit to data. How good is the model fit? Explain your reasoning."
+q17,"Q17. Record your model RMSE. Then, use the calculated RMSE to assess the model fit to data. How good is the model fit? Explain your reasoning."
+q18,"Q18. Explain, in your own words, what forecast uncertainty is and why it is important to account for uncertainty in forecasts."
+q19,"Q19. Record the value of your process uncertainty standard deviation in ug/L, and explain in your own words how this value was calculated."
+q20,Q20. What data from your chosen lake are needed to provide the initial condition for your forecast model?
+q21,Q21. Examine the plot of high-frequency chlorophyll-a data. 
+q21a,a. Download the plot of high-frequency chlorophyll-a data and copy-paste it into your report.
+q21b,b. How variable is chlorophyll-a over the course of a day?
+q22,"Q22. Record the value of your initial condition uncertainty standard deviation in ug/L, and explain in your own words how this value was calculated."
+q23,Q23. Examine the chlorophyll-a forecast plot.
+q23a,a. Download the chlorophyll-a forecast plot and copy-paste it into your report.
+q23b,b. What is the forecasted chlorophyll-a concentration for 2020-09-26?
+q23c,"c. What is the relationship between the observed chlorophyll-a for 2020-09-25, and the initial condition distribution (shown in blue)?"
+q23d,d. Each one of the gray lines in the figure above represents an ensemble member. Describe the sources of uncertainty in the ensemble forecast for 2020-09-26 in your own words.
+q24,Q24. Briefly describe in your own words how an ensemble Kalman filter can be used to assimilate data into an ecological forecast.
+q25,Q25. Examine the forecast plot with an updated initial condition.
+q25a,a. Download the plot of a forecast with an updated initial condition and copy-paste it into your report.
+q25b,b. Compare the difference between the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. How are these two distributions different?
+q26,Q26. Examine the forecast plot with an updated initial condition when data are missing.
+q26a,a. Download the plot of the updated initial condition when data are missing and copy-paste it into your report.
+q26b,b. Compare the forecast distribution (white) for 2020-09-26 and the updated initial condition (blue distribution) for 2020-09-26. What happened when there was no new observation to update the forecast?
+q27,Q27. Compare the two-forecast plot with no data assimilation (missing observation) to the two-forecast plot with data assimilation.
+q27a,a. Download the two 1-day-ahead forecasts plot with data assimilation and copy-paste it into your report.
+q27b,b. Download the two 1-day-ahead forecasts plot with no data assimilation (missing observation) and copy-paste it into your report.
+q27c,c. How do the forecasts for 2020-09-27 on each plot compare?
+q28,Q28. Make a prediction. How do you think a decrease in observation uncertainty will affect the forecasts?
+q29,Q29. Compare the initial conditions distributions (blue) in Figure A with those in Figure B. 
+q29a,a. Download the plot of forecasts assimilating data with low observation uncertainty and copy-paste it into your report.
+q29b,b. Describe how the initial conditions distributions differ between the two figures.
+q29c,c. What is the effect of a decrease in observation uncertainty on the forecasts? Does this match what you predicted in Q28?
+q30,"Q30. Make a prediction. Using your experience from the previous example, how do you think an increase in observation uncertainty will affect the forecasts?"
+q31,Q31. Compare the initial conditions distributions (blue) in Figure C above with those in Figure D. 
+q31a,a. Download the plot of forecasts assimilating data with high observation uncertainty and copy-paste it into your report.
+q31b,b. Describe how the initial conditions distributions differ between the two figures.
+q31c,c. What is the effect of an increase in observation uncertainty on the forecasts? Does this match what you predicted in Q30?
+q32,"Q32. Make a prediction by filling in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.'"
+q33,Q33. Describe the series of one-day-ahead forecasts with no data assimilation.
+q33a,a. Download the plot of a series of one-day-ahead forecasts with no data assimilation and copy-paste it into your report.
+q33b,b. Describe how the central tendency (most likely outcome predicted for each day) of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q33c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when no data are assimilated.
+q34,Q34. Assess the series of one-day-ahead forecasts with no data assimilation.
+q34a,"a. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
+q34b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with no data assimilation. How well do you think the forecasts are performing?"
+q35,Q35. Describe the series of one-day-ahead forecasts with weekly data assimilation.
+q35a,a. Download the plot of a series of one-day-ahead forecasts with weekly data assimilation and copy-paste it into your report.
+q35b,b. Describe how the central tendency (most likely outcome predicted for each day) of the 1-day-ahead forecasts changes over time when weekly data are assimilated.
+q35c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when weekly data are assimilated.
+q36,Q36. Assess the series of one-day-ahead forecasts with weekly data assimilation.
+q36a,"a. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
+q36b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with weekly data assimilation. How well do you think the forecasts are performing?"
+q37,Q37. Describe the series of one-day-ahead forecasts with daily data assimilation.
+q37a,a. Download the plot of a series of one-day-ahead forecasts with daily data assimilation and copy-paste it into your report.
+q37b,b. Describe how the central tendency (most likely outcome predicted for each day) of the 1-day-ahead forecasts changes over time when daily data are assimilated.
+q37c,c. Describe how the uncertainty distribution of the 1-day-ahead forecasts changes over time when daily data are assimilated.
+q38,Q38. Assess the series of one-day-ahead forecasts with daily data assimilation.
+q38a,"a. Click the ""show observations"" checkbox under the plot above, and then visually assess the forecasts and describe their accuracy. How well do they match observations?"
+q38b,"b. Click the buttons to calculate bias and RMSE, and then use the values of bias and RMSE to assess the forecasts with daily data assimilation. How well do you think the forecasts are performing?"
+q39,"Q39. Fill in the blank: as the frequency of data assimilation increases, forecast accuracy ____________. Choose from 'increases', 'decreases', or 'stays the same.' How does your answer now compare to what your answer in Q32?"
+q40,"Q40. Make a preliminary recommendation. Based on what you have learned in Activities A and B, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
+q41,Q41. Make a management decision.
+q41a,a. Download the plot of the series of forecasts generated using the current forecasting system and copy-paste it into your report.
+q41b,"b. Based on the forecasts presented here, as a manager, would you recommend a beach closure for Saturday, October 11?"
+q42,Q42. Make a management decision.
+q42a,a. Download the plot of the series of forecasts generated using the borrowed high-frequency sensor and copy-paste it into your report.
+q42b,"b. Based on the forecasts presented here, as a manager, would you recommend a beach closure for Saturday, October 11?"
+q43,Q43. Compare the two series of forecasts.
+q43a,"a. Download the plot of the series of forecasts generated using the current forecasting system AND the observation for Saturday, Oct. 11 and copy-paste it into your report."
+q43b,"b. Download the plot of the series of forecasts generated using the borrowed high-frequency sensor AND the observation for Saturday, Oct. 11 and copy-paste it into your report."
+q43c,"c. Which forecast series - the one with or without the high-frequency sensor data - provided a more accurate forecast for Saturday, Oct. 11?"
+q43d,"d. How did your lake closure decision made using the forecast series with weekly, manual data assimilation compare to the decision made using the forecast series with daily high-frequency sensor data assimilation?"
+q44,"Q44. Compare the values of bias and RMSE for the forecast series with data assimilation of weekly manual data vs. the forecast series with data assimilation of daily sensor data. Overall, which forecast series produces more accurate forecasts over the trial forecasting period?"
+q45,Q45. Make a final recommendation.
+q45a,"a. Based on what you have learned from your forecast trials with the high-frequency sensor over the full week of forecasts, do you recommend that the Green Reservoir management authority invest in a new high-frequency sensor to inform their forecasts?"
+q45b,b. Briefly explain the reasoning behind your final recommendation. Did it change from the preliminary recommendation that you made in Q.40?
