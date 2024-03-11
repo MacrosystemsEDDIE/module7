@@ -1298,7 +1298,7 @@ ui <- function(req) {
                                              hr(),
                                              fluidRow(
                                                column(12,
-                                                      h3("How much observation uncertainty is associatiated with chlorophyll-a measurements in lakes?"),
+                                                      h3("How much observation uncertainty is associated with chlorophyll-a measurements in lakes?"),
                                                       h4(tags$em("Different methods of collecting data have varying levels of observation uncertainty. Read the text and scroll through the slides below to learn about observation uncertainty in chl-a measurements."))
                                                ),
                                                column(4,
