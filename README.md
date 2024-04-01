@@ -2,19 +2,18 @@
 # [Macrosystems EDDIE](https://serc.carleton.edu/eddie/macrosystems/index.html)
 ## Module 7: Using Data to Improve Ecological Forecasts
 [![](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=white&logo=RStudio&logoColor=blue)](https://macrosystemseddie.shinyapps.io/module7/)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MacrosystemsEDDIE/module7/main?urlpath=shiny/app/)
 <a href="url"><img src="app/www/mod7_conceptual_figure.png" align="right" height="220" width="293" ></a>
 ### Summary
 Here is the code for running the Macrosystems EDDIE Module 7: _Using Data to Improve Ecological Forecasts_. Below are instructions on how to access the Shiny app *via* a web browser and also a detailed guide below for launching the R Shiny App locally on your own computer. For more details about teaching this module please visit our [website](https://serc.carleton.edu/eddie/teaching_materials/modules/module7.html).
 
 ## Accessing the Shiny App _via_ a web browser
 The Shiny app for this module can be accessed through any internet browser either on [shinyapps.io](https://macrosystemseddie.shinyapps.io/module7/) or [mybinder.org](https://mybinder.org/v2/gh/MacrosystemsEDDIE/module7/main?urlpath=shiny/app/).
-When launching first it will take a while for the Shiny app to boot up. If you are using this in a large class (>20 users at the same time), we would recommend splitting the group into two and using **both** [shinyapps.io](https://macrosystemseddie.shinyapps.io/module7/) and [mybinder.org](https://mybinder.org/v2/gh/MacrosystemsEDDIE/module7/main?urlpath=shiny/app/).
+When launching first it will take a while for the Shiny app to boot up. If you are using this module in a large class (>50 users at the same time), you may consider asking students to run the module locally on their own computers (see instructions below).
 
 ##  Running the Shiny App on your computer
 ### Pre-requisites
-1. Latest version of [R](https://cran.r-project.org/) installed (currently R 4.0.3 as of 2021-01-22).  
-2. [RStudio](https://rstudio.com/products/rstudio/download/) installed (preferably >1.3).  
+1. Latest version of [R](https://cran.r-project.org/) installed.  
+2. Latest version of [RStudio](https://rstudio.com/products/rstudio/download/) installed.  
 
 ### Step 1: Download this repository
 There are two options:  
